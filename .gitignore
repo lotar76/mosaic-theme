@@ -1,0 +1,24 @@
+# WordPress
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.sublime-*
+
+# Temp files
+*.log
+*.tmp
+*.bak
+*~
+
+# Node (if you add build tools later)
+node_modules/
+package-lock.json
+yarn.lock
+
+# macOS
+.AppleDouble
+.LSOverride
+

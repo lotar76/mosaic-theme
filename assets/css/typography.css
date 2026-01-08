@@ -1,0 +1,82 @@
+/* Типографика */
+
+/* Заголовки */
+h1, .h1 {
+  font-family: var(--font-century) !important;
+  font-weight: 400 !important;
+  font-style: normal;
+  font-size: 70px !important;
+  line-height: 100%;
+  letter-spacing: -0.01em;
+}
+
+h2, .h2 {
+  font-family: var(--font-century);
+  font-weight: 400;
+  font-style: normal;
+}
+
+h3, .h3 {
+  font-family: var(--font-century);
+  font-weight: 400;
+}
+
+h4, .h4 {
+  font-family: var(--font-century);
+  font-weight: 400;
+}
+
+h5, .h5 {
+  font-family: var(--font-century);
+  font-weight: 400;
+}
+
+h6, .h6 {
+  font-family: var(--font-century);
+  font-weight: 400;
+}
+
+/* Основной текст */
+body {
+  font-family: var(--font-century);
+  font-weight: 400;
+}
+
+/* Параграфы */
+p {
+  line-height: 1.6;
+}
+
+/* Ссылки */
+a {
+  transition: color 0.3s ease;
+}
+
+/* Текстовые классы */
+.text2 {
+  font-family: var(--font-century);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 145%;
+  letter-spacing: 0;
+  color: #fff;
+}
+
+.text3 {
+  font-family: var(--font-century);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 145%;
+  letter-spacing: 0;
+}
+
+.subtitle {
+  font-family: var(--font-century);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 22px;
+  line-height: 145%;
+  letter-spacing: 0;
+}

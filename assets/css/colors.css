@@ -1,0 +1,19 @@
+/* Цветовая палитра */
+
+:root {
+  /* Базовые цвета */
+  --color-black: #0F0303;
+  --color-gray: #1C0101;
+  --color-stroke: #CBD5E0;
+  --color-back: #F6F6F6;
+  --color-white: #FFFFFF;
+
+  /* Primary */
+  --color-primary: #A36217;
+  --color-primary-15: #A3621726;
+  --color-primary-25: #A3621740;
+
+  /* Статусы */
+  --color-error: #EF3D47;
+  --color-success: #46DF83;
+}
