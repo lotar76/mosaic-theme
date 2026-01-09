@@ -114,24 +114,24 @@ if (count($breadcrumbs) <= 1) {
 }
 ?>
 
-<nav aria-label="Breadcrumb" class="bg-black py-4 md:py-6">
+<nav aria-label="Breadcrumbs" class="bg-black">
 	<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
-		<ol class="flex flex-wrap items-center gap-2 text-sm md:text-base">
+		<ol class="flex flex-wrap items-center gap-2 text-[15px] leading-[16px]">
 			<?php foreach ($breadcrumbs as $index => $crumb) : ?>
 				<?php $isLast = ($index === count($breadcrumbs) - 1); ?>
 				<li class="flex items-center gap-2">
 					<?php if (!$isLast && $crumb['url'] !== '') : ?>
 						<a 
 							href="<?= esc_url($crumb['url']); ?>" 
-							class="text-white/70 hover:text-primary transition-colors"
+							class="text-[#847575] hover:text-primary transition-colors"
 							tabindex="0"
 							aria-label="<?= esc_attr('Перейти: ' . $crumb['title']); ?>"
 						>
 							<?= esc_html($crumb['title']); ?>
 						</a>
-						<span class="text-white/40" aria-hidden="true">/</span>
+						<span class="text-[#847575]" aria-hidden="true">●</span>
 					<?php else : ?>
-						<span class="text-white" aria-current="page">
+						<span class="text-[#847575]" aria-current="page">
 							<?= esc_html($crumb['title']); ?>
 						</span>
 					<?php endif; ?>
