@@ -37,13 +37,7 @@ body {
   /* Стили для мобильных устройств */
 }
 
-/* Contact block: force exact paddings on tablet+desktop */
-@media (min-width: 1280px) {
-  [data-contact] {
-    padding-top: 100px;
-    padding-bottom: 100px;
-  }
-}
+/* Contact block: force exact paddings removed - spacing управляется через space-y на уровне контейнера */
 
 /* Анимации для header menu */
 /* Dropdown menu - плавное появление сверху */
@@ -510,4 +504,29 @@ body {
     color: rgba(255, 255, 255, 0.6);
   }
 }
+
+/* Section Spacing Management */
+/* 
+  ❌ DEPRECATED: .section-spacing классы больше не используются
+  
+  Правильный подход: space-y на контейнере
+  
+  Было (неправильно):
+    <div class="section-spacing">
+      <?php get_template_part('block-1'); ?>
+    </div>
+    <div class="section-spacing">
+      <?php get_template_part('block-2'); ?>
+    </div>
+    Результат: 160px между блоками (padding-bottom + padding-top)
+  
+  Стало (правильно):
+    <div class="py-[80px] space-y-[80px] min-[1280px]:py-[100px] min-[1280px]:space-y-[100px]">
+      <?php get_template_part('block-1'); ?>
+      <?php get_template_part('block-2'); ?>
+    </div>
+    Результат: 80px между блоками (margin-top на всех кроме первого)
+  
+  См. .cursor/rules/workflow.mdc для деталей
+*/
 

@@ -8,7 +8,7 @@ declare(strict_types=1);
 ?>
 
 <!-- Benefits Section -->
-<section class="bg-black py-[80px] min-[1280px]:py-[100px]" data-benefits>
+<section class="bg-black" data-benefits>
 	<div class="mx-auto w-full max-w-[1722px]">
 		<!-- Desktop (>=1920) -->
 		<div class="hidden min-[1920px]:block">
