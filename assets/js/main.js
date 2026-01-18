@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initShowroomCollectionsSlider();
     initShowroomEventsSlider();
     initShowroomMap();
+    initShowroomLightbox();
 });
 
 /**
@@ -1331,7 +1332,7 @@ const initShowroomHeroSlider = () => {
 };
 
 /**
- * Showroom Collections Slider (slow marquee if > 4 items)
+ * Showroom Collections Slider (marquee like Portfolio if > 4 items)
  */
 const initShowroomCollectionsSlider = () => {
     const slider = document.querySelector('[data-collections-slider]');
@@ -1345,29 +1346,51 @@ const initShowroomCollectionsSlider = () => {
     if (!track || slides.length === 0) return;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const SPEED_PX_PER_S = 30; // Slower marquee
+    const SPEED_PX_PER_S = 38; // Same as Portfolio
 
-    /** @type {{ rafId: number | null, lastTs: number | null, offsetX: number, originalWidth: number, paused: boolean }} */
-    const marquee = { rafId: null, lastTs: null, offsetX: 0, originalWidth: 0, paused: false };
-
-    const stopMarquee = () => {
-        if (marquee.rafId !== null) cancelAnimationFrame(marquee.rafId);
-        marquee.rafId = null;
-        marquee.lastTs = null;
+    const setScrollMode = () => {
+        slider.classList.add('is-scroll');
+        track.style.transform = 'none';
+        track.style.transition = 'none';
     };
 
-    const ensureClones = () => {
+    const setTranslateMode = () => {
+        slider.classList.remove('is-scroll');
+        slider.classList.remove('is-autoplay');
+        track.style.transition = '';
+    };
+
+    /** @type {{ rafId: number | null, lastTs: number | null, offsetX: number, originalWidth: number, paused: boolean }} */
+    const marqueeTransform = { rafId: null, lastTs: null, offsetX: 0, originalWidth: 0, paused: false };
+    /** @type {{ rafId: number | null, lastTs: number | null, originalWidth: number, pausedUntil: number }} */
+    const marqueeScroll = { rafId: null, lastTs: null, originalWidth: 0, pausedUntil: 0 };
+    const MOBILE_USER_PAUSE_MS = 2200;
+
+    const stopMarquee = () => {
+        if (marqueeTransform.rafId !== null) cancelAnimationFrame(marqueeTransform.rafId);
+        marqueeTransform.rafId = null;
+        marqueeTransform.lastTs = null;
+        if (marqueeScroll.rafId !== null) cancelAnimationFrame(marqueeScroll.rafId);
+        marqueeScroll.rafId = null;
+        marqueeScroll.lastTs = null;
+        slider.classList.remove('is-autoplay');
+    };
+
+    const ensureClonesForTransform = () => {
+        const width = getViewportWidth();
+        if (isMobile(width)) return false;
         if (prefersReducedMotion) return false;
+        if (!document.body.contains(slider)) return false;
 
         Array.from(track.querySelectorAll('[data-collections-clone="1"]')).forEach((n) => n.remove());
 
         const originalChildren = Array.from(track.children);
         if (originalChildren.length === 0) return false;
 
-        marquee.originalWidth = track.scrollWidth;
-        if (marquee.originalWidth <= 0) return false;
+        marqueeTransform.originalWidth = track.scrollWidth;
+        if (marqueeTransform.originalWidth <= 0) return false;
 
-        while (track.scrollWidth < marquee.originalWidth * 2) {
+        while (track.scrollWidth < marqueeTransform.originalWidth * 2) {
             originalChildren.forEach((child) => {
                 const clone = child.cloneNode(true);
                 if (clone instanceof HTMLElement) clone.dataset.collectionsClone = '1';
@@ -1377,57 +1400,124 @@ const initShowroomCollectionsSlider = () => {
 
         track.style.transition = 'none';
         track.style.willChange = 'transform';
+        slider.classList.remove('is-scroll');
         return true;
     };
 
-    const tick = (ts) => {
-        if (marquee.paused) {
-            marquee.lastTs = ts;
-            marquee.rafId = requestAnimationFrame(tick);
+    const tickTransform = (ts) => {
+        if (marqueeTransform.paused) {
+            marqueeTransform.lastTs = ts;
+            marqueeTransform.rafId = requestAnimationFrame(tickTransform);
             return;
         }
 
-        if (marquee.lastTs === null) marquee.lastTs = ts;
-        const dt = Math.min(48, ts - marquee.lastTs);
-        marquee.lastTs = ts;
+        if (marqueeTransform.lastTs === null) marqueeTransform.lastTs = ts;
+        const dt = Math.min(48, ts - marqueeTransform.lastTs);
+        marqueeTransform.lastTs = ts;
 
-        marquee.offsetX += (SPEED_PX_PER_S * dt) / 1000;
-        if (marquee.originalWidth > 0 && marquee.offsetX >= marquee.originalWidth) {
-            marquee.offsetX -= marquee.originalWidth;
+        marqueeTransform.offsetX += (SPEED_PX_PER_S * dt) / 1000;
+        if (marqueeTransform.originalWidth > 0 && marqueeTransform.offsetX >= marqueeTransform.originalWidth) {
+            marqueeTransform.offsetX -= marqueeTransform.originalWidth;
         }
-        track.style.transform = `translateX(-${marquee.offsetX}px)`;
-        marquee.rafId = requestAnimationFrame(tick);
+        track.style.transform = `translateX(-${marqueeTransform.offsetX}px)`;
+        marqueeTransform.rafId = requestAnimationFrame(tickTransform);
     };
 
-    const startMarquee = () => {
+    const startMarqueeDesktop = () => {
         stopMarquee();
-        marquee.offsetX = 0;
-        marquee.paused = false;
-        if (!ensureClones()) return;
-        marquee.rafId = requestAnimationFrame(tick);
+        marqueeTransform.offsetX = 0;
+        marqueeTransform.paused = false;
+        if (!ensureClonesForTransform()) return;
+        marqueeTransform.rafId = requestAnimationFrame(tickTransform);
     };
 
-    // Pause on hover/focus
-    slider.addEventListener('mouseenter', () => { marquee.paused = true; });
-    slider.addEventListener('mouseleave', () => { marquee.paused = false; });
-    slider.addEventListener('focusin', () => { marquee.paused = true; });
-    slider.addEventListener('focusout', () => { marquee.paused = false; });
+    const ensureClonesForScroll = () => {
+        const width = getViewportWidth();
+        if (!isMobile(width)) return false;
+        if (prefersReducedMotion) return false;
+        if (!document.body.contains(slider)) return false;
 
-    // Manual navigation
+        Array.from(track.querySelectorAll('[data-collections-clone="1"]')).forEach((n) => n.remove());
+        marqueeScroll.originalWidth = track.scrollWidth;
+        if (marqueeScroll.originalWidth <= 0) return false;
+
+        const originals = Array.from(track.children);
+        if (originals.length === 0) return false;
+
+        while (track.scrollWidth < marqueeScroll.originalWidth * 2) {
+            originals.forEach((child) => {
+                const clone = child.cloneNode(true);
+                if (clone instanceof HTMLElement) clone.dataset.collectionsClone = '1';
+                track.appendChild(clone);
+            });
+        }
+        return true;
+    };
+
+    const tickScroll = (ts) => {
+        const width = getViewportWidth();
+        if (!isMobile(width)) {
+            stopMarquee();
+            return;
+        }
+
+        if (Date.now() < marqueeScroll.pausedUntil) {
+            marqueeScroll.lastTs = ts;
+            marqueeScroll.rafId = requestAnimationFrame(tickScroll);
+            return;
+        }
+
+        slider.classList.add('is-autoplay');
+        if (marqueeScroll.lastTs === null) marqueeScroll.lastTs = ts;
+        const dt = Math.min(48, ts - marqueeScroll.lastTs);
+        marqueeScroll.lastTs = ts;
+
+        slider.scrollLeft += (SPEED_PX_PER_S * dt) / 1000;
+        if (marqueeScroll.originalWidth > 0 && slider.scrollLeft >= marqueeScroll.originalWidth) {
+            slider.scrollLeft -= marqueeScroll.originalWidth;
+        }
+        marqueeScroll.rafId = requestAnimationFrame(tickScroll);
+    };
+
+    const startMarqueeMobile = () => {
+        stopMarquee();
+        setScrollMode();
+        if (!ensureClonesForScroll()) return;
+        slider.scrollLeft = 0;
+        marqueeScroll.pausedUntil = Date.now() + 700;
+        marqueeScroll.rafId = requestAnimationFrame(tickScroll);
+    };
+
+    // Pause on hover/focus for readability
+    slider.addEventListener('mouseenter', () => { marqueeTransform.paused = true; });
+    slider.addEventListener('mouseleave', () => { marqueeTransform.paused = false; });
+    slider.addEventListener('focusin', () => { marqueeTransform.paused = true; });
+    slider.addEventListener('focusout', () => { marqueeTransform.paused = false; });
+
+    // Mobile user interaction pauses autoplay
+    const pauseMobileByUser = () => {
+        marqueeScroll.pausedUntil = Date.now() + MOBILE_USER_PAUSE_MS;
+        slider.classList.remove('is-autoplay');
+    };
+    slider.addEventListener('pointerdown', pauseMobileByUser, { passive: true });
+    slider.addEventListener('touchstart', pauseMobileByUser, { passive: true });
+    slider.addEventListener('wheel', pauseMobileByUser, { passive: true });
+
+    // Manual navigation (desktop)
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
-            marquee.offsetX = Math.max(0, marquee.offsetX - 300);
-            track.style.transform = `translateX(-${marquee.offsetX}px)`;
+            marqueeTransform.offsetX = Math.max(0, marqueeTransform.offsetX - 300);
+            track.style.transform = `translateX(-${marqueeTransform.offsetX}px)`;
         });
     }
 
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
-            marquee.offsetX += 300;
-            if (marquee.originalWidth > 0 && marquee.offsetX >= marquee.originalWidth) {
-                marquee.offsetX -= marquee.originalWidth;
+            marqueeTransform.offsetX += 300;
+            if (marqueeTransform.originalWidth > 0 && marqueeTransform.offsetX >= marqueeTransform.originalWidth) {
+                marqueeTransform.offsetX -= marqueeTransform.originalWidth;
             }
-            track.style.transform = `translateX(-${marquee.offsetX}px)`;
+            track.style.transform = `translateX(-${marqueeTransform.offsetX}px)`;
         });
     }
 
@@ -1436,10 +1526,35 @@ const initShowroomCollectionsSlider = () => {
             stopMarquee();
             return;
         }
-        startMarquee();
+        const width = getViewportWidth();
+        if (isMobile(width)) {
+            startMarqueeMobile();
+            return;
+        }
+        startMarqueeDesktop();
     });
 
-    startMarquee();
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (isMobile(getViewportWidth())) {
+                setScrollMode();
+                slider.scrollLeft = 0;
+                stopMarquee();
+                startMarqueeMobile();
+                return;
+            }
+            startMarqueeDesktop();
+        }, 100);
+    });
+
+    // Initialize
+    if (isMobile(getViewportWidth())) {
+        startMarqueeMobile();
+    } else {
+        startMarqueeDesktop();
+    }
 };
 
 /**
@@ -1553,7 +1668,7 @@ const initShowroomEventsSlider = () => {
 };
 
 /**
- * Showroom Map (Yandex Maps)
+ * Showroom Map (Yandex Maps) - серая карта с прямоугольным маркером
  */
 const initShowroomMap = () => {
     const mapContainer = document.getElementById('showroom-map');
@@ -1562,6 +1677,19 @@ const initShowroomMap = () => {
     const lat = parseFloat(mapContainer.dataset.lat || '45.0355');
     const lng = parseFloat(mapContainer.dataset.lng || '38.9753');
     const zoom = parseInt(mapContainer.dataset.zoom || '15', 10);
+    const address = mapContainer.dataset.address || '';
+    const phone = mapContainer.dataset.phone || '';
+    const hours = mapContainer.dataset.hours || '';
+
+    // Формируем содержимое balloon
+    const balloonContent = `
+        <div style="font-size:13px;line-height:1.4;">
+            <b>Si Mosaic Showroom</b><br>
+            ${address ? `${address}<br>` : ''}
+            ${hours ? `${hours}<br>` : ''}
+            ${phone ? `<a href="tel:${phone.replace(/[^+\d]/g, '')}" style="color:#A36217;">${phone}</a>` : ''}
+        </div>
+    `.trim();
 
     // Load Yandex Maps API
     const script = document.createElement('script');
@@ -1574,15 +1702,30 @@ const initShowroomMap = () => {
             const map = new ymaps.Map(mapContainer, {
                 center: [lat, lng],
                 zoom: zoom,
-                controls: ['zoomControl']
+                controls: []
             });
 
+            // Добавляем кнопки зума (+ и -)
+            // eslint-disable-next-line no-undef
+            map.controls.add('zoomControl', {
+                size: 'small',
+                position: {
+                    right: 10,
+                    top: 10
+                }
+            });
+
+            // Кастомный прямоугольный маркер (ромб) как на дизайне
+            const svgIcon = '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="2.93" width="24" height="24" transform="rotate(45 20 2.93)" fill="#A36217"/></svg>';
             // eslint-disable-next-line no-undef
             const placemark = new ymaps.Placemark([lat, lng], {
                 hintContent: 'Si Mosaic Showroom',
-                balloonContent: 'Шоурум Si Mosaic'
+                balloonContentBody: balloonContent
             }, {
-                preset: 'islands#darkOrangeIcon'
+                iconLayout: 'default#image',
+                iconImageHref: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon),
+                iconImageSize: [40, 40],
+                iconImageOffset: [-20, -20]
             });
 
             map.geoObjects.add(placemark);
@@ -1590,5 +1733,65 @@ const initShowroomMap = () => {
         });
     };
     document.head.appendChild(script);
+};
+
+/**
+ * Showroom Lightbox - fullscreen image viewer
+ */
+const initShowroomLightbox = () => {
+    const modal = document.querySelector('[data-lightbox-modal]');
+    if (!modal) return;
+
+    const image = modal.querySelector('[data-lightbox-image]');
+    const title = modal.querySelector('[data-lightbox-title]');
+    const closeBtn = modal.querySelector('[data-lightbox-close]');
+    const triggers = document.querySelectorAll('[data-lightbox-open]');
+
+    if (!image || !title || triggers.length === 0) return;
+
+    const open = (src, titleText) => {
+        image.src = src;
+        image.alt = titleText;
+        title.textContent = titleText;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const close = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
+        image.src = '';
+    };
+
+    triggers.forEach((trigger) => {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            const src = trigger.dataset.lightboxSrc || '';
+            const titleText = trigger.dataset.lightboxTitle || '';
+            if (src) {
+                open(src, titleText);
+            }
+        });
+    });
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', close);
+    }
+
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            close();
+        }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            close();
+        }
+    });
 };
 

@@ -21,6 +21,12 @@ declare(strict_types=1);
  *   video: array{
  *     title: string,
  *     url: string
+ *   },
+ *   requisites: array{
+ *     legal_address: string,
+ *     actual_address: string,
+ *     inn: string,
+ *     okved: string
  *   }
  * }
  */
@@ -38,6 +44,12 @@ function mosaic_get_about_page_defaults(): array {
 		'video' => [
 			'title' => 'Видео о нашей компании',
 			'url' => '',
+		],
+		'requisites' => [
+			'legal_address' => 'Краснодар, Селезнёва 204',
+			'actual_address' => 'Краснодар, Селезнёва 204',
+			'inn' => '',
+			'okved' => '',
 		],
 	];
 }
@@ -89,6 +101,17 @@ function mosaic_sanitize_about_page_option(mixed $value): array {
 	$videoTitle = sanitize_text_field((string) ($video['title'] ?? ''));
 	$videoUrl = esc_url_raw(trim((string) ($video['url'] ?? '')));
 
+	// Requisites
+	$requisites = $value['requisites'] ?? [];
+	if (!is_array($requisites)) {
+		$requisites = [];
+	}
+
+	$legalAddress = sanitize_text_field((string) ($requisites['legal_address'] ?? ''));
+	$actualAddress = sanitize_text_field((string) ($requisites['actual_address'] ?? ''));
+	$inn = sanitize_text_field((string) ($requisites['inn'] ?? ''));
+	$okved = sanitize_text_field((string) ($requisites['okved'] ?? ''));
+
 	return [
 		'hero' => [
 			'title' => $heroTitle !== '' ? $heroTitle : $defaults['hero']['title'],
@@ -102,6 +125,12 @@ function mosaic_sanitize_about_page_option(mixed $value): array {
 		'video' => [
 			'title' => $videoTitle !== '' ? $videoTitle : $defaults['video']['title'],
 			'url' => $videoUrl,
+		],
+		'requisites' => [
+			'legal_address' => $legalAddress,
+			'actual_address' => $actualAddress,
+			'inn' => $inn,
+			'okved' => $okved,
 		],
 	];
 }
@@ -310,10 +339,19 @@ add_action('admin_post_mosaic_save_about_page', static function (): void {
 		'url' => isset($_POST['video_url']) ? (string) $_POST['video_url'] : '',
 	];
 
+	// Requisites
+	$requisites = [
+		'legal_address' => isset($_POST['requisites_legal_address']) ? (string) $_POST['requisites_legal_address'] : '',
+		'actual_address' => isset($_POST['requisites_actual_address']) ? (string) $_POST['requisites_actual_address'] : '',
+		'inn' => isset($_POST['requisites_inn']) ? (string) $_POST['requisites_inn'] : '',
+		'okved' => isset($_POST['requisites_okved']) ? (string) $_POST['requisites_okved'] : '',
+	];
+
 	$data = mosaic_sanitize_about_page_option([
 		'hero' => $hero,
 		'gallery' => $gallery,
 		'video' => $video,
+		'requisites' => $requisites,
 	]);
 
 	update_option('mosaic_about_page', $data, false);
@@ -332,6 +370,7 @@ function mosaic_render_about_page_admin(): void {
 	$hero = $data['hero'];
 	$gallery = $data['gallery'];
 	$video = $data['video'];
+	$requisites = $data['requisites'];
 
 	// Get gallery previews
 	$galleryPreviews = [];
@@ -405,6 +444,29 @@ function mosaic_render_about_page_admin(): void {
 	echo '<p class="mosaic-field"><label class="mosaic-label">Ссылка на видео (YouTube или Vimeo)</label>';
 	echo '<input type="url" class="mosaic-input" name="video_url" value="' . esc_attr($video['url']) . '" placeholder="https://www.youtube.com/watch?v=..."></p>';
 	echo '<p class="mosaic-muted">Вставьте ссылку на видео YouTube или Vimeo. Например: https://www.youtube.com/watch?v=xxxxx</p>';
+
+	echo '</div></div>';
+
+	// Requisites Section
+	echo '<div class="mosaic-section">';
+	echo '<div class="mosaic-section-header"><p class="mosaic-section-title">Реквизиты</p></div>';
+	echo '<div class="mosaic-section-body">';
+
+	echo '<div class="two-cols">';
+	echo '<p class="mosaic-field"><label class="mosaic-label">Юридический адрес</label>';
+	echo '<input type="text" class="mosaic-input" name="requisites_legal_address" value="' . esc_attr($requisites['legal_address']) . '"></p>';
+	echo '<p class="mosaic-field"><label class="mosaic-label">Фактический адрес</label>';
+	echo '<input type="text" class="mosaic-input" name="requisites_actual_address" value="' . esc_attr($requisites['actual_address']) . '"></p>';
+	echo '</div>';
+
+	echo '<div class="two-cols">';
+	echo '<p class="mosaic-field"><label class="mosaic-label">ИНН</label>';
+	echo '<input type="text" class="mosaic-input" name="requisites_inn" value="' . esc_attr($requisites['inn']) . '"></p>';
+	echo '<p class="mosaic-field"><label class="mosaic-label">Основной код ОКВЭД</label>';
+	echo '<input type="text" class="mosaic-input" name="requisites_okved" value="' . esc_attr($requisites['okved']) . '"></p>';
+	echo '</div>';
+
+	echo '<p class="mosaic-muted">Эти данные отображаются в блоке "Реквизиты" на странице О нас.</p>';
 
 	echo '</div></div>';
 

@@ -261,17 +261,19 @@ if ($video['url'] !== '') {
 		</section>
 	<?php endif; ?>
 
-	<!-- Reusable Blocks Container (as on portfolio page) -->
-	<div class="py-[80px] min-[1280px]:py-[100px] space-y-[80px] min-[1280px]:space-y-[100px]">
+	<!-- Reusable Blocks Container -->
+	<div>
 		<!-- Benefits Section -->
-		<?php get_template_part('template-parts/sections/benefits'); ?>
+		<div class="pb-[60px] min-[1280px]:pb-[80px]">
+			<?php get_template_part('template-parts/sections/benefits'); ?>
+		</div>
 
 		<!-- Contact Form Section -->
 		<?php get_template_part('template-parts/sections/contact-form'); ?>
-	</div>
 
-	<!-- Requisites Section -->
-	<?php get_template_part('template-parts/requisites'); ?>
+		<!-- Requisites Section -->
+		<?php get_template_part('template-parts/requisites'); ?>
+	</div>
 </main>
 
 <script>

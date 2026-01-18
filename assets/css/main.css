@@ -761,6 +761,95 @@ body {
   }
 }
 
+/* Showroom Map - grayscale filter for tiles only, not markers */
+#showroom-map ymaps[class*="ground-pane"],
+#showroom-map ymaps[class*="copyrights-pane"],
+#showroom-map ymaps[class*="graphics-pane"] > ymaps:first-child {
+  filter: grayscale(100%);
+}
+
+/* Ensure marker stays colored */
+#showroom-map ymaps[class*="places-pane"],
+#showroom-map ymaps[class*="overlay-pane"],
+#showroom-map ymaps[class*="placemark"] {
+  filter: none !important;
+}
+
+/* Showroom Collections Slider - like Portfolio marquee */
+[data-showroom-collections] .collections-slider {
+  overflow: hidden;
+}
+
+[data-showroom-collections] .collections-track {
+  gap: 16px;
+}
+
+[data-showroom-collections] .collections-slide {
+  scroll-snap-align: start;
+}
+
+[data-showroom-collections] .collections-slider.is-scroll {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+}
+
+[data-showroom-collections] .collections-slider.is-scroll::-webkit-scrollbar {
+  height: 0;
+}
+
+[data-showroom-collections] .collections-slider.is-autoplay {
+  scroll-snap-type: none;
+}
+
+[data-showroom-collections] .collections-slider.is-scroll .collections-track {
+  transform: none !important;
+  transition: none !important;
+  width: max-content;
+}
+
+/* Mobile slide sizes */
+[data-showroom-collections] .collections-slide {
+  width: 280px;
+}
+
+[data-showroom-collections] .collections-slide .aspect-\[4\/5\] {
+  width: 280px;
+  height: 350px;
+}
+
+@media (min-width: 1280px) and (max-width: 1919px) {
+  [data-showroom-collections] .collections-track {
+    gap: 24px;
+  }
+
+  [data-showroom-collections] .collections-slide {
+    width: 280px;
+  }
+
+  [data-showroom-collections] .collections-slide .aspect-\[4\/5\] {
+    width: 280px;
+    height: 350px;
+  }
+}
+
+@media (min-width: 1920px) {
+  [data-showroom-collections] .collections-track {
+    gap: 24px;
+  }
+
+  [data-showroom-collections] .collections-slide {
+    width: 300px;
+  }
+
+  [data-showroom-collections] .collections-slide .aspect-\[4\/5\] {
+    width: 300px;
+    height: 375px;
+  }
+}
+
 /* Section Spacing Management */
 /*
   ❌ DEPRECATED: .section-spacing классы больше не используются

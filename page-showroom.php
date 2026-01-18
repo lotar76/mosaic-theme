@@ -59,7 +59,7 @@ if (count($galleryImages) === 0) {
 	</div>
 
 	<!-- Hero Section -->
-	<section class="bg-black py-[40px] min-[1280px]:py-[60px]">
+	<section class="bg-black pt-[40px] min-[1280px]:pt-[60px]">
 		<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
 			<!-- Mobile: <=1279 -->
 			<div class="max-[1279px]:block min-[1280px]:hidden">
@@ -141,14 +141,14 @@ if (count($galleryImages) === 0) {
 			</div>
 		</div>
 
-		<!-- Full-width Gallery Slider -->
-		<div class="mt-8 min-[1280px]:mt-12">
+		<!-- Gallery Slider (ограничен контентом) -->
+		<div class="mt-8 min-[1280px]:mt-12 max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
 			<?php if (count($galleryImages) > 1) : ?>
 				<div class="showroom-hero-slider relative overflow-hidden" data-showroom-hero-slider>
 					<div class="showroom-hero-track flex transition-transform duration-700 ease-in-out" data-showroom-hero-track>
 						<?php foreach ($galleryImages as $img) : ?>
 							<div class="showroom-hero-slide flex-shrink-0 w-full" data-showroom-hero-slide>
-								<div class="relative w-full h-[400px] max-[1279px]:h-[300px] min-[1920px]:h-[600px]">
+								<div class="relative w-full h-[300px] min-[1280px]:h-[500px] min-[1920px]:h-[600px]">
 									<img
 										src="<?= esc_url($img['url']); ?>"
 										alt="<?= esc_attr($img['alt']); ?>"
@@ -161,7 +161,7 @@ if (count($galleryImages) === 0) {
 						<?php endforeach; ?>
 					</div>
 
-					<!-- Navigation Arrows -->
+					<!-- Navigation Arrows (только если >1 фото) -->
 					<button
 						type="button"
 						class="showroom-hero-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10"
@@ -184,7 +184,8 @@ if (count($galleryImages) === 0) {
 					</button>
 				</div>
 			<?php else : ?>
-				<div class="relative w-full h-[400px] max-[1279px]:h-[300px] min-[1920px]:h-[600px]">
+				<!-- Одно фото - без стрелок -->
+				<div class="relative w-full h-[300px] min-[1280px]:h-[500px] min-[1920px]:h-[600px]">
 					<img
 						src="<?= esc_url($galleryImages[0]['url']); ?>"
 						alt="<?= esc_attr($galleryImages[0]['alt']); ?>"
@@ -197,28 +198,28 @@ if (count($galleryImages) === 0) {
 		</div>
 
 		<!-- Description and Button -->
-		<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px] mt-8 min-[1280px]:mt-12">
+		<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px] mt-6 min-[1280px]:mt-8 pb-6 min-[1280px]:pb-8">
 			<div class="flex flex-col min-[1280px]:flex-row min-[1280px]:items-center min-[1280px]:justify-between gap-6">
-				<p class="text-white/70 text-base min-[1280px]:text-lg max-w-[800px] min-[1280px]:max-w-[1000px]">
-					<?= nl2br(esc_html($hero['description'])); ?>
-				</p>
-
 				<button
 					type="button"
-					class="inline-flex items-center justify-center bg-primary hover:bg-opacity-90 text-white h-[56px] px-8 text-base transition-colors flex-shrink-0"
+					class="inline-flex items-center justify-center bg-primary hover:bg-opacity-90 text-white h-[56px] px-8 text-base transition-colors flex-shrink-0 order-2 min-[1280px]:order-1"
 					tabindex="0"
 					aria-label="<?= esc_attr($hero['button_text']); ?>"
 					data-modal-open="modal-showroom"
 				>
 					<?= esc_html($hero['button_text']); ?>
 				</button>
+
+				<p class="text-white/70 text-base min-[1280px]:text-lg max-w-[800px] min-[1280px]:max-w-[1000px] order-1 min-[1280px]:order-2">
+					<?= nl2br(esc_html($hero['description'])); ?>
+				</p>
 			</div>
 		</div>
 	</section>
 
 	<!-- Content Blocks (alternating image + text) -->
 	<?php if (count($blocks) > 0) : ?>
-		<section class="bg-black py-[60px] min-[1280px]:py-[80px]">
+		<section class="bg-black pt-6 min-[1280px]:pt-8 pb-[60px] min-[1280px]:pb-[80px]">
 			<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
 				<div class="space-y-[60px] min-[1280px]:space-y-[100px]">
 					<?php foreach ($blocks as $index => $block) :
@@ -249,9 +250,12 @@ if (count($galleryImages) === 0) {
 
 								<!-- Text -->
 								<div class="space-y-4">
-									<h2 class="text-white text-[24px] leading-[110%] font-normal">
-										<?= esc_html($block['title']); ?>
-									</h2>
+									<div>
+										<h2 class="text-white text-[24px] leading-[110%] font-normal mb-0">
+											<?= esc_html($block['title']); ?>
+										</h2>
+										<div class="w-[70px] h-[6px] bg-primary mt-4"></div>
+									</div>
 									<div class="space-y-4 text-white/70 text-base leading-[160%]">
 										<?php foreach ($textParagraphs as $p) : ?>
 											<p><?= esc_html($p); ?></p>
@@ -263,7 +267,7 @@ if (count($galleryImages) === 0) {
 
 						<!-- Tablet: 1280..1919 -->
 						<div class="hidden min-[1280px]:max-[1919px]:block">
-							<div class="grid grid-cols-2 gap-12 items-center <?= $isImageLeft ? '' : 'direction-rtl'; ?>">
+							<div class="grid grid-cols-2 gap-12 items-center">
 								<!-- Image -->
 								<div class="w-full h-[450px] overflow-hidden <?= $isImageLeft ? '' : 'order-2'; ?>">
 									<img
@@ -277,9 +281,12 @@ if (count($galleryImages) === 0) {
 
 								<!-- Text -->
 								<div class="space-y-6 <?= $isImageLeft ? '' : 'order-1'; ?>">
-									<h2 class="text-white font-century text-[40px] leading-[110%] font-normal">
-										<?= esc_html($block['title']); ?>
-									</h2>
+									<div>
+										<h2 class="text-white font-century text-[40px] leading-[110%] font-normal mb-0">
+											<?= esc_html($block['title']); ?>
+										</h2>
+										<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
+									</div>
 									<div class="space-y-4 text-white/70 text-[18px] leading-[160%]">
 										<?php foreach ($textParagraphs as $p) : ?>
 											<p><?= esc_html($p); ?></p>
@@ -305,9 +312,12 @@ if (count($galleryImages) === 0) {
 
 								<!-- Text -->
 								<div class="space-y-6 <?= $isImageLeft ? '' : 'order-1'; ?>">
-									<h2 class="text-white font-century text-[48px] leading-[110%] font-normal">
-										<?= esc_html($block['title']); ?>
-									</h2>
+									<div>
+										<h2 class="text-white font-century text-[48px] leading-[110%] font-normal mb-0">
+											<?= esc_html($block['title']); ?>
+										</h2>
+										<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
+									</div>
 									<div class="space-y-4 text-white/70 text-[20px] leading-[160%]">
 										<?php foreach ($textParagraphs as $p) : ?>
 											<p><?= esc_html($p); ?></p>
@@ -324,10 +334,11 @@ if (count($galleryImages) === 0) {
 
 	<!-- Collections Section -->
 	<?php if (count($collections['items']) > 0) : ?>
-		<section class="bg-black py-[60px] min-[1280px]:py-[80px]" data-showroom-collections>
-			<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
+		<?php $useCollectionsSlider = count($collections['items']) > 4; ?>
+		<section class="bg-black pb-[40px] min-[1280px]:pb-[60px]" data-showroom-collections>
+			<div class="max-w-[1920px] mx-auto pl-4 md:pl-8 lg:pl-16 min-[1920px]:pl-[100px] <?= $useCollectionsSlider ? 'pr-0' : 'pr-4 md:pr-8 lg:pr-16 min-[1920px]:pr-[100px]'; ?>">
 				<!-- Section Header -->
-				<div class="flex items-center justify-between mb-8 min-[1280px]:mb-12">
+				<div class="flex items-center justify-between mb-8 min-[1280px]:mb-12 <?= $useCollectionsSlider ? 'pr-4 md:pr-8 lg:pr-16 min-[1920px]:pr-[100px]' : ''; ?>">
 					<div>
 						<h2 class="text-white text-[24px] min-[1280px]:text-[40px] min-[1920px]:text-[48px] font-normal mb-0">
 							<?= esc_html($collections['title']); ?>
@@ -335,7 +346,7 @@ if (count($galleryImages) === 0) {
 						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
 					</div>
 
-					<?php if (count($collections['items']) > 4) : ?>
+					<?php if ($useCollectionsSlider) : ?>
 						<!-- Navigation Arrows (show if more than 4 items) -->
 						<div class="flex gap-[37px] max-[1279px]:hidden">
 							<button
@@ -363,23 +374,28 @@ if (count($galleryImages) === 0) {
 				</div>
 
 				<!-- Collections Grid/Slider -->
-				<?php $useSlider = count($collections['items']) > 4; ?>
-				<?php if ($useSlider) : ?>
+				<?php if ($useCollectionsSlider) : ?>
 					<div class="collections-slider overflow-hidden" data-collections-slider>
-						<div class="collections-track flex gap-6 transition-transform duration-700 ease-in-out" data-collections-track>
+						<div class="collections-track flex gap-6" data-collections-track>
 							<?php foreach ($collections['items'] as $item) :
 								$itemImageUrl = '';
+								$itemImageUrlFull = '';
 								if ($item['image_id'] > 0) {
 									$itemImageUrl = (string) wp_get_attachment_image_url($item['image_id'], 'medium_large');
+									$itemImageUrlFull = (string) wp_get_attachment_image_url($item['image_id'], 'full');
 								}
 								if ($itemImageUrl === '') {
 									$itemImageUrl = get_template_directory_uri() . '/img/placeholder.jpg';
+									$itemImageUrlFull = $itemImageUrl;
 								}
 							?>
-								<a
-									href="<?= esc_url($item['url'] ?: '#'); ?>"
-									class="collections-slide group flex-shrink-0 w-[calc(25%-18px)] max-[1279px]:w-[calc(50%-12px)]"
+								<button
+									type="button"
+									class="collections-slide group flex-shrink-0 text-left"
 									data-collections-slide
+									data-lightbox-open
+									data-lightbox-src="<?= esc_attr($itemImageUrlFull); ?>"
+									data-lightbox-title="<?= esc_attr($item['title']); ?>"
 								>
 									<div class="aspect-[4/5] overflow-hidden bg-gray mb-4">
 										<img
@@ -396,7 +412,7 @@ if (count($galleryImages) === 0) {
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
 										</svg>
 									</div>
-								</a>
+								</button>
 							<?php endforeach; ?>
 						</div>
 					</div>
@@ -404,16 +420,22 @@ if (count($galleryImages) === 0) {
 					<div class="grid grid-cols-2 min-[1280px]:grid-cols-4 gap-6">
 						<?php foreach ($collections['items'] as $item) :
 							$itemImageUrl = '';
+							$itemImageUrlFull = '';
 							if ($item['image_id'] > 0) {
 								$itemImageUrl = (string) wp_get_attachment_image_url($item['image_id'], 'medium_large');
+								$itemImageUrlFull = (string) wp_get_attachment_image_url($item['image_id'], 'full');
 							}
 							if ($itemImageUrl === '') {
 								$itemImageUrl = get_template_directory_uri() . '/img/placeholder.jpg';
+								$itemImageUrlFull = $itemImageUrl;
 							}
 						?>
-							<a
-								href="<?= esc_url($item['url'] ?: '#'); ?>"
-								class="group"
+							<button
+								type="button"
+								class="group text-left"
+								data-lightbox-open
+								data-lightbox-src="<?= esc_attr($itemImageUrlFull); ?>"
+								data-lightbox-title="<?= esc_attr($item['title']); ?>"
 							>
 								<div class="aspect-[4/5] overflow-hidden bg-gray mb-4">
 									<img
@@ -430,7 +452,7 @@ if (count($galleryImages) === 0) {
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
 									</svg>
 								</div>
-							</a>
+							</button>
 						<?php endforeach; ?>
 					</div>
 				<?php endif; ?>
@@ -440,7 +462,7 @@ if (count($galleryImages) === 0) {
 
 	<!-- Events Section -->
 	<?php if (count($events['items']) > 0) : ?>
-		<section class="bg-black py-[60px] min-[1280px]:py-[80px]" data-showroom-events>
+		<section class="bg-black pb-[40px] min-[1280px]:pb-[60px]" data-showroom-events>
 			<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
 				<!-- Section Header -->
 				<div class="flex items-center justify-between mb-8 min-[1280px]:mb-12">
@@ -485,17 +507,23 @@ if (count($galleryImages) === 0) {
 						<div class="events-track flex gap-6 transition-transform duration-700 ease-in-out" data-events-track>
 							<?php foreach ($events['items'] as $item) :
 								$itemImageUrl = '';
+								$itemImageUrlFull = '';
 								if ($item['image_id'] > 0) {
 									$itemImageUrl = (string) wp_get_attachment_image_url($item['image_id'], 'medium_large');
+									$itemImageUrlFull = (string) wp_get_attachment_image_url($item['image_id'], 'full');
 								}
 								if ($itemImageUrl === '') {
 									$itemImageUrl = get_template_directory_uri() . '/img/placeholder.jpg';
+									$itemImageUrlFull = $itemImageUrl;
 								}
 							?>
-								<a
-									href="<?= esc_url($item['url'] ?: '#'); ?>"
-									class="events-slide group flex-shrink-0 w-[calc(25%-18px)] max-[1279px]:w-[calc(50%-12px)]"
+								<button
+									type="button"
+									class="events-slide group flex-shrink-0 w-[calc(25%-18px)] max-[1279px]:w-[calc(50%-12px)] text-left"
 									data-events-slide
+									data-lightbox-open
+									data-lightbox-src="<?= esc_attr($itemImageUrlFull); ?>"
+									data-lightbox-title="<?= esc_attr($item['title']); ?>"
 								>
 									<div class="aspect-[4/3] overflow-hidden bg-gray mb-4">
 										<img
@@ -507,7 +535,7 @@ if (count($galleryImages) === 0) {
 										>
 									</div>
 									<span class="text-white text-base min-[1280px]:text-lg"><?= esc_html($item['title']); ?></span>
-								</a>
+								</button>
 							<?php endforeach; ?>
 						</div>
 					</div>
@@ -515,16 +543,22 @@ if (count($galleryImages) === 0) {
 					<div class="grid grid-cols-2 min-[1280px]:grid-cols-4 gap-6">
 						<?php foreach ($events['items'] as $item) :
 							$itemImageUrl = '';
+							$itemImageUrlFull = '';
 							if ($item['image_id'] > 0) {
 								$itemImageUrl = (string) wp_get_attachment_image_url($item['image_id'], 'medium_large');
+								$itemImageUrlFull = (string) wp_get_attachment_image_url($item['image_id'], 'full');
 							}
 							if ($itemImageUrl === '') {
 								$itemImageUrl = get_template_directory_uri() . '/img/placeholder.jpg';
+								$itemImageUrlFull = $itemImageUrl;
 							}
 						?>
-							<a
-								href="<?= esc_url($item['url'] ?: '#'); ?>"
-								class="group"
+							<button
+								type="button"
+								class="group text-left"
+								data-lightbox-open
+								data-lightbox-src="<?= esc_attr($itemImageUrlFull); ?>"
+								data-lightbox-title="<?= esc_attr($item['title']); ?>"
 							>
 								<div class="aspect-[4/3] overflow-hidden bg-gray mb-4">
 									<img
@@ -536,7 +570,7 @@ if (count($galleryImages) === 0) {
 									>
 								</div>
 								<span class="text-white text-base min-[1280px]:text-lg"><?= esc_html($item['title']); ?></span>
-							</a>
+							</button>
 						<?php endforeach; ?>
 					</div>
 				<?php endif; ?>
@@ -544,39 +578,263 @@ if (count($galleryImages) === 0) {
 		</section>
 	<?php endif; ?>
 
-	<!-- Contact Form CTA Section -->
+	<!-- Contact Form Section -->
 	<section class="bg-gray py-[80px] min-[1280px]:py-[100px]" id="contact-form">
 		<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
-			<div class="flex flex-col min-[1280px]:flex-row items-start min-[1280px]:items-center justify-between gap-8">
-				<!-- Left: Title and Info -->
-				<div class="space-y-6">
+			<!-- Mobile: <=1279 -->
+			<div class="max-[1279px]:block min-[1280px]:hidden">
+				<div class="grid grid-cols-1 gap-8">
+					<!-- Left Column: Contact Info -->
+					<div class="space-y-8">
+						<!-- Title -->
+						<div>
+							<h2 class="text-white font-century font-normal text-[28px] leading-[110%] tracking-[-0.01em] mb-0">
+								Записаться в шоурум
+							</h2>
+							<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
+						</div>
+
+						<!-- Contact Details -->
+						<div class="space-y-5 text-white font-century font-normal text-[18px] leading-[145%] tracking-[0]">
+							<div>
+								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>">
+									<?= esc_html((string) $phoneContact['display']); ?>
+								</a>
+							</div>
+							<div><?= esc_html($address); ?></div>
+							<div><?= esc_html($workHours); ?></div>
+						</div>
+					</div>
+
+					<!-- Right Column: Contact Form -->
 					<div>
-						<h2 class="text-white font-century font-normal text-[28px] min-[1280px]:text-[56px] leading-[110%] min-[1280px]:leading-[100%] tracking-[-0.01em] mb-0">
+						<form class="flex flex-col gap-4" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
+							<input type="hidden" name="action" value="contact_form">
+							<input type="hidden" name="form_type" value="showroom">
+							<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
+
+							<!-- Name Field -->
+							<div>
+								<input
+									type="text"
+									name="name"
+									placeholder="Имя"
+									required
+									class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
+									tabindex="0"
+									aria-label="Ваше имя"
+								>
+							</div>
+
+							<!-- Email Field -->
+							<div>
+								<input
+									type="email"
+									name="email"
+									placeholder="Почта"
+									required
+									class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
+									tabindex="0"
+									aria-label="Ваш email"
+								>
+							</div>
+
+							<!-- Phone Field -->
+							<div>
+								<input
+									type="tel"
+									name="phone"
+									placeholder="Телефон"
+									required
+									class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
+									tabindex="0"
+									aria-label="Ваш телефон"
+								>
+							</div>
+
+							<!-- Submit Button -->
+							<button
+								type="submit"
+								class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
+								tabindex="0"
+								aria-label="Отправить заявку"
+							>
+								Отправить заявку
+							</button>
+
+							<!-- Privacy Consent -->
+							<p class="text-white/40 text-xs text-left">
+								Согласен с обработкой персональных данных
+							</p>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tablet: 1280..1919 -->
+			<div class="hidden min-[1280px]:max-[1919px]:block">
+				<div class="flex items-start justify-between">
+					<!-- Left -->
+					<div class="w-[596px] flex flex-col">
+						<h2 class="text-white font-century font-normal text-[56px] leading-[100%] tracking-[-0.01em] mb-0">
 							Записаться в шоурум
 						</h2>
 						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
-					</div>
 
-					<div class="space-y-4 text-white font-century font-normal text-[16px] min-[1280px]:text-[20px] leading-[145%]">
-						<div><?= esc_html($address); ?></div>
-						<div><?= esc_html($workHours); ?></div>
-						<div>
-							<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors">
-								<?= esc_html((string) $phoneContact['display']); ?>
-							</a>
+						<div class="mt-8 space-y-[30px] text-white font-century font-normal text-[20px] leading-[145%] tracking-[0]">
+							<div>
+								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>">
+									<?= esc_html((string) $phoneContact['display']); ?>
+								</a>
+							</div>
+							<div><?= esc_html($address); ?></div>
+							<div><?= esc_html($workHours); ?></div>
 						</div>
 					</div>
-				</div>
 
-				<!-- Right: CTA Button -->
-				<button
-					type="button"
-					class="inline-flex items-center justify-center bg-primary hover:bg-opacity-90 text-white h-[56px] px-8 text-base transition-colors flex-shrink-0"
-					data-modal-open="modal-showroom"
-					aria-label="Записаться в шоурум"
-				>
-					Записаться в шоурум
-				</button>
+					<!-- Right -->
+					<div class="w-[593px]">
+						<form class="h-full" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
+							<input type="hidden" name="action" value="contact_form">
+							<input type="hidden" name="form_type" value="showroom">
+							<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
+
+							<div class="flex flex-col gap-5">
+								<div>
+									<input
+										type="text"
+										name="name"
+										placeholder="Имя"
+										required
+										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
+										tabindex="0"
+										aria-label="Ваше имя"
+									>
+								</div>
+
+								<div>
+									<input
+										type="email"
+										name="email"
+										placeholder="Почта"
+										required
+										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
+										tabindex="0"
+										aria-label="Ваш email"
+									>
+								</div>
+
+								<div>
+									<input
+										type="tel"
+										name="phone"
+										placeholder="Телефон"
+										required
+										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
+										tabindex="0"
+										aria-label="Ваш телефон"
+									>
+								</div>
+
+								<button
+									type="submit"
+									class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
+									tabindex="0"
+									aria-label="Отправить заявку"
+								>
+									Отправить заявку
+								</button>
+
+								<p class="text-white/40 text-xs text-left">
+									Согласен с обработкой персональных данных
+								</p>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- >=1920 desktop layout -->
+			<div class="hidden min-[1920px]:block">
+				<div class="flex items-start gap-[121px]">
+					<!-- Left: text block -->
+					<div class="w-[900px] flex flex-col">
+						<h2 class="text-white font-century font-normal text-[56px] leading-[100%] tracking-[-0.01em] mb-0">
+							Записаться в шоурум
+						</h2>
+						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
+
+						<div class="mt-8 space-y-[30px] text-white font-century font-normal text-[20px] leading-[145%] tracking-[0]">
+							<div>
+								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>">
+									<?= esc_html((string) $phoneContact['display']); ?>
+								</a>
+							</div>
+							<div><?= esc_html($address); ?></div>
+							<div><?= esc_html($workHours); ?></div>
+						</div>
+					</div>
+
+					<!-- Right: form block -->
+					<div class="w-[658px]">
+						<form class="h-full flex flex-col" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
+							<input type="hidden" name="action" value="contact_form">
+							<input type="hidden" name="form_type" value="showroom">
+							<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
+
+							<div class="flex flex-col gap-5">
+								<div>
+									<input
+										type="text"
+										name="name"
+										placeholder="Имя"
+										required
+										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
+										tabindex="0"
+										aria-label="Ваше имя"
+									>
+								</div>
+
+								<div>
+									<input
+										type="email"
+										name="email"
+										placeholder="Почта"
+										required
+										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
+										tabindex="0"
+										aria-label="Ваш email"
+									>
+								</div>
+
+								<div>
+									<input
+										type="tel"
+										name="phone"
+										placeholder="Телефон"
+										required
+										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
+										tabindex="0"
+										aria-label="Ваш телефон"
+									>
+								</div>
+
+								<button
+									type="submit"
+									class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
+									tabindex="0"
+									aria-label="Отправить заявку"
+								>
+									Отправить заявку
+								</button>
+
+								<p class="text-white/40 text-xs text-left">
+									Согласен с обработкой персональных данных
+								</p>
+							</div>
+						</form>
+					</div>
+				</div>
 			</div>
 		</div>
 	</section>
@@ -584,9 +842,51 @@ if (count($galleryImages) === 0) {
 	<!-- Map Section -->
 	<?php if ($map['latitude'] !== '' && $map['longitude'] !== '') : ?>
 		<section class="bg-black">
-			<div id="showroom-map" class="w-full h-[400px] min-[1280px]:h-[500px] min-[1920px]:h-[600px]" data-lat="<?= esc_attr($map['latitude']); ?>" data-lng="<?= esc_attr($map['longitude']); ?>" data-zoom="<?= esc_attr((string) $map['zoom']); ?>"></div>
+			<div
+				id="showroom-map"
+				class="w-full h-[400px] min-[1280px]:h-[500px] min-[1920px]:h-[600px]"
+				data-lat="<?= esc_attr($map['latitude']); ?>"
+				data-lng="<?= esc_attr($map['longitude']); ?>"
+				data-zoom="<?= esc_attr((string) $map['zoom']); ?>"
+				data-address="<?= esc_attr($address); ?>"
+				data-phone="<?= esc_attr((string) $phoneContact['display']); ?>"
+				data-hours="<?= esc_attr($workHours); ?>"
+			></div>
 		</section>
 	<?php endif; ?>
+
+	<!-- Lightbox Modal -->
+	<div
+		id="showroom-lightbox"
+		class="fixed inset-0 z-50 hidden items-center justify-center bg-black/95"
+		data-lightbox-modal
+	>
+		<!-- Close Button - ниже шапки сайта -->
+		<button
+			type="button"
+			class="fixed top-32 right-6 min-[1280px]:top-36 min-[1280px]:right-10 w-14 h-14 flex items-center justify-center text-white hover:text-primary transition-colors z-[100] bg-white/20 hover:bg-white/30 rounded-full pointer-events-auto cursor-pointer"
+			aria-label="Закрыть"
+			data-lightbox-close
+		>
+			<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+			</svg>
+		</button>
+
+		<!-- Content -->
+		<div class="w-full h-full flex flex-col items-center justify-center p-4 min-[1280px]:p-12 pointer-events-none">
+			<img
+				src=""
+				alt=""
+				class="max-w-full max-h-[calc(100vh-120px)] object-contain pointer-events-auto"
+				data-lightbox-image
+			>
+			<h3
+				class="text-white text-xl min-[1280px]:text-2xl font-normal mt-6 text-center"
+				data-lightbox-title
+			></h3>
+		</div>
+	</div>
 </main>
 
 <?php get_footer(); ?>
