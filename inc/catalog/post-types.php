@@ -138,10 +138,16 @@ add_action('init', static function (): void {
 }, 20);
 
 /**
- * Раннее определение товара по URL - исправляем query vars ДО основного запроса
+ * Раннее определение товара по URL - модифицируем main query
  * Это нужно чтобы URL вида /catalog/category/product/?contact=success работали правильно
+ * Используем pre_get_posts как рекомендует WordPress
  */
-add_action('parse_request', static function (WP $wp): void {
+add_action('pre_get_posts', static function (WP_Query $query): void {
+	// Только для главного запроса на фронтенде
+	if (is_admin() || !$query->is_main_query()) {
+		return;
+	}
+
 	// Получаем текущий URL path
 	$requestUri = trim((string) ($_SERVER['REQUEST_URI'] ?? ''), '/');
 	$requestUri = strtok($requestUri, '?'); // Убираем query string
@@ -169,10 +175,13 @@ add_action('parse_request', static function (WP $wp): void {
 		return;
 	}
 
-	// Нашли товар — устанавливаем query vars
-	$wp->query_vars['product'] = $productSlug;
-	$wp->query_vars['post_type'] = 'product';
-	$wp->query_vars['name'] = $productSlug;
+	// Нашли товар — устанавливаем параметры запроса
+	$query->set('post_type', 'product');
+	$query->set('name', $productSlug);
+	$query->set('p', $product->ID);
+	$query->is_single = true;
+	$query->is_singular = true;
+	$query->is_404 = false;
 });
 
 /**
