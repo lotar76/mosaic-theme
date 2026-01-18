@@ -138,6 +138,44 @@ add_action('init', static function (): void {
 }, 20);
 
 /**
+ * Раннее определение товара по URL - исправляем query vars ДО основного запроса
+ * Это нужно чтобы URL вида /catalog/category/product/?contact=success работали правильно
+ */
+add_action('parse_request', static function (WP $wp): void {
+	// Получаем текущий URL path
+	$requestUri = trim((string) ($_SERVER['REQUEST_URI'] ?? ''), '/');
+	$requestUri = strtok($requestUri, '?'); // Убираем query string
+
+	// Проверяем, начинается ли с catalog/
+	if (strpos($requestUri, 'catalog/') !== 0) {
+		return;
+	}
+
+	// Разбираем путь: catalog/{...}/{product_slug}
+	$parts = explode('/', $requestUri);
+	if (count($parts) < 3) {
+		return; // Минимум: catalog / category / product
+	}
+
+	// Последний сегмент — потенциальный slug товара
+	$productSlug = end($parts);
+	if ($productSlug === '') {
+		return;
+	}
+
+	// Ищем товар по slug
+	$product = get_page_by_path($productSlug, OBJECT, 'product');
+	if (!$product || $product->post_status !== 'publish') {
+		return;
+	}
+
+	// Нашли товар — устанавливаем query vars
+	$wp->query_vars['product'] = $productSlug;
+	$wp->query_vars['post_type'] = 'product';
+	$wp->query_vars['name'] = $productSlug;
+});
+
+/**
  * Обработка корневого /catalog/ - загружаем шаблон page-catalog.php
  */
 add_action('template_redirect', static function (): void {
