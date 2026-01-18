@@ -160,14 +160,15 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                         <p class="text-[#847575] text-sm mb-4">
                             Стоимость каждого проекта уникальна и зависит от габаритов, сложности и сроков
                         </p>
-                        <a
-                            href="#contact-form"
+                        <button
+                            type="button"
                             class="inline-block bg-primary hover:bg-opacity-90 transition-colors text-white py-3 px-6 text-base"
                             tabindex="0"
                             aria-label="Получить консультацию"
+                            data-modal-open="modal-consultation"
                         >
                             Получить консультацию
-                        </a>
+                        </button>
                     </div>
 
                     <!-- Description -->

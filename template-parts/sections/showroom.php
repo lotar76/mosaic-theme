@@ -25,7 +25,7 @@ declare(strict_types=1);
 						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
 					</div>
 					<a
-						href="#contact-form"
+						href="#" data-modal-open="modal-showroom"
 						class="inline-flex items-center justify-center bg-primary hover:bg-opacity-90 text-white h-[56px] px-8 text-base transition-colors"
 						tabindex="0"
 						aria-label="Записаться на посещение шоурума"
@@ -87,7 +87,7 @@ declare(strict_types=1);
 						</div>
 
 						<a
-							href="#contact-form"
+							href="#" data-modal-open="modal-showroom"
 							class="inline-flex items-center justify-center bg-primary hover:bg-opacity-90 text-white h-[56px] px-8 text-base transition-colors w-fit"
 							tabindex="0"
 							aria-label="Записаться на посещение шоурума"
@@ -149,7 +149,7 @@ declare(strict_types=1);
 						</div>
 
 						<a
-							href="#contact-form"
+							href="#" data-modal-open="modal-showroom"
 							class="inline-flex items-center justify-center bg-primary hover:bg-opacity-90 text-white h-[56px] px-8 text-base transition-colors w-fit"
 							tabindex="0"
 							aria-label="Записаться на посещение шоурума"

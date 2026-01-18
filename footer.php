@@ -137,6 +137,8 @@ $phoneContact = function_exists('mosaic_get_phone_contact') ? mosaic_get_phone_c
     </div>
 </footer>
 
+<?php get_template_part('template-parts/modal-forms'); ?>
+
 <?php wp_footer(); ?>
 </body>
 </html>

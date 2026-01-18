@@ -29,12 +29,14 @@ function mosaic_create_contacts_table(): void
 		name varchar(255) NOT NULL,
 		email varchar(255) NOT NULL,
 		phone varchar(50) NOT NULL,
+		form_type varchar(50) NOT NULL DEFAULT 'project',
 		created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		ip_address varchar(45) DEFAULT NULL,
 		user_agent text DEFAULT NULL,
 		PRIMARY KEY (id),
 		KEY created_at (created_at),
-		KEY email (email)
+		KEY email (email),
+		KEY form_type (form_type)
 	) {$charset_collate};";
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -66,6 +68,33 @@ function mosaic_ensure_contacts_table_exists(): void
 	update_option($option_key, true);
 }
 
+// Миграция: добавление колонки form_type если её нет
+add_action('admin_init', 'mosaic_migrate_contacts_table');
+
+/**
+ * Добавляет колонку form_type в существующую таблицу
+ */
+function mosaic_migrate_contacts_table(): void
+{
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'mosaic_contacts';
+	$migration_key = 'mosaic_contacts_form_type_added';
+
+	if (get_option($migration_key)) {
+		return;
+	}
+
+	// Проверяем существование колонки
+	$column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table_name} LIKE 'form_type'");
+
+	if (empty($column_exists)) {
+		$wpdb->query("ALTER TABLE {$table_name} ADD COLUMN form_type varchar(50) NOT NULL DEFAULT 'project' AFTER phone");
+		$wpdb->query("ALTER TABLE {$table_name} ADD INDEX form_type (form_type)");
+	}
+
+	update_option($migration_key, true);
+}
+
 // Обработчики формы
 add_action('admin_post_nopriv_contact_form', 'mosaic_handle_contact_form');
 add_action('admin_post_contact_form', 'mosaic_handle_contact_form');
@@ -87,6 +116,13 @@ function mosaic_handle_contact_form(): void
 	$name = isset($_POST['name']) ? sanitize_text_field((string) $_POST['name']) : '';
 	$email = isset($_POST['email']) ? sanitize_email((string) $_POST['email']) : '';
 	$phone = isset($_POST['phone']) ? sanitize_text_field((string) $_POST['phone']) : '';
+	$form_type = isset($_POST['form_type']) ? sanitize_key((string) $_POST['form_type']) : 'project';
+
+	// Допустимые типы форм
+	$allowed_types = ['project', 'showroom', 'consultation'];
+	if (!in_array($form_type, $allowed_types, true)) {
+		$form_type = 'project';
+	}
 
 	$errors = [];
 
@@ -109,10 +145,10 @@ function mosaic_handle_contact_form(): void
 	}
 
 	// 3. Сохранение в БД
-	$contact_id = mosaic_save_contact($name, $email, $phone);
+	$contact_id = mosaic_save_contact($name, $email, $phone, $form_type);
 
 	// 4. Отправка в Telegram
-	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $contact_id);
+	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $form_type, $contact_id);
 
 	// 5. Редирект с результатом
 	$referer = wp_get_referer() ?: home_url();
@@ -128,12 +164,13 @@ function mosaic_handle_contact_form(): void
 /**
  * Сохраняет контакт в БД
  *
- * @param string $name  Имя
- * @param string $email Email
- * @param string $phone Телефон
+ * @param string $name      Имя
+ * @param string $email     Email
+ * @param string $phone     Телефон
+ * @param string $form_type Тип формы (project, showroom, consultation)
  * @return int|false ID записи или false при ошибке
  */
-function mosaic_save_contact(string $name, string $email, string $phone)
+function mosaic_save_contact(string $name, string $email, string $phone, string $form_type = 'project')
 {
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'mosaic_contacts';
@@ -147,13 +184,31 @@ function mosaic_save_contact(string $name, string $email, string $phone)
 			'name' => $name,
 			'email' => $email,
 			'phone' => $phone,
+			'form_type' => $form_type,
 			'ip_address' => sanitize_text_field($ip_address),
 			'user_agent' => sanitize_text_field($user_agent),
 		],
-		['%s', '%s', '%s', '%s', '%s']
+		['%s', '%s', '%s', '%s', '%s', '%s']
 	);
 
 	return $result ? (int) $wpdb->insert_id : false;
+}
+
+/**
+ * Возвращает человекочитаемое название типа формы
+ *
+ * @param string $form_type Тип формы
+ * @return string Название формы
+ */
+function mosaic_get_form_type_label(string $form_type): string
+{
+	$labels = [
+		'project' => 'Обсудить проект',
+		'showroom' => 'Записаться в шоурум',
+		'consultation' => 'Получить консультацию',
+	];
+
+	return $labels[$form_type] ?? $form_type;
 }
 
 /**
@@ -162,10 +217,11 @@ function mosaic_save_contact(string $name, string $email, string $phone)
  * @param string    $name       Имя
  * @param string    $email      Email
  * @param string    $phone      Телефон
+ * @param string    $form_type  Тип формы
  * @param int|false $contact_id ID заявки в БД или false при ошибке
  * @return bool True если отправлено успешно
  */
-function mosaic_send_to_telegram(string $name, string $email, string $phone, $contact_id = 0): bool
+function mosaic_send_to_telegram(string $name, string $email, string $phone, string $form_type = 'project', $contact_id = 0): bool
 {
 	$bot_token = defined('MOSAIC_TELEGRAM_BOT_TOKEN') ? MOSAIC_TELEGRAM_BOT_TOKEN : '';
 	$chat_id = defined('MOSAIC_TELEGRAM_CHAT_ID') ? MOSAIC_TELEGRAM_CHAT_ID : '';
@@ -175,8 +231,12 @@ function mosaic_send_to_telegram(string $name, string $email, string $phone, $co
 		return false;
 	}
 
+	// Получаем название формы
+	$form_label = mosaic_get_form_type_label($form_type);
+
 	// Формируем сообщение
 	$message = "🔔 <b>Новая заявка с сайта</b>\n\n";
+	$message .= "📋 <b>Форма:</b> " . esc_html($form_label) . "\n";
 	$message .= "👤 <b>Имя:</b> " . esc_html($name) . "\n";
 	$message .= "📧 <b>Email:</b> " . esc_html($email) . "\n";
 	$message .= "📱 <b>Телефон:</b> " . esc_html($phone) . "\n";
@@ -423,6 +483,7 @@ function mosaic_render_contacts_page(): void
 				<thead>
 					<tr>
 						<th style="width: 50px;">ID</th>
+						<th style="width: 180px;">Форма</th>
 						<th>Имя</th>
 						<th>Email</th>
 						<th>Телефон</th>
@@ -433,8 +494,22 @@ function mosaic_render_contacts_page(): void
 				</thead>
 				<tbody>
 					<?php foreach ($contacts as $contact) : ?>
+						<?php
+						$form_type = isset($contact->form_type) ? $contact->form_type : 'project';
+						$form_label = mosaic_get_form_type_label($form_type);
+						$badge_class = match ($form_type) {
+							'showroom' => 'background: #2271b1; color: #fff;',
+							'consultation' => 'background: #135e96; color: #fff;',
+							default => 'background: #787c82; color: #fff;',
+						};
+						?>
 						<tr>
 							<td><?php echo esc_html((string) $contact->id); ?></td>
+							<td>
+								<span style="display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 12px; <?php echo $badge_class; ?>">
+									<?php echo esc_html($form_label); ?>
+								</span>
+							</td>
 							<td><strong><?php echo esc_html($contact->name); ?></strong></td>
 							<td>
 								<a href="mailto:<?php echo esc_attr($contact->email); ?>">
@@ -515,12 +590,14 @@ function mosaic_export_contacts_csv(): void
 	fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
 	// Заголовки
-	fputcsv($output, ['ID', 'Имя', 'Email', 'Телефон', 'Дата', 'IP']);
+	fputcsv($output, ['ID', 'Форма', 'Имя', 'Email', 'Телефон', 'Дата', 'IP']);
 
 	// Данные
 	foreach ($contacts as $contact) {
+		$form_type = isset($contact->form_type) ? $contact->form_type : 'project';
 		fputcsv($output, [
 			$contact->id,
+			mosaic_get_form_type_label($form_type),
 			$contact->name,
 			$contact->email,
 			$contact->phone,

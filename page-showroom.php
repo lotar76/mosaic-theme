@@ -203,14 +203,15 @@ if (count($galleryImages) === 0) {
 					<?= nl2br(esc_html($hero['description'])); ?>
 				</p>
 
-				<a
-					href="<?= esc_url($hero['button_url']); ?>"
+				<button
+					type="button"
 					class="inline-flex items-center justify-center bg-primary hover:bg-opacity-90 text-white h-[56px] px-8 text-base transition-colors flex-shrink-0"
 					tabindex="0"
 					aria-label="<?= esc_attr($hero['button_text']); ?>"
+					data-modal-open="modal-showroom"
 				>
 					<?= esc_html($hero['button_text']); ?>
-				</a>
+				</button>
 			</div>
 		</div>
 	</section>
@@ -543,234 +544,39 @@ if (count($galleryImages) === 0) {
 		</section>
 	<?php endif; ?>
 
-	<!-- Contact Form Section -->
+	<!-- Contact Form CTA Section -->
 	<section class="bg-gray py-[80px] min-[1280px]:py-[100px]" id="contact-form">
 		<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
-			<!-- Mobile: <=1279 -->
-			<div class="max-[1279px]:block min-[1280px]:hidden">
-				<div class="grid grid-cols-1 gap-8">
-					<!-- Left Column: Contact Info -->
-					<div class="space-y-8">
-						<!-- Title -->
-						<div>
-							<h2 class="text-white font-century font-normal text-[28px] leading-[110%] tracking-[-0.01em] mb-0">
-								Записаться в шоурум
-							</h2>
-							<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
-						</div>
-
-						<!-- Contact Details -->
-						<div class="space-y-5 text-white font-century font-normal text-[18px] leading-[145%] tracking-[0]">
-							<div>
-								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors">
-									<?= esc_html((string) $phoneContact['display']); ?>
-								</a>
-							</div>
-							<div><?= esc_html($address); ?></div>
-							<div><?= esc_html($workHours); ?></div>
-						</div>
-					</div>
-
-					<!-- Right Column: Contact Form -->
+			<div class="flex flex-col min-[1280px]:flex-row items-start min-[1280px]:items-center justify-between gap-8">
+				<!-- Left: Title and Info -->
+				<div class="space-y-6">
 					<div>
-						<form class="flex flex-col gap-4" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
-							<input type="hidden" name="action" value="contact_form">
-							<input type="hidden" name="form_source" value="showroom">
-							<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
-
-							<div>
-								<input
-									type="text"
-									name="name"
-									placeholder="Имя"
-									required
-									class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
-								>
-							</div>
-
-							<div>
-								<input
-									type="email"
-									name="email"
-									placeholder="Почта"
-									required
-									class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
-								>
-							</div>
-
-							<div>
-								<input
-									type="tel"
-									name="phone"
-									placeholder="Телефон"
-									required
-									class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
-								>
-							</div>
-
-							<button
-								type="submit"
-								class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
-							>
-								Отправить заявку
-							</button>
-
-							<p class="text-white/40 text-xs text-left">
-								Согласен с обработкой персональных данных
-							</p>
-						</form>
-					</div>
-				</div>
-			</div>
-
-			<!-- Tablet: 1280..1919 -->
-			<div class="hidden min-[1280px]:max-[1919px]:block">
-				<div class="flex items-start justify-between">
-					<!-- Left -->
-					<div class="w-[500px] flex flex-col">
-						<h2 class="text-white font-century font-normal text-[56px] leading-[100%] tracking-[-0.01em] mb-0">
+						<h2 class="text-white font-century font-normal text-[28px] min-[1280px]:text-[56px] leading-[110%] min-[1280px]:leading-[100%] tracking-[-0.01em] mb-0">
 							Записаться в шоурум
 						</h2>
 						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
+					</div>
 
-						<div class="mt-8 space-y-[30px] text-white font-century font-normal text-[20px] leading-[145%]">
-							<div>
-								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors">
-									<?= esc_html((string) $phoneContact['display']); ?>
-								</a>
-							</div>
-							<div><?= esc_html($address); ?></div>
-							<div><?= esc_html($workHours); ?></div>
+					<div class="space-y-4 text-white font-century font-normal text-[16px] min-[1280px]:text-[20px] leading-[145%]">
+						<div><?= esc_html($address); ?></div>
+						<div><?= esc_html($workHours); ?></div>
+						<div>
+							<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors">
+								<?= esc_html((string) $phoneContact['display']); ?>
+							</a>
 						</div>
 					</div>
-
-					<!-- Right -->
-					<div class="w-[593px]">
-						<form method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
-							<input type="hidden" name="action" value="contact_form">
-							<input type="hidden" name="form_source" value="showroom">
-							<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
-
-							<div class="flex flex-col gap-5">
-								<div>
-									<input
-										type="text"
-										name="name"
-										placeholder="Имя"
-										required
-										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
-									>
-								</div>
-
-								<div>
-									<input
-										type="email"
-										name="email"
-										placeholder="Почта"
-										required
-										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
-									>
-								</div>
-
-								<div>
-									<input
-										type="tel"
-										name="phone"
-										placeholder="Телефон"
-										required
-										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
-									>
-								</div>
-
-								<button
-									type="submit"
-									class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
-								>
-									Отправить заявку
-								</button>
-
-								<p class="text-white/40 text-xs text-left">
-									Согласен с обработкой персональных данных
-								</p>
-							</div>
-						</form>
-					</div>
 				</div>
-			</div>
 
-			<!-- Desktop: >=1920 -->
-			<div class="hidden min-[1920px]:block">
-				<div class="flex items-start gap-[121px]">
-					<!-- Left -->
-					<div class="w-[700px] flex flex-col">
-						<h2 class="text-white font-century font-normal text-[56px] leading-[100%] tracking-[-0.01em] mb-0">
-							Записаться в шоурум
-						</h2>
-						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
-
-						<div class="mt-8 space-y-[30px] text-white font-century font-normal text-[20px] leading-[145%]">
-							<div>
-								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors">
-									<?= esc_html((string) $phoneContact['display']); ?>
-								</a>
-							</div>
-							<div><?= esc_html($address); ?></div>
-							<div><?= esc_html($workHours); ?></div>
-						</div>
-					</div>
-
-					<!-- Right -->
-					<div class="w-[658px]">
-						<form method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
-							<input type="hidden" name="action" value="contact_form">
-							<input type="hidden" name="form_source" value="showroom">
-							<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
-
-							<div class="flex flex-col gap-5">
-								<div>
-									<input
-										type="text"
-										name="name"
-										placeholder="Имя"
-										required
-										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
-									>
-								</div>
-
-								<div>
-									<input
-										type="email"
-										name="email"
-										placeholder="Почта"
-										required
-										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
-									>
-								</div>
-
-								<div>
-									<input
-										type="tel"
-										name="phone"
-										placeholder="Телефон"
-										required
-										class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
-									>
-								</div>
-
-								<button
-									type="submit"
-									class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
-								>
-									Отправить заявку
-								</button>
-
-								<p class="text-white/40 text-xs text-left">
-									Согласен с обработкой персональных данных
-								</p>
-							</div>
-						</form>
-					</div>
-				</div>
+				<!-- Right: CTA Button -->
+				<button
+					type="button"
+					class="inline-flex items-center justify-center bg-primary hover:bg-opacity-90 text-white h-[56px] px-8 text-base transition-colors flex-shrink-0"
+					data-modal-open="modal-showroom"
+					aria-label="Записаться в шоурум"
+				>
+					Записаться в шоурум
+				</button>
 			</div>
 		</div>
 	</section>
