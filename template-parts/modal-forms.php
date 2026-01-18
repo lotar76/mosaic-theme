@@ -152,10 +152,9 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 
 				<!-- Right: Form -->
 				<div>
-					<form class="flex flex-col gap-4" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
-						<input type="hidden" name="action" value="contact_form">
+					<form id="modal-consultation-form" class="flex flex-col gap-4">
+						<input type="hidden" name="action" value="contact_form_ajax">
 						<input type="hidden" name="form_type" value="consultation">
-						<input type="hidden" name="form_source" value="modal">
 						<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
 
 						<div>
@@ -193,15 +192,19 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 
 						<button
 							type="submit"
-							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
+							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors disabled:opacity-50"
 							aria-label="Отправить заявку"
 						>
-							Отправить заявку
+							<span class="btn-text">Отправить заявку</span>
+							<span class="btn-loading hidden">Отправка...</span>
 						</button>
 
 						<p class="text-white/40 text-xs text-left">
 							Согласен с обработкой персональных данных
 						</p>
+
+						<!-- Сообщение результата -->
+						<div id="modal-consultation-result" class="hidden p-4 text-center"></div>
 					</form>
 				</div>
 			</div>
@@ -289,5 +292,66 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 			}
 		}
 	});
+
+	// AJAX форма консультации
+	var consultForm = document.getElementById('modal-consultation-form');
+	if (consultForm) {
+		consultForm.addEventListener('submit', function(e) {
+			e.preventDefault();
+
+			var form = this;
+			var btn = form.querySelector('button[type="submit"]');
+			var btnText = btn.querySelector('.btn-text');
+			var btnLoading = btn.querySelector('.btn-loading');
+			var result = document.getElementById('modal-consultation-result');
+
+			// Показываем загрузку
+			btn.disabled = true;
+			btnText.classList.add('hidden');
+			btnLoading.classList.remove('hidden');
+			result.classList.add('hidden');
+
+			// Собираем данные формы
+			var formData = new FormData(form);
+
+			// Отправляем AJAX
+			fetch('<?= esc_url(admin_url('admin-ajax.php')); ?>', {
+				method: 'POST',
+				body: formData
+			})
+			.then(function(response) { return response.json(); })
+			.then(function(data) {
+				// Восстанавливаем кнопку
+				btn.disabled = false;
+				btnText.classList.remove('hidden');
+				btnLoading.classList.add('hidden');
+
+				// Показываем результат
+				result.classList.remove('hidden');
+				if (data.success) {
+					result.className = 'p-4 text-center bg-primary/20 text-white';
+					result.textContent = data.data.message;
+					form.reset();
+					// Закрыть модалку через 2 сек
+					setTimeout(function() {
+						var modal = form.closest('.mosaic-modal');
+						closeModal(modal);
+						result.classList.add('hidden');
+					}, 2000);
+				} else {
+					result.className = 'p-4 text-center bg-red-500/20 text-white';
+					result.textContent = data.data.message || 'Ошибка отправки';
+				}
+			})
+			.catch(function() {
+				btn.disabled = false;
+				btnText.classList.remove('hidden');
+				btnLoading.classList.add('hidden');
+				result.classList.remove('hidden');
+				result.className = 'p-4 text-center bg-red-500/20 text-white';
+				result.textContent = 'Ошибка сети. Попробуйте позже.';
+			});
+		});
+	}
 })();
 </script>

@@ -95,9 +95,63 @@ function mosaic_migrate_contacts_table(): void
 	update_option($migration_key, true);
 }
 
-// Обработчики формы
+// Обработчики формы (стандартный POST)
 add_action('admin_post_nopriv_contact_form', 'mosaic_handle_contact_form');
 add_action('admin_post_contact_form', 'mosaic_handle_contact_form');
+
+// AJAX обработчики (для модальных форм)
+add_action('wp_ajax_contact_form_ajax', 'mosaic_handle_contact_form_ajax');
+add_action('wp_ajax_nopriv_contact_form_ajax', 'mosaic_handle_contact_form_ajax');
+
+/**
+ * AJAX обработчик контактной формы
+ */
+function mosaic_handle_contact_form_ajax(): void
+{
+	// Проверка nonce
+	if (
+		!isset($_POST['contact_nonce']) ||
+		!wp_verify_nonce((string) $_POST['contact_nonce'], 'contact_form_nonce')
+	) {
+		wp_send_json_error(['message' => 'Ошибка безопасности. Обновите страницу.']);
+	}
+
+	// Валидация
+	$name = isset($_POST['name']) ? sanitize_text_field((string) $_POST['name']) : '';
+	$email = isset($_POST['email']) ? sanitize_email((string) $_POST['email']) : '';
+	$phone = isset($_POST['phone']) ? sanitize_text_field((string) $_POST['phone']) : '';
+	$form_type = isset($_POST['form_type']) ? sanitize_key((string) $_POST['form_type']) : 'project';
+
+	$allowed_types = ['project', 'showroom', 'consultation'];
+	if (!in_array($form_type, $allowed_types, true)) {
+		$form_type = 'project';
+	}
+
+	$errors = [];
+	if (empty($name)) {
+		$errors[] = 'Укажите имя';
+	}
+	if (empty($email) || !is_email($email)) {
+		$errors[] = 'Укажите корректный email';
+	}
+	if (empty($phone)) {
+		$errors[] = 'Укажите телефон';
+	}
+
+	if (!empty($errors)) {
+		wp_send_json_error(['message' => implode('. ', $errors)]);
+	}
+
+	// Сохранение и отправка
+	$contact_id = mosaic_save_contact($name, $email, $phone, $form_type);
+	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $form_type, $contact_id);
+
+	if ($contact_id || $telegram_sent) {
+		wp_send_json_success(['message' => 'Заявка отправлена! Мы свяжемся с вами в ближайшее время.']);
+	} else {
+		wp_send_json_error(['message' => 'Ошибка отправки. Попробуйте позже.']);
+	}
+}
 
 /**
  * Обработчик отправки контактной формы
