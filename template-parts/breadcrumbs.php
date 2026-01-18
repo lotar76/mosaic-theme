@@ -17,7 +17,28 @@ $breadcrumbs[] = [
 ];
 
 // Определяем текущую страницу
-if (is_page()) {
+if (get_query_var('mosaic_catalog_root')) {
+	// Корневая страница каталога /catalog/
+	$breadcrumbs[] = [
+		'url' => '',
+		'title' => 'Каталог',
+		'is_current' => true,
+	];
+} elseif (get_query_var('mosaic_portfolio_root')) {
+	// Корневая страница портфолио /portfolio/
+	$breadcrumbs[] = [
+		'url' => '',
+		'title' => 'Портфолио',
+		'is_current' => true,
+	];
+} elseif (get_query_var('mosaic_news_root')) {
+	// Корневая страница новостей /news/
+	$breadcrumbs[] = [
+		'url' => '',
+		'title' => 'Новости',
+		'is_current' => true,
+	];
+} elseif (is_page()) {
 	$page = get_queried_object();
 	if ($page instanceof WP_Post) {
 		// Если есть родительские страницы, добавляем их
@@ -45,14 +66,71 @@ if (is_page()) {
 } elseif (is_single()) {
 	$post = get_queried_object();
 	if ($post instanceof WP_Post) {
-		// Для кастомных типов записей добавляем архив
-		$post_type = get_post_type_object($post->post_type);
-		if ($post_type && $post_type->has_archive) {
+		// Для проектов портфолио
+		if ($post->post_type === 'portfolio') {
 			$breadcrumbs[] = [
-				'url' => get_post_type_archive_link($post->post_type),
-				'title' => $post_type->labels->name ?? 'Архив',
+				'url' => home_url('/portfolio/'),
+				'title' => 'Портфолио',
 				'is_current' => false,
 			];
+		}
+		// Для новостей
+		elseif ($post->post_type === 'news') {
+			$breadcrumbs[] = [
+				'url' => home_url('/news/'),
+				'title' => 'Новости',
+				'is_current' => false,
+			];
+		}
+		// Для товаров (product) добавляем раздел каталога в breadcrumbs
+		elseif ($post->post_type === 'product') {
+			$terms = get_the_terms($post->ID, 'product_section');
+			if (!empty($terms) && !is_wp_error($terms)) {
+				// Берём первый терм
+				$term = reset($terms);
+				if ($term instanceof WP_Term) {
+					// Добавляем родительские разделы
+					$current = $term;
+					$termPath = [];
+					while ($current && !is_wp_error($current)) {
+						array_unshift($termPath, $current);
+						if ($current->parent > 0) {
+							$current = get_term((int) $current->parent, 'product_section');
+						} else {
+							break;
+						}
+					}
+					
+					// Добавляем все разделы в breadcrumbs
+					foreach ($termPath as $t) {
+						$termLink = get_term_link($t);
+						if (!is_wp_error($termLink)) {
+							$breadcrumbs[] = [
+								'url' => (string) $termLink,
+								'title' => $t->name,
+								'is_current' => false,
+							];
+						}
+					}
+				}
+			} else {
+				// Если нет раздела, добавляем ссылку на каталог
+				$breadcrumbs[] = [
+					'url' => home_url('/catalog/'),
+					'title' => 'Каталог',
+					'is_current' => false,
+				];
+			}
+		} else {
+			// Для других типов записей добавляем архив
+			$post_type = get_post_type_object($post->post_type);
+			if ($post_type && $post_type->has_archive) {
+				$breadcrumbs[] = [
+					'url' => get_post_type_archive_link($post->post_type),
+					'title' => $post_type->labels->name ?? 'Архив',
+					'is_current' => false,
+				];
+			}
 		}
 		
 		// Текущая запись
@@ -74,19 +152,55 @@ if (is_page()) {
 } elseif (is_tax() || is_category() || is_tag()) {
 	$term = get_queried_object();
 	if ($term instanceof WP_Term) {
-		// Добавляем архив таксономии если есть
-		$taxonomy = get_taxonomy($term->taxonomy);
-		if ($taxonomy && !empty($taxonomy->object_type)) {
-			$post_type = get_post_type_object($taxonomy->object_type[0]);
-			if ($post_type && $post_type->has_archive) {
-				$breadcrumbs[] = [
-					'url' => get_post_type_archive_link($taxonomy->object_type[0]),
-					'title' => $post_type->labels->name ?? 'Архив',
-					'is_current' => false,
-				];
+		// Для portfolio_category добавляем "Портфолио"
+		if ($term->taxonomy === 'portfolio_category') {
+			$breadcrumbs[] = [
+				'url' => home_url('/portfolio/'),
+				'title' => 'Портфолио',
+				'is_current' => false,
+			];
+		}
+		// Для product_section добавляем "Каталог" и родительские термы
+		elseif ($term->taxonomy === 'product_section') {
+			$breadcrumbs[] = [
+				'url' => home_url('/catalog/'),
+				'title' => 'Каталог',
+				'is_current' => false,
+			];
+
+			// Добавляем родительские термы
+			if ($term->parent > 0) {
+				$ancestors = get_ancestors($term->term_id, 'product_section', 'taxonomy');
+				$ancestors = array_reverse($ancestors);
+				foreach ($ancestors as $ancestorId) {
+					$ancestor = get_term($ancestorId, 'product_section');
+					if ($ancestor instanceof WP_Term) {
+						$ancestorLink = get_term_link($ancestor);
+						if (!is_wp_error($ancestorLink)) {
+							$breadcrumbs[] = [
+								'url' => (string) $ancestorLink,
+								'title' => $ancestor->name,
+								'is_current' => false,
+							];
+						}
+					}
+				}
+			}
+		} else {
+			// Для других таксономий — архив post type если есть
+			$taxonomy = get_taxonomy($term->taxonomy);
+			if ($taxonomy && !empty($taxonomy->object_type)) {
+				$post_type = get_post_type_object($taxonomy->object_type[0]);
+				if ($post_type && $post_type->has_archive) {
+					$breadcrumbs[] = [
+						'url' => get_post_type_archive_link($taxonomy->object_type[0]),
+						'title' => $post_type->labels->name ?? 'Архив',
+						'is_current' => false,
+					];
+				}
 			}
 		}
-		
+
 		// Текущая категория/термин
 		$breadcrumbs[] = [
 			'url' => '',

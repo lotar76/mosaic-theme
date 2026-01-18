@@ -54,8 +54,9 @@ function mosaic_get_catalog_categories(): array {
  * Важно: позиции в WP меню часто строковые и могут быть "десятичными" (например "58.0001").
  *
  * @param string $position
+ * @param string $label Опциональная подпись рядом с разделителем
  */
-function mosaic_add_admin_menu_separator(string $position): void {
+function mosaic_add_admin_menu_separator(string $position, string $label = ''): void {
 	global $menu;
 
 	if (!is_array($menu)) {
@@ -63,7 +64,35 @@ function mosaic_add_admin_menu_separator(string $position): void {
 	}
 
 	$slug = 'separator-mosaic-' . preg_replace('~[^a-z0-9_-]+~i', '-', $position);
-	$menu[$position] = ['', 'read', $slug, '', 'wp-menu-separator'];
+
+	if ($label !== '') {
+		// Разделитель с подписью — используем структуру обычного пункта меню
+		$menu[$position] = [
+			$label,                        // 0: menu title
+			'read',                        // 1: capability
+			$slug,                         // 2: menu slug
+			'',                            // 3: page title
+			'menu-top mosaic-labeled-separator', // 4: classes
+			$slug,                         // 5: id
+			'none',                        // 6: icon
+		];
+	} else {
+		$menu[$position] = ['', 'read', $slug, '', 'wp-menu-separator'];
+	}
+}
+
+/**
+ * Скрывает стандартные пункты меню WordPress.
+ */
+function mosaic_hide_default_admin_menu_items(): void {
+	// Записи (Posts)
+	remove_menu_page('edit.php');
+	// Комментарии
+	remove_menu_page('edit-comments.php');
+	// Консоль (Dashboard) — оставляем только для суперадминов
+	if (!is_super_admin()) {
+		remove_menu_page('index.php');
+	}
 }
 
 

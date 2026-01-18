@@ -184,15 +184,20 @@ if (is_admin()) {
 			return;
 		}
 
-		// Визуально отделяем наш блок меню от стандартных.
+		// Скрываем стандартные пункты меню WP (Записи, Комментарии, Консоль).
+		if (function_exists('mosaic_hide_default_admin_menu_items')) {
+			mosaic_hide_default_admin_menu_items();
+		}
+
+		// Разделитель с подписью "Мозаика" перед блоком настроек темы.
 		if (function_exists('mosaic_add_admin_menu_separator')) {
-			mosaic_add_admin_menu_separator('55.9');
-			mosaic_add_admin_menu_separator('59.9');
+			mosaic_add_admin_menu_separator('55.9', 'Мозаика');
+			mosaic_add_admin_menu_separator('59.99');
 		}
 
 		$hook = add_menu_page(
 			'Баннер на главной',
-			'Баннер на главной',
+			'Баннер',
 			'edit_theme_options',
 			'mosaic-home-settings',
 			'mosaic_render_home_settings_page',
@@ -257,15 +262,40 @@ JS;
 	});
 
 	add_action('admin_head', static function (): void {
-		// Красим только наши разделители.
+		// Стили для разделителей в админ-меню.
 		echo '<style>
 			#adminmenu li#separator-mosaic-55-9,
-			#adminmenu li#separator-mosaic-59-9 {
+			#adminmenu li#separator-mosaic-59-99 {
 				margin: 8px 0;
 			}
 			#adminmenu li#separator-mosaic-55-9 div.separator,
-			#adminmenu li#separator-mosaic-59-9 div.separator {
+			#adminmenu li#separator-mosaic-59-99 div.separator {
 				border-top-color: rgba(255, 255, 255, 0.55) !important;
+			}
+			/* Разделитель с подписью "Мозаика" */
+			#adminmenu li.mosaic-labeled-separator {
+				pointer-events: none;
+				margin: 12px 0 4px 0;
+			}
+			#adminmenu li.mosaic-labeled-separator a.menu-top {
+				color: rgba(240, 246, 252, 0.5) !important;
+				font-size: 11px;
+				font-weight: 400;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				padding: 4px 12px;
+				background: transparent !important;
+				cursor: default;
+			}
+			#adminmenu li.mosaic-labeled-separator a.menu-top:before {
+				content: "";
+				display: block;
+				border-top: 1px solid rgba(255, 255, 255, 0.25);
+				margin-bottom: 8px;
+			}
+			#adminmenu li.mosaic-labeled-separator a.menu-top .wp-menu-image,
+			#adminmenu li.mosaic-labeled-separator a.menu-top .wp-menu-arrow {
+				display: none;
 			}
 		</style>';
 	});

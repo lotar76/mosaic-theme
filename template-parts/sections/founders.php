@@ -5,6 +5,17 @@
  */
 
 declare(strict_types=1);
+
+$aboutData = mosaic_get_about_home();
+$founders = $aboutData['founders'];
+
+$imageUrl = '';
+if ($founders['image_id'] > 0) {
+	$imageUrl = (string) wp_get_attachment_image_url($founders['image_id'], 'large');
+}
+if ($imageUrl === '' && $founders['image_url'] !== '') {
+	$imageUrl = $founders['image_url'];
+}
 ?>
 
 <!-- Founders Section -->
@@ -14,21 +25,21 @@ declare(strict_types=1);
 			<!-- Left: Founders Info -->
 			<div class="flex flex-col justify-center bg-gray px-6 md:px-12 lg:px-16 py-12 lg:py-20 order-2 lg:order-1">
 				<h2 class="text-white text-2xl md:text-3xl lg:text-4xl font-normal mb-2">
-					Алексей и Светлана Исаевы
+					<?= esc_html($founders['name']); ?>
 				</h2>
-				<p class="text-white/60 text-lg md:text-xl mb-0">Основатели компании Si Mosaic</p>
+				<p class="text-white/60 text-lg md:text-xl mb-0"><?= esc_html($founders['title']); ?></p>
 				<div class="w-[70px] h-[6px] bg-primary mt-6 mb-8"></div>
 
 				<p class="text-white/80 text-base md:text-lg leading-relaxed">
-					Мы верим, что искусство должно быть живым и может передавать эмоции. Каждый проект имеет свою историю, наполненную смыслом. Мы имеем свой уникальный почерк и это отражается в наших работах. Разработали собственную технологию обучения мастеров, благодаря которой команда работает в едином стиле и качестве. Каждый проект проходит через наш личный контроль: от идеи и художественного замысла до финального исполнения.
+					<?= esc_html($founders['description']); ?>
 				</p>
 			</div>
 
 			<!-- Right: Founders Photo -->
 			<div class="h-[400px] lg:h-[500px] overflow-hidden order-1 lg:order-2">
 				<img
-					src="<?= get_template_directory_uri(); ?>/img/13.png"
-					alt="Алексей и Светлана Исаевы - основатели Si Mosaic"
+					src="<?= esc_url($imageUrl); ?>"
+					alt="<?= esc_attr($founders['name']); ?> - <?= esc_attr($founders['title']); ?>"
 					class="w-full h-full object-cover"
 				>
 			</div>

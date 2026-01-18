@@ -24,7 +24,7 @@ get_header();
     </div>
 
     <!-- Page Content Block -->
-    <div class="pt-[40px]">
+    <div>
         <!-- Catalog Section (without title) -->
         <?php get_template_part('template-parts/sections/catalog', null, [
             'show_title' => false

@@ -73,7 +73,7 @@ if (is_admin()) {
 			return;
 		}
 		$tax = isset($_GET['taxonomy']) ? sanitize_key((string) $_GET['taxonomy']) : '';
-		if ($tax !== 'catalog_category') {
+		if ($tax !== 'product_section') {
 			return;
 		}
 		$userId = get_current_user_id();
@@ -90,7 +90,7 @@ if (is_admin()) {
 		echo '<div class="notice notice-error is-dismissible"><p>' . wp_kses_post($notice) . '</p></div>';
 	});
 
-	add_action('catalog_category_add_form_fields', static function (): void {
+	add_action('product_section_add_form_fields', static function (): void {
 		$maxMb = (int) ceil(mosaic_catalog_term_video_effective_max_bytes() / (1024 * 1024));
 		$serverMb = function_exists('wp_max_upload_size') ? (int) ceil(((int) wp_max_upload_size()) / (1024 * 1024)) : 0;
 
@@ -131,7 +131,7 @@ if (is_admin()) {
 		echo '</div>';
 	});
 
-	add_action('catalog_category_edit_form_fields', static function ($term): void {
+	add_action('product_section_edit_form_fields', static function ($term): void {
 		if (!($term instanceof WP_Term)) {
 			return;
 		}
@@ -180,7 +180,7 @@ if (is_admin()) {
 		echo '</td></tr>';
 	});
 
-	add_action('created_catalog_category', static function (int $termId): void {
+	add_action('created_product_section', static function (int $termId): void {
 		if (isset($_POST['mosaic_cat_image_id'])) {
 			update_term_meta($termId, mosaic_catalog_term_image_meta_key(), absint($_POST['mosaic_cat_image_id']));
 		}
@@ -206,7 +206,7 @@ if (is_admin()) {
 		}
 	});
 
-	add_action('edited_catalog_category', static function (int $termId): void {
+	add_action('edited_product_section', static function (int $termId): void {
 		if (isset($_POST['mosaic_cat_image_id'])) {
 			update_term_meta($termId, mosaic_catalog_term_image_meta_key(), absint($_POST['mosaic_cat_image_id']));
 		}
@@ -237,7 +237,7 @@ if (is_admin()) {
 			return;
 		}
 		$tax = isset($_GET['taxonomy']) ? sanitize_key((string) $_GET['taxonomy']) : '';
-		if ($tax !== 'catalog_category') {
+		if ($tax !== 'product_section') {
 			return;
 		}
 
@@ -357,7 +357,7 @@ JS;
 			return;
 		}
 
-		$terms = get_terms(['taxonomy' => 'catalog_category', 'hide_empty' => false]);
+		$terms = get_terms(['taxonomy' => 'product_section', 'hide_empty' => false]);
 		if (!is_wp_error($terms) && is_array($terms)) {
 			foreach ($terms as $term) {
 				if ($term instanceof WP_Term) {
@@ -376,7 +376,7 @@ JS;
  */
 function mosaic_get_catalog_category_cards(): array {
 	$terms = get_terms([
-		'taxonomy' => 'catalog_category',
+		'taxonomy' => 'product_section',
 		'hide_empty' => false,
 	]);
 	if (is_wp_error($terms) || !is_array($terms) || count($terms) === 0) {
@@ -443,7 +443,7 @@ add_action('admin_init', static function (): void {
 	}
 
 	$existing = get_terms([
-		'taxonomy' => 'catalog_category',
+		'taxonomy' => 'product_section',
 		'hide_empty' => false,
 	]);
 	if (!is_wp_error($existing) && is_array($existing) && count($existing) > 0) {
@@ -464,7 +464,7 @@ add_action('admin_init', static function (): void {
 			continue;
 		}
 
-		$insert = wp_insert_term($title, 'catalog_category', ['slug' => $slug]);
+		$insert = wp_insert_term($title, 'product_section', ['slug' => $slug]);
 		if (is_wp_error($insert)) {
 			continue;
 		}

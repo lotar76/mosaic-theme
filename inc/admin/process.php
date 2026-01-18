@@ -136,7 +136,7 @@ if (is_admin()) {
 			'mosaic-work-process',
 			'mosaic_render_work_process_page',
 			'dashicons-editor-ol',
-			58
+			58.5 // После Меню (58)
 		);
 
 		add_action('admin_enqueue_scripts', static function (string $hookSuffix) use ($hook): void {

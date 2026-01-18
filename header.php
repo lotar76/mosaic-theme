@@ -44,28 +44,9 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
             <nav class="relative flex items-center justify-between h-full gap-4">
                 <!-- Left: Desktop menu (>= 1920) -->
                 <div class="flex-1 hidden min-[1920px]:block">
-                    <ul class="flex items-center gap-6 lg:gap-10 text2">
-                        <li>
-                            <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Каталог">
-                                Каталог
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Портфолио">
-                                Портфолио
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="О нас">
-                                О нас
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Новости">
-                                Новости
-                            </a>
-                        </li>
-                    </ul>
+                    <?php mosaic_render_menu_zone_with_fallback('desktop_left', [
+                        'class' => 'flex items-center gap-6 lg:gap-10 text2',
+                    ]); ?>
                 </div>
 
                 <!-- Left: 1280..1919 (menu + hamburger) - планшет -->
@@ -86,23 +67,9 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M18 6l-12 12"/>
                         </svg>
                     </button>
-                    <ul class="flex items-center gap-6 text2">
-                        <li>
-                            <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Каталог">
-                                Каталог
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Портфолио">
-                                Портфолио
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Шоурум">
-                                Шоурум
-                            </a>
-                        </li>
-                    </ul>
+                    <?php mosaic_render_menu_zone_with_fallback('tablet_inline', [
+                        'class' => 'flex items-center gap-6 text2',
+                    ]); ?>
                 </div>
 
                 <!-- Left: <= 1279 (icons) - мобилка -->
@@ -120,7 +87,7 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
                 </div>
 
                 <!-- Logo -->
-                <a href="#" class="shrink-0 flex items-center justify-center" tabindex="0" aria-label="Si Mosaic - На главную">
+                <a href="<?= esc_url(home_url('/')); ?>" class="shrink-0 flex items-center justify-center" tabindex="0" aria-label="Si Mosaic - На главную">
                     <img
                         src="<?= get_template_directory_uri(); ?>/img/logo/Logo.svg"
                         alt="Si Mosaic"
@@ -130,33 +97,17 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
 
                 <!-- Right: Desktop (>= 1920) -->
                 <div class="flex-1 hidden min-[1920px]:flex items-center justify-end gap-8">
-                        <ul class="flex items-center gap-8 text2">
-                            <li>
-                                <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Магазин">
-                                    Магазин
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Шоурум">
-                                    Шоурум
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Контакты">
-                                    Контакты
-                                </a>
-                            </li>
-                            <li>
-                            <a
-                                href="<?= esc_url($phoneContact['href']); ?>"
-                                class="text2 whitespace-nowrap hover:text-primary transition-colors"
-                                tabindex="0"
-                                aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>"
-                            >
-									<?= esc_html((string) $phoneContact['display']); ?>
-                                </a>
-                            </li>
-                        </ul>
+                    <?php mosaic_render_menu_zone_with_fallback('desktop_right', [
+                        'class' => 'flex items-center gap-8 text2',
+                    ]); ?>
+                    <a
+                        href="<?= esc_url($phoneContact['href']); ?>"
+                        class="text2 whitespace-nowrap hover:text-primary transition-colors"
+                        tabindex="0"
+                        aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>"
+                    >
+                        <?= esc_html((string) $phoneContact['display']); ?>
+                    </a>
                     <div class="flex items-center gap-4">
                         <?php get_template_part('template-parts/social-icons'); ?>
                     </div>
@@ -170,8 +121,8 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
                         tabindex="0"
                         aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>"
                     >
-						<?= esc_html((string) $phoneContact['display']); ?>
-                        </a>
+                        <?= esc_html((string) $phoneContact['display']); ?>
+                    </a>
                     <div class="flex items-center gap-4">
                         <?php get_template_part('template-parts/social-icons'); ?>
                     </div>
@@ -189,12 +140,12 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
                         data-header-menu-toggle="mobile"
                     >
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-icon="burger">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-icon="close">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M18 6l-12 12"/>
                         </svg>
-                </button>
+                    </button>
                 </div>
 
                 <!-- Dropdown menu (1280..1919) - планшет -->
@@ -204,28 +155,9 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
                     data-header-menu-panel="dropdown"
                 >
                     <div class="w-full max-w-[320px] bg-gray/95 backdrop-blur-sm shadow-lg p-6">
-                        <ul class="flex flex-col gap-6 text2">
-                            <li>
-                                <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="О нас">
-                                    О нас
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Новости">
-                                    Новости
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Магазин">
-                                    Магазин
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Контакты">
-                                    Контакты
-                                </a>
-                            </li>
-                        </ul>
+                        <?php mosaic_render_menu_zone_with_fallback('tablet_dropdown', [
+                            'class' => 'flex flex-col gap-6 text2',
+                        ]); ?>
                     </div>
                 </div>
             </nav>
@@ -241,15 +173,9 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
         >
             <div class="flex h-full flex-col p-6">
                 <nav>
-                    <ul class="flex flex-col gap-6 text2">
-                        <li><a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Каталог">Каталог</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Портфолио">Портфолио</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="О нас">О нас</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Новости">Новости</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Магазин">Магазин</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Шоурум">Шоурум</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors" tabindex="0" aria-label="Контакты">Контакты</a></li>
-                    </ul>
+                    <?php mosaic_render_menu_zone_with_fallback('mobile_offcanvas', [
+                        'class' => 'flex flex-col gap-6 text2',
+                    ]); ?>
                 </nav>
 
                 <div class="mt-auto pt-8">
@@ -259,7 +185,7 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
                         tabindex="0"
                         aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>"
                     >
-						<?= esc_html((string) $phoneContact['display']); ?>
+                        <?= esc_html((string) $phoneContact['display']); ?>
                     </a>
                     <div class="mt-6 flex items-center gap-4">
                         <?php get_template_part('template-parts/social-icons'); ?>
@@ -271,4 +197,3 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
 
     <!-- Header spacer (prevents content from going under fixed header) -->
     <div aria-hidden="true" class="h-[120px] max-[1279px]:h-[88px]"></div>
-

@@ -505,8 +505,264 @@ body {
   }
 }
 
+/* Related Products (похожие товары) - carousel like Portfolio */
+[data-related-products] [data-related-track] {
+  gap: 16px;
+}
+
+[data-related-products] [data-related-slide] {
+  scroll-snap-align: start;
+}
+
+[data-related-products] .related-slider.is-scroll {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+}
+
+[data-related-products] .related-slider.is-scroll::-webkit-scrollbar {
+  height: 0;
+}
+
+[data-related-products] .related-slider.is-autoplay {
+  scroll-snap-type: none;
+}
+
+[data-related-products] .related-slider.is-scroll [data-related-track] {
+  transform: none !important;
+  transition: none !important;
+  width: max-content;
+}
+
+[data-related-products] [data-related-media] {
+  width: 300px;
+  height: 228px;
+}
+
+[data-related-products] [data-related-caption] {
+  margin-top: 12px;
+  color: #fff;
+}
+
+[data-related-products] [data-related-title] {
+  font-family: var(--font-century);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 145%;
+  letter-spacing: 0;
+}
+
+@media (min-width: 1280px) and (max-width: 1919px) {
+  [data-related-products] [data-related-track] {
+    gap: 24px;
+  }
+
+  [data-related-products] [data-related-media] {
+    width: 385px;
+    height: 351px;
+  }
+
+  [data-related-products] [data-related-caption] {
+    display: none;
+  }
+}
+
+@media (min-width: 1920px) {
+  [data-related-products] [data-related-track] {
+    gap: 24px;
+  }
+
+  [data-related-products] [data-related-media] {
+    width: 408px;
+    height: 408px;
+  }
+
+  [data-related-products] [data-related-caption] {
+    display: block;
+    margin-top: 14px;
+  }
+
+  [data-related-products] [data-related-title] {
+    font-size: 20px;
+    line-height: 145%;
+    letter-spacing: 0;
+  }
+}
+
+/* Portfolio Page Grid (like Catalog) */
+[data-portfolio-page] {
+  --portfolio-pad: 16px;
+  --portfolio-gap-x: 16px;
+  --portfolio-gap-y: 24px;
+  --portfolio-card-w: 156px;
+  --portfolio-media-h: 238px;
+}
+
+[data-portfolio-page] [data-portfolio-inner] {
+  max-width: 1920px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--portfolio-pad);
+  padding-right: var(--portfolio-pad);
+}
+
+[data-portfolio-page] [data-portfolio-grid] {
+  display: grid;
+  grid-template-columns: repeat(2, var(--portfolio-card-w));
+  justify-content: center;
+  column-gap: var(--portfolio-gap-x);
+  row-gap: var(--portfolio-gap-y);
+}
+
+[data-portfolio-page] [data-portfolio-card] {
+  display: block;
+  width: var(--portfolio-card-w);
+  min-width: 156px;
+}
+
+[data-portfolio-page] [data-portfolio-media] {
+  width: 100%;
+  height: var(--portfolio-media-h);
+  min-height: 238px;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (max-width: 1279px) {
+  [data-portfolio-page] {
+    --portfolio-pad: max(16px, calc(40px + (100vw - 1280px) * 0.09375));
+    --portfolio-card-w: max(156px, calc(282px + (100vw - 1280px) * 0.196875));
+    --portfolio-media-h: max(238px, calc(383px + (100vw - 1280px) * 0.3078125));
+  }
+}
+
+@media (min-width: 1280px) {
+  [data-portfolio-page] {
+    --portfolio-pad: calc(40px + (100vw - 1280px) * 0.09375);
+    --portfolio-gap-x: 24px;
+    --portfolio-gap-y: 0px;
+    --portfolio-card-w: calc(282px + (100vw - 1280px) * 0.196875);
+    --portfolio-media-h: calc(383px + (100vw - 1280px) * 0.3078125);
+  }
+
+  [data-portfolio-page] [data-portfolio-grid] {
+    grid-template-columns: repeat(4, var(--portfolio-card-w));
+    justify-content: start;
+  }
+
+  [data-portfolio-page] [data-portfolio-card] {
+    min-width: 282px;
+  }
+
+  [data-portfolio-page] [data-portfolio-media] {
+    min-height: 383px;
+  }
+}
+
+/* Portfolio Page captions */
+[data-portfolio-page] [data-portfolio-caption] {
+  font-family: var(--font-century);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 145%;
+  letter-spacing: 0;
+  display: block;
+}
+
+[data-portfolio-page] [data-portfolio-category] {
+  font-family: var(--font-century);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 145%;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  margin-top: 2px;
+}
+
+[data-portfolio-page] [data-portfolio-meta] {
+  color: #fff;
+}
+
+[data-portfolio-page] [data-portfolio-card]:is(:hover, :focus-visible) [data-portfolio-meta] {
+  color: var(--color-primary);
+}
+
+@media (min-width: 1280px) and (max-width: 1919px) {
+  [data-portfolio-page] [data-portfolio-caption] {
+    font-size: 22px;
+    line-height: 145%;
+    letter-spacing: 0;
+  }
+
+  [data-portfolio-page] [data-portfolio-category] {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1920px) {
+  [data-portfolio-page] [data-portfolio-caption] {
+    font-size: 24px;
+    line-height: 130%;
+    letter-spacing: -0.01em;
+  }
+
+  [data-portfolio-page] [data-portfolio-category] {
+    font-size: 18px;
+    margin-top: 4px;
+  }
+}
+
+/* Portfolio Filter Buttons */
+[data-portfolio-page] [data-portfolio-filters] {
+  padding-left: var(--portfolio-pad);
+  padding-right: var(--portfolio-pad);
+}
+
+[data-portfolio-page] .portfolio-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
+  font-family: var(--font-century);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1;
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+[data-portfolio-page] .portfolio-filter-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+[data-portfolio-page] .portfolio-filter-btn.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+@media (min-width: 1280px) {
+  [data-portfolio-page] .portfolio-filter-btn {
+    height: 48px;
+    padding: 0 28px;
+    font-size: 18px;
+  }
+}
+
 /* Section Spacing Management */
-/* 
+/*
   ❌ DEPRECATED: .section-spacing классы больше не используются
   
   Правильный подход: space-y на контейнере
@@ -529,4 +785,3 @@ body {
   
   См. .cursor/rules/workflow.mdc для деталей
 */
-

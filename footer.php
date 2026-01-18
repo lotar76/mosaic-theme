@@ -31,13 +31,17 @@ $phoneContact = function_exists('mosaic_get_phone_contact') ? mosaic_get_phone_c
                 </div>
 
                 <nav class="flex flex-col gap-6 text-white font-century font-normal text-[22px] leading-[145%] tracking-[0]" aria-label="Навигация в подвале">
-                    <a href="#" class="hover:text-primary transition-colors w-fit" tabindex="0">Каталог</a>
-                    <a href="#" class="hover:text-primary transition-colors w-fit" tabindex="0">Портфолио</a>
-                    <a href="#" class="hover:text-primary transition-colors w-fit" tabindex="0">О нас</a>
-                    <a href="#" class="hover:text-primary transition-colors w-fit" tabindex="0">Новости</a>
-                    <a href="#" class="hover:text-primary transition-colors w-fit" tabindex="0">Шоурум</a>
-                    <a href="#" class="hover:text-primary transition-colors w-fit" tabindex="0">Контакты</a>
-                    <a href="#" class="hover:text-primary transition-colors w-fit" tabindex="0">Магазин</a>
+                    <?php
+                    $footerItems = mosaic_get_menu_items_for_zone('footer');
+                    if (empty($footerItems)) {
+                        $footerItems = mosaic_get_menu_fallback()['footer'] ?? [];
+                    }
+                    foreach ($footerItems as $item):
+                        $title = $item['title'] ?? '';
+                        $url = $item['url'] ?? '#';
+                    ?>
+                        <a href="<?= esc_url($url); ?>" class="hover:text-primary transition-colors w-fit" tabindex="0"><?= esc_html($title); ?></a>
+                    <?php endforeach; ?>
                 </nav>
 
                 <div class="pt-6 border-t border-white/10 flex flex-col gap-3">
@@ -65,13 +69,9 @@ $phoneContact = function_exists('mosaic_get_phone_contact') ? mosaic_get_phone_c
                     </a>
 
                     <nav class="flex flex-1 flex-nowrap items-center justify-between text-white font-century font-normal text-[20px] leading-[145%] tracking-[0]" aria-label="Навигация в подвале">
-                        <a href="#" class="hover:text-primary transition-colors whitespace-nowrap" tabindex="0">Каталог</a>
-                        <a href="#" class="hover:text-primary transition-colors whitespace-nowrap" tabindex="0">Портфолио</a>
-                        <a href="#" class="hover:text-primary transition-colors whitespace-nowrap" tabindex="0">О нас</a>
-                        <a href="#" class="hover:text-primary transition-colors whitespace-nowrap" tabindex="0">Новости</a>
-                        <a href="#" class="hover:text-primary transition-colors whitespace-nowrap" tabindex="0">Шоурум</a>
-                        <a href="#" class="hover:text-primary transition-colors whitespace-nowrap" tabindex="0">Контакты</a>
-                        <a href="#" class="hover:text-primary transition-colors whitespace-nowrap" tabindex="0">Магазин</a>
+                        <?php foreach ($footerItems as $item): ?>
+                            <a href="<?= esc_url($item['url'] ?? '#'); ?>" class="hover:text-primary transition-colors whitespace-nowrap" tabindex="0"><?= esc_html($item['title'] ?? ''); ?></a>
+                        <?php endforeach; ?>
                     </nav>
                 </div>
 
@@ -110,13 +110,9 @@ $phoneContact = function_exists('mosaic_get_phone_contact') ? mosaic_get_phone_c
 
                 <!-- Menu -->
                 <nav class="flex flex-wrap items-center gap-8" aria-label="Навигация в подвале">
-                    <a href="#" class="text2 hover:text-primary transition-colors" tabindex="0">Каталог</a>
-                    <a href="#" class="text2 hover:text-primary transition-colors" tabindex="0">Портфолио</a>
-                    <a href="#" class="text2 hover:text-primary transition-colors" tabindex="0">О нас</a>
-                    <a href="#" class="text2 hover:text-primary transition-colors" tabindex="0">Новости</a>
-                    <a href="#" class="text2 hover:text-primary transition-colors" tabindex="0">Шоурум</a>
-                    <a href="#" class="text2 hover:text-primary transition-colors" tabindex="0">Контакты</a>
-                    <a href="#" class="text2 hover:text-primary transition-colors" tabindex="0">Магазин</a>
+                    <?php foreach ($footerItems as $item): ?>
+                        <a href="<?= esc_url($item['url'] ?? '#'); ?>" class="text2 hover:text-primary transition-colors" tabindex="0"><?= esc_html($item['title'] ?? ''); ?></a>
+                    <?php endforeach; ?>
                 </nav>
 
                 <!-- Phone & Socials -->

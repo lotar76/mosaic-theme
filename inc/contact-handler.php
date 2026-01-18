@@ -365,7 +365,7 @@ function mosaic_add_contacts_admin_page(): void
 		'mosaic-contacts',                 // Menu slug
 		'mosaic_render_contacts_page',     // Callback
 		'dashicons-email-alt',             // Icon
-		30                                 // Position
+		56.1                               // Position (после Каталога = 56, перед Баннером = 57)
 	);
 }
 

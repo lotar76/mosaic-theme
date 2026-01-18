@@ -1,24 +1,13 @@
 <?php
 /**
  * Template Part: News Section
- * Переиспользуемый блок "Новости и блог"
+ * Переиспользуемый блок "Новости и блог" на главной странице
  */
 
 declare(strict_types=1);
 
-$newsImgBaseUrl = get_template_directory_uri() . '/img/news';
-
-$newsOpt = function_exists('mosaic_get_news') ? mosaic_get_news() : ['items' => []];
-$newsItems = is_array($newsOpt) ? ($newsOpt['items'] ?? []) : [];
-if (!is_array($newsItems)) {
-	$newsItems = [];
-}
-
-$newsPage = function_exists('get_page_by_path') ? get_page_by_path('news') : null;
-$newsArchiveUrl = ($newsPage instanceof WP_Post) ? (string) get_permalink($newsPage) : '#';
-
-// Fallback: если новостей нет — показываем старые 5 карточек из темы.
-$hasDynamicNews = count($newsItems) > 0;
+$newsItems = function_exists('mosaic_get_news_posts') ? mosaic_get_news_posts(10) : [];
+$newsArchiveUrl = home_url('/news/');
 ?>
 
 <!-- News and Blog Section -->
@@ -59,78 +48,35 @@ $hasDynamicNews = count($newsItems) > 0;
 		<!-- News Slider -->
 		<div class="news-slider overflow-hidden">
 			<div class="news-track flex gap-4 md:gap-6 transition-transform duration-500 ease-out">
-				<?php if ($hasDynamicNews) : ?>
+				<?php if (count($newsItems) > 0) : ?>
 					<?php foreach ($newsItems as $item) : ?>
-						<?php
-						if (!is_array($item)) {
-							continue;
-						}
-						$title = (string) ($item['title'] ?? '');
-						$content = (string) ($item['content'] ?? '');
-						$galleryIds = is_array($item['gallery_ids'] ?? null) ? $item['gallery_ids'] : [];
-						$galleryUrls = is_array($item['gallery_urls'] ?? null) ? $item['gallery_urls'] : [];
-
-						$thumbUrl = '';
-						if (count($galleryIds) > 0) {
-							$thumbUrl = (string) wp_get_attachment_image_url((int) $galleryIds[0], 'large');
-						} elseif (count($galleryUrls) > 0) {
-							$thumbUrl = (string) $galleryUrls[0];
-						}
-
-						$textPlain = trim((string) wp_strip_all_tags($content));
-						$excerpt = $textPlain !== '' ? wp_trim_words($textPlain, 18, '…') : '';
-						$caption = $excerpt !== '' ? $excerpt : ($title !== '' ? $title : '');
-						if ($caption === '') {
-							$caption = 'Новость';
-						}
-
-						$aria = $title !== '' ? $title : $caption;
-						?>
-						<a href="<?= esc_url($newsArchiveUrl); ?>" class="news-slide bg-black group flex-shrink-0 w-[280px] md:w-[320px]" tabindex="0" aria-label="<?= esc_attr($aria); ?>">
+						<a href="<?= esc_url($item['url']); ?>" class="news-slide bg-black group flex-shrink-0 w-[280px] md:w-[320px]" tabindex="0" aria-label="<?= esc_attr($item['title']); ?>">
 							<div class="aspect-[4/3] overflow-hidden">
-								<?php if ($thumbUrl !== '') : ?>
+								<?php if ($item['image_url'] !== '') : ?>
 									<img
-										src="<?= esc_url($thumbUrl); ?>"
-										alt="<?= esc_attr($aria); ?>"
+										src="<?= esc_url($item['image_url']); ?>"
+										alt="<?= esc_attr($item['title']); ?>"
 										class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
 										loading="lazy"
 										decoding="async"
 									>
 								<?php else : ?>
-									<img
-										src="<?= esc_url($newsImgBaseUrl . '/1.png'); ?>"
-										alt="<?= esc_attr($aria); ?>"
-										class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-										loading="lazy"
-										decoding="async"
-									>
+									<div class="w-full h-full bg-gray/40 flex items-center justify-center">
+										<span class="text-white/40 text-sm">Нет изображения</span>
+									</div>
 								<?php endif; ?>
 							</div>
 							<p class="p-6 text-white/70 text-sm leading-relaxed">
-								<?= esc_html($caption); ?>
+								<?= esc_html($item['title']); ?>
 							</p>
 						</a>
 					<?php endforeach; ?>
 				<?php else : ?>
-					<?php for ($i = 1; $i <= 5; $i++) : ?>
-						<a href="<?= esc_url($newsArchiveUrl); ?>" class="news-slide bg-black group flex-shrink-0 w-[280px] md:w-[320px]" tabindex="0" aria-label="<?= esc_attr('Новость ' . $i); ?>">
-							<div class="aspect-[4/3] overflow-hidden">
-								<img
-									src="<?= esc_url($newsImgBaseUrl . '/' . $i . '.png'); ?>"
-									alt="<?= esc_attr('Новость ' . $i); ?>"
-									class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-									loading="lazy"
-									decoding="async"
-								>
-							</div>
-							<p class="p-6 text-white/70 text-sm leading-relaxed">
-								Банальные, но неопровержимые выводы, а также независимые государства
-							</p>
-						</a>
-					<?php endfor; ?>
+					<div class="text-white/60 py-8">
+						Новости пока не добавлены
+					</div>
 				<?php endif; ?>
 			</div>
 		</div>
 	</div>
 </section>
-
