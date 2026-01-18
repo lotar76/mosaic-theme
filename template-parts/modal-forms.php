@@ -329,15 +329,22 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 				// Показываем результат
 				result.classList.remove('hidden');
 				if (data.success) {
-					result.className = 'p-4 text-center bg-primary/20 text-white';
-					result.textContent = data.data.message;
+					// Скрываем все поля формы, оставляем только результат
+					var fields = form.querySelectorAll('input, button, p');
+					fields.forEach(function(el) { el.style.display = 'none'; });
+					result.className = 'p-6 text-center bg-primary/20 text-white text-lg';
+					result.innerHTML = '<div class="mb-2 text-2xl">✓</div>' + data.data.message;
 					form.reset();
-					// Закрыть модалку через 2 сек
+					// Закрыть модалку через 3 сек
 					setTimeout(function() {
 						var modal = form.closest('.mosaic-modal');
 						closeModal(modal);
-						result.classList.add('hidden');
-					}, 2000);
+						// Восстановить форму после закрытия
+						setTimeout(function() {
+							fields.forEach(function(el) { el.style.display = ''; });
+							result.classList.add('hidden');
+						}, 300);
+					}, 3000);
 				} else {
 					result.className = 'p-4 text-center bg-red-500/20 text-white';
 					result.textContent = data.data.message || 'Ошибка отправки';
