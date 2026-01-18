@@ -58,6 +58,7 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 					<form class="flex flex-col gap-4" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="contact_form">
 						<input type="hidden" name="form_type" value="showroom">
+						<input type="hidden" name="form_source" value="modal">
 						<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
 
 						<div>
@@ -154,6 +155,7 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 					<form class="flex flex-col gap-4" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="contact_form">
 						<input type="hidden" name="form_type" value="consultation">
+						<input type="hidden" name="form_source" value="modal">
 						<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
 
 						<div>

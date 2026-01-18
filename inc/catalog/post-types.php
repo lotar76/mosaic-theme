@@ -40,10 +40,11 @@ if (!function_exists('mosaic_get_term_path')) {
 }
 
 /**
- * Регистрируем query var для /catalog/
+ * Регистрируем query vars
  */
 add_filter('query_vars', static function (array $vars): array {
 	$vars[] = 'mosaic_catalog_root';
+	$vars[] = 'contact'; // Для уведомлений после отправки формы
 	return $vars;
 });
 
@@ -160,13 +161,10 @@ add_action('template_redirect', static function (): void {
 }, 1);
 
 /**
- * Обработка 404 для товаров — проверяем, может это товар в категории
+ * Обработка товаров в каталоге — проверяем URL и загружаем товар если нужно
+ * Срабатывает как для 404, так и для случаев когда WP не нашел товар правильно
  */
 add_action('template_redirect', static function (): void {
-	if (!is_404()) {
-		return;
-	}
-
 	// Получаем текущий URL path
 	$requestUri = trim((string) ($_SERVER['REQUEST_URI'] ?? ''), '/');
 	$requestUri = strtok($requestUri, '?'); // Убираем query string
@@ -188,6 +186,19 @@ add_action('template_redirect', static function (): void {
 		return;
 	}
 
+	// Проверяем, не загружен ли уже правильный товар
+	global $wp_query, $post;
+	if (
+		!is_404() &&
+		is_singular('product') &&
+		isset($post) &&
+		$post instanceof WP_Post &&
+		$post->post_name === $productSlug
+	) {
+		// Товар уже правильно загружен
+		return;
+	}
+
 	// Ищем товар по slug
 	$product = get_page_by_path($productSlug, OBJECT, 'product');
 	if (!$product || $product->post_status !== 'publish') {
@@ -195,8 +206,6 @@ add_action('template_redirect', static function (): void {
 	}
 
 	// Нашли товар — загружаем шаблон
-	global $wp_query, $post;
-
 	$wp_query->is_404 = false;
 	$wp_query->is_single = true;
 	$wp_query->is_singular = true;

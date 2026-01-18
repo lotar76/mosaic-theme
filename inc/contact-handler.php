@@ -151,11 +151,34 @@ function mosaic_handle_contact_form(): void
 	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $form_type, $contact_id);
 
 	// 5. Редирект с результатом
-	$referer = wp_get_referer() ?: home_url();
+	$referer = wp_get_referer();
+
+	// Если referer пустой или указывает на admin-post.php, используем HTTP_REFERER напрямую
+	if (empty($referer) || strpos($referer, 'admin-post.php') !== false) {
+		$referer = isset($_SERVER['HTTP_REFERER']) ? esc_url_raw($_SERVER['HTTP_REFERER']) : '';
+	}
+
+	// Fallback на главную если всё ещё пусто
+	if (empty($referer)) {
+		$referer = home_url('/');
+	}
+
 	// Успех если хотя бы одно из действий прошло (БД или Telegram)
 	$status = ($contact_id || $telegram_sent) ? 'success' : 'error';
-	// Добавляем якорь к форме, чтобы не скроллить наверх
-	$redirect_url = add_query_arg('contact', $status, $referer) . '#contact-form';
+
+	// Определяем источник формы (modal = модальное окно, inline = обычная форма на странице)
+	$form_source = isset($_POST['form_source']) ? sanitize_key((string) $_POST['form_source']) : 'inline';
+
+	// Убираем существующий якорь из referer (если есть)
+	$referer_no_hash = preg_replace('/#.*$/', '', $referer);
+
+	// Для модальных форм - не добавляем якорь (страница товара, любая страница с модальной формой)
+	// Для inline форм - добавляем якорь #contact-form чтобы проскроллить к форме
+	if ($form_source === 'modal') {
+		$redirect_url = add_query_arg('contact', $status, $referer_no_hash);
+	} else {
+		$redirect_url = add_query_arg('contact', $status, $referer_no_hash) . '#contact-form';
+	}
 
 	wp_safe_redirect($redirect_url);
 	exit;
