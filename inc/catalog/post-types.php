@@ -152,6 +152,11 @@ add_action('pre_get_posts', static function (WP_Query $query): void {
 	$requestUri = trim((string) ($_SERVER['REQUEST_URI'] ?? ''), '/');
 	$requestUri = strtok($requestUri, '?'); // Убираем query string
 
+	// strtok может вернуть false для пустой строки
+	if ($requestUri === false || $requestUri === '') {
+		return;
+	}
+
 	// Проверяем, начинается ли с catalog/
 	if (strpos($requestUri, 'catalog/') !== 0) {
 		return;
@@ -215,6 +220,11 @@ add_action('template_redirect', static function (): void {
 	// Получаем текущий URL path
 	$requestUri = trim((string) ($_SERVER['REQUEST_URI'] ?? ''), '/');
 	$requestUri = strtok($requestUri, '?'); // Убираем query string
+
+	// strtok может вернуть false для пустой строки
+	if ($requestUri === false || $requestUri === '') {
+		return;
+	}
 
 	// Проверяем, начинается ли с catalog/
 	if (strpos($requestUri, 'catalog/') !== 0) {
