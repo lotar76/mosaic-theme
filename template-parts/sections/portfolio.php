@@ -18,6 +18,7 @@ if (function_exists('mosaic_get_portfolio_projects')) {
 			'subtitle' => $project['category'],
 			'image_url' => $project['image_url'],
 			'url' => $project['url'],
+			'pdf_file_url' => $project['pdf_file_url'] ?? '',
 		];
 	}
 }
@@ -31,6 +32,7 @@ if (count($portfolioItems) === 0) {
 			'subtitle' => $i % 2 === 0 ? 'Интерьеры' : 'Коммерческое',
 			'image_url' => get_template_directory_uri() . "/img/portfolio/{$i}.jpg",
 			'url' => home_url("/portfolio/project-{$i}/"),
+			'pdf_file_url' => '',
 		];
 	}
 }
@@ -80,7 +82,7 @@ if (count($portfolioItems) === 0) {
 					$title = (string) ($item['title'] ?? '');
 					$subtitle = (string) ($item['subtitle'] ?? '');
 					$imageUrl = (string) ($item['image_url'] ?? '');
-					$itemUrl = (string) ($item['url'] ?? '');
+					$pdfFileUrl = (string) ($item['pdf_file_url'] ?? '');
 
 					if ($id <= 0) {
 						continue;
@@ -90,11 +92,22 @@ if (count($portfolioItems) === 0) {
 					if ($imageUrl === '') {
 						$imageUrl = get_template_directory_uri() . "/img/portfolio/{$id}.jpg";
 					}
+
+					// Логика PDF: есть PDF - открываем в новой вкладке, нет - не кликабельный
+					$hasPdf = $pdfFileUrl !== '';
+					$linkUrl = $hasPdf ? $pdfFileUrl : '#';
+					$cursorClass = $hasPdf ? '' : 'cursor-default';
 					?>
 					<a
-						href="<?= esc_url($itemUrl); ?>"
-						class="portfolio-slide group flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-black"
-						tabindex="0"
+						href="<?= esc_url($linkUrl); ?>"
+						<?php if ($hasPdf) : ?>
+							target="_blank"
+							rel="noopener noreferrer"
+						<?php else : ?>
+							onclick="return false;"
+						<?php endif; ?>
+						class="portfolio-slide group flex-shrink-0 <?= esc_attr($cursorClass); ?> focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-black"
+						tabindex="<?= $hasPdf ? '0' : '-1'; ?>"
 						aria-label="<?= esc_attr("{$title} {$subtitle}"); ?>"
 						data-portfolio-slide
 					>
@@ -102,7 +115,7 @@ if (count($portfolioItems) === 0) {
 							<img
 								src="<?= esc_url($imageUrl); ?>"
 								alt="<?= esc_attr($title); ?>"
-								class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+								class="w-full h-full object-cover transition-transform duration-500 <?= $hasPdf ? 'group-hover:scale-[1.03]' : ''; ?>"
 								loading="lazy"
 								decoding="async"
 							>
