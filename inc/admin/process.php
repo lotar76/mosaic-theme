@@ -236,31 +236,46 @@ if (is_admin()) {
       start: function(){ $tbody.addClass('is-reordering'); },
       stop: function(){ $tbody.removeClass('is-reordering'); },
       update: function(){
-        if (isSaving) return;
-        isSaving = true;
-
+        // Собираем текущий порядок индексов
         var order = [];
         $tbody.find('tr').each(function(){
-          var idx = parseInt(String($(this).data('index') || ''), 10);
-          if (!Number.isFinite(idx)) return;
+          var raw = $(this).data('index');
+          // Важно: raw может быть 0, поэтому нельзя использовать || (0 - falsy)
+          if (raw === undefined || raw === null || raw === '') return;
+          var idx = parseInt(String(raw), 10);
+          if (!Number.isFinite(idx) || idx < 0) return;
           order.push(idx);
         });
 
+        console.log('=== REORDER DEBUG ===');
+        console.log('Order to send:', order);
+
+        // Сразу обновляем data-index на новые позиции (0, 1, 2, ...)
+        // чтобы следующий drag работал корректно
+        $tbody.find('tr').each(function(newIdx){
+          $(this).attr('data-index', newIdx).data('index', newIdx);
+        });
+
+        // Обновляем номера строк
         $tbody.find('[data-mosaic-process-row-num]').each(function(i){
           $(this).text(String(i + 1));
         });
 
+        // Отправляем на сервер
         $.post(CFG.postUrl, {
           action: 'mosaic_reorder_work_process_blocks',
           mosaic_work_process_nonce: CFG.reorderNonce,
           order: order
         }).done(function(resp){
-          if (resp && resp.success) showNotice('success', 'Порядок сохранён.');
-          else showNotice('error', 'Не удалось сохранить порядок.');
-        }).fail(function(){
+          console.log('Response:', resp);
+          if (resp && resp.success) {
+            showNotice('success', 'Порядок сохранён.');
+          } else {
+            showNotice('error', 'Не удалось сохранить порядок.');
+          }
+        }).fail(function(xhr, status, error){
+          console.log('FAIL:', status, error, xhr.responseText);
           showNotice('error', 'Не удалось сохранить порядок.');
-        }).always(function(){
-          isSaving = false;
         });
       }
     });
@@ -478,30 +493,30 @@ add_action('admin_post_mosaic_reorder_work_process_blocks', static function (): 
 		wp_send_json_error(['message' => 'bad_request'], 400);
 	}
 
-	$order = [];
-	foreach ($orderIn as $v) {
-		$order[] = absint($v);
-	}
+	// order содержит индексы элементов в новом порядке
+	// например [2, 0, 1] означает: элемент с индекса 2 теперь первый, с 0 - второй, с 1 - третий
+	$order = array_map('absint', $orderIn);
 
 	$opt = mosaic_get_work_process();
 	$blocks = is_array($opt['blocks'] ?? null) ? $opt['blocks'] : [];
+	$blocksCount = count($blocks);
 
-	$seen = [];
+	// Переупорядочиваем блоки согласно order
 	$nextBlocks = [];
+	$used = [];
 	foreach ($order as $idx) {
-		if (isset($seen[$idx])) {
-			continue;
-		}
-		$seen[$idx] = true;
-		if (array_key_exists($idx, $blocks)) {
+		// Проверяем что индекс валидный и не использован
+		if ($idx < $blocksCount && !isset($used[$idx]) && isset($blocks[$idx])) {
 			$nextBlocks[] = $blocks[$idx];
+			$used[$idx] = true;
 		}
 	}
-	foreach ($blocks as $i => $row) {
-		if (isset($seen[$i])) {
-			continue;
+
+	// Добавляем оставшиеся блоки (на случай если order неполный)
+	for ($i = 0; $i < $blocksCount; $i++) {
+		if (!isset($used[$i]) && isset($blocks[$i])) {
+			$nextBlocks[] = $blocks[$i];
 		}
-		$nextBlocks[] = $row;
 	}
 
 	$next = mosaic_sanitize_work_process_option(['blocks' => $nextBlocks]);

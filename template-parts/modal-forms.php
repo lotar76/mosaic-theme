@@ -9,6 +9,7 @@ declare(strict_types=1);
 // Получаем контактную информацию
 $siteSettings = function_exists('mosaic_get_site_settings') ? mosaic_get_site_settings() : [];
 $phoneContact = function_exists('mosaic_get_phone_contact') ? mosaic_get_phone_contact() : ['display' => '+7 (928) 206-07-75', 'href' => 'tel:+79282060775'];
+$phone2Contact = function_exists('mosaic_get_phone2_contact') ? mosaic_get_phone2_contact() : ['display' => '+7 (928) 400-32-55', 'href' => 'tel:+79284003255'];
 $address = is_array($siteSettings) ? trim((string) ($siteSettings['address'] ?? '')) : '';
 $address = $address !== '' ? $address : 'Краснодар, Селезнёва 204';
 $workHours = is_array($siteSettings) ? trim((string) ($siteSettings['work_hours'] ?? '')) : '';
@@ -45,9 +46,12 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 					<div class="space-y-4 text-white font-century font-normal text-[16px] min-[1280px]:text-[18px] leading-[145%]">
 						<div><?= esc_html($address); ?></div>
 						<div><?= esc_html($workHours); ?></div>
-						<div>
+						<div class="flex flex-wrap gap-x-3 gap-y-2">
 							<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors">
 								<?= esc_html((string) $phoneContact['display']); ?>
+							</a>
+							<a href="<?= esc_url($phone2Contact['href']); ?>" class="hover:text-primary transition-colors">
+								<?= esc_html((string) $phone2Contact['display']); ?>
 							</a>
 						</div>
 					</div>
@@ -142,9 +146,12 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 					<div class="space-y-4 text-white font-century font-normal text-[16px] min-[1280px]:text-[18px] leading-[145%]">
 						<div><?= esc_html($address); ?></div>
 						<div><?= esc_html($workHours); ?></div>
-						<div>
+						<div class="flex flex-wrap gap-x-3 gap-y-2">
 							<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors">
 								<?= esc_html((string) $phoneContact['display']); ?>
+							</a>
+							<a href="<?= esc_url($phone2Contact['href']); ?>" class="hover:text-primary transition-colors">
+								<?= esc_html((string) $phone2Contact['display']); ?>
 							</a>
 						</div>
 					</div>

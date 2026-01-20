@@ -145,8 +145,9 @@ function mosaic_handle_contact_form_ajax(): void
 	// Сохранение и отправка
 	$contact_id = mosaic_save_contact($name, $email, $phone, $form_type);
 	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $form_type, $contact_id);
+	$email_sent = mosaic_send_email_notification($name, $email, $phone, $form_type);
 
-	if ($contact_id || $telegram_sent) {
+	if ($contact_id || $telegram_sent || $email_sent) {
 		wp_send_json_success(['message' => 'Заявка отправлена! Мы свяжемся с вами в ближайшее время.']);
 	} else {
 		wp_send_json_error(['message' => 'Ошибка отправки. Попробуйте позже.']);
@@ -204,7 +205,10 @@ function mosaic_handle_contact_form(): void
 	// 4. Отправка в Telegram
 	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $form_type, $contact_id);
 
-	// 5. Редирект с результатом
+	// 5. Отправка на email
+	$email_sent = mosaic_send_email_notification($name, $email, $phone, $form_type);
+
+	// 6. Редирект с результатом
 	$referer = wp_get_referer();
 
 	// Если referer пустой или указывает на admin-post.php, используем HTTP_REFERER напрямую
@@ -217,8 +221,8 @@ function mosaic_handle_contact_form(): void
 		$referer = home_url('/');
 	}
 
-	// Успех если хотя бы одно из действий прошло (БД или Telegram)
-	$status = ($contact_id || $telegram_sent) ? 'success' : 'error';
+	// Успех если хотя бы одно из действий прошло (БД, Telegram или Email)
+	$status = ($contact_id || $telegram_sent || $email_sent) ? 'success' : 'error';
 
 	// Определяем источник формы (modal = модальное окно, inline = обычная форма на странице)
 	$form_source = isset($_POST['form_source']) ? sanitize_key((string) $_POST['form_source']) : 'inline';
@@ -351,6 +355,54 @@ function mosaic_send_to_telegram(string $name, string $email, string $phone, str
 
 	error_log('Mosaic Telegram: успешно отправлено!');
 	return true;
+}
+
+/**
+ * Отправляет уведомление о заявке на email из настроек
+ *
+ * @param string $name      Имя клиента
+ * @param string $email     Email клиента
+ * @param string $phone     Телефон клиента
+ * @param string $form_type Тип формы
+ * @return bool True если отправлено успешно
+ */
+function mosaic_send_email_notification(string $name, string $email, string $phone, string $form_type = 'project'): bool
+{
+	$settings = mosaic_get_site_settings();
+	$to_email = $settings['email'] ?? '';
+
+	if (empty($to_email) || !is_email($to_email)) {
+		error_log('Mosaic Email: email не указан в настройках или некорректен');
+		return false;
+	}
+
+	$form_label = mosaic_get_form_type_label($form_type);
+	$site_name = get_bloginfo('name');
+	$date_time = current_time('d.m.Y H:i');
+
+	$subject = "Новая заявка с сайта: {$form_label}";
+
+	$message = "Новая заявка с сайта {$site_name}\n\n";
+	$message .= "Форма: {$form_label}\n";
+	$message .= "Имя: {$name}\n";
+	$message .= "Email: {$email}\n";
+	$message .= "Телефон: {$phone}\n\n";
+	$message .= "Дата: {$date_time}\n";
+
+	$headers = [
+		'Content-Type: text/plain; charset=UTF-8',
+		"Reply-To: {$name} <{$email}>",
+	];
+
+	$sent = wp_mail($to_email, $subject, $message, $headers);
+
+	if ($sent) {
+		error_log("Mosaic Email: успешно отправлено на {$to_email}");
+	} else {
+		error_log("Mosaic Email: ошибка отправки на {$to_email}");
+	}
+
+	return $sent;
 }
 
 // Уведомления пользователю

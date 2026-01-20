@@ -397,7 +397,7 @@ add_action('admin_init', static function (): void {
  *
  * @param string $category Slug категории (пусто = все)
  * @param int $limit Лимит (-1 = все)
- * @return array<int, array{id:int,title:string,url:string,image_url:string,category:string,category_slug:string}>
+ * @return array<int, array{id:int,title:string,url:string,image_url:string,category:string,category_slug:string,pdf_file_url:string}>
  */
 function mosaic_get_portfolio_projects(string $category = '', int $limit = -1): array {
 	$args = [
@@ -451,6 +451,13 @@ function mosaic_get_portfolio_projects(string $category = '', int $limit = -1): 
 				}
 			}
 
+			// Получаем PDF файл
+			$pdfFileId = (int) get_post_meta($postId, '_mosaic_portfolio_pdf_file', true);
+			$pdfFileUrl = '';
+			if ($pdfFileId > 0) {
+				$pdfFileUrl = (string) wp_get_attachment_url($pdfFileId);
+			}
+
 			$projects[] = [
 				'id' => $postId,
 				'title' => get_the_title(),
@@ -458,6 +465,7 @@ function mosaic_get_portfolio_projects(string $category = '', int $limit = -1): 
 				'image_url' => $imageUrl,
 				'category' => $categoryName,
 				'category_slug' => $categorySlug,
+				'pdf_file_url' => $pdfFileUrl,
 			];
 		}
 		wp_reset_postdata();

@@ -57,10 +57,21 @@ $projects = function_exists('mosaic_get_portfolio_projects') ? mosaic_get_portfo
 		<div data-portfolio-grid>
 			<?php if (count($projects) > 0) : ?>
 				<?php foreach ($projects as $project) : ?>
+					<?php
+					$hasPdf = !empty($project['pdf_file_url']);
+					$linkUrl = $hasPdf ? $project['pdf_file_url'] : '#';
+					$cursorClass = $hasPdf ? 'cursor-pointer' : 'cursor-default';
+					?>
 					<a
-						href="<?= esc_url($project['url']); ?>"
-						class="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-black"
-						tabindex="0"
+						href="<?= esc_url($linkUrl); ?>"
+						<?php if ($hasPdf) : ?>
+							target="_blank"
+							rel="noopener noreferrer"
+						<?php else : ?>
+							onclick="return false;"
+						<?php endif; ?>
+						class="group <?= esc_attr($cursorClass); ?> focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-black"
+						tabindex="<?= $hasPdf ? '0' : '-1'; ?>"
 						aria-label="<?= esc_attr($project['title']); ?>"
 						data-portfolio-card
 						data-category="<?= esc_attr($project['category_slug']); ?>"
@@ -70,7 +81,7 @@ $projects = function_exists('mosaic_get_portfolio_projects') ? mosaic_get_portfo
 								<img
 									src="<?= esc_url($project['image_url']); ?>"
 									alt="<?= esc_attr($project['title']); ?>"
-									class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+									class="w-full h-full object-cover transition-transform duration-500 <?= $hasPdf ? 'group-hover:scale-[1.03]' : ''; ?>"
 									loading="lazy"
 									decoding="async"
 								>

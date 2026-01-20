@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 // Получаем контактную информацию
 $phoneContact = function_exists('mosaic_get_phone_contact') ? mosaic_get_phone_contact() : ['display' => '+7 (928) 206-07-75', 'href' => 'tel:+79282060775'];
+$phone2Contact = function_exists('mosaic_get_phone2_contact') ? mosaic_get_phone2_contact() : ['display' => '+7 (928) 400-32-55', 'href' => 'tel:+79284003255'];
 $siteSettings = function_exists('mosaic_get_site_settings') ? mosaic_get_site_settings() : [];
 $email = is_array($siteSettings) ? (string) ($siteSettings['email'] ?? 'si.mosaic@yandex.ru') : 'si.mosaic@yandex.ru';
 $email = $email !== '' ? $email : 'si.mosaic@yandex.ru';
@@ -41,9 +42,12 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 
 					<!-- Contact Details -->
 					<div class="space-y-5 text-white font-century font-normal text-[18px] leading-[145%] tracking-[0]">
-						<div>
+						<div class="flex flex-wrap gap-x-4 gap-y-2">
 							<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>">
 								<?= esc_html((string) $phoneContact['display']); ?>
+							</a>
+							<a href="<?= esc_url($phone2Contact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phone2Contact['display']); ?>">
+								<?= esc_html((string) $phone2Contact['display']); ?>
 							</a>
 						</div>
 						<div>
@@ -137,9 +141,12 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 						</div>
 
 						<div class="space-y-[30px] text-white font-century font-normal text-[20px] leading-[145%] tracking-[0]">
-							<div>
+							<div class="flex flex-wrap gap-x-4 gap-y-2">
 								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>">
 									<?= esc_html((string) $phoneContact['display']); ?>
+								</a>
+								<a href="<?= esc_url($phone2Contact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phone2Contact['display']); ?>">
+									<?= esc_html((string) $phone2Contact['display']); ?>
 								</a>
 							</div>
 							<div>
@@ -231,9 +238,12 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 						</div>
 
 						<div class="space-y-[30px] text-white font-century font-normal text-[20px] leading-[145%] tracking-[0]">
-							<div>
+							<div class="flex flex-wrap gap-x-4 gap-y-2">
 								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>">
 									<?= esc_html((string) $phoneContact['display']); ?>
+								</a>
+								<a href="<?= esc_url($phone2Contact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phone2Contact['display']); ?>">
+									<?= esc_html((string) $phone2Contact['display']); ?>
 								</a>
 							</div>
 							<div>

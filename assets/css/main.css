@@ -813,9 +813,7 @@ body {
 /* Mobile slide sizes */
 [data-showroom-collections] .collections-slide {
   width: 280px;
-}
-
-[data-showroom-collections] .collections-slide .aspect-\[4\/5\] {
+}[data-showroom-collections] .collections-slide .aspect-\[4\/5\] {
   width: 280px;
   height: 350px;
 }

@@ -18,6 +18,7 @@ $map = $data['map'];
 // Site settings for contact form
 $siteSettings = function_exists('mosaic_get_site_settings') ? mosaic_get_site_settings() : [];
 $phoneContact = function_exists('mosaic_get_phone_contact') ? mosaic_get_phone_contact() : ['display' => '+7 (928) 206-07-75', 'href' => 'tel:+79282060775'];
+$phone2Contact = function_exists('mosaic_get_phone2_contact') ? mosaic_get_phone2_contact() : ['display' => '+7 (928) 400-32-55', 'href' => 'tel:+79284003255'];
 $email = is_array($siteSettings) ? (string) ($siteSettings['email'] ?? 'si.mosaic@yandex.ru') : 'si.mosaic@yandex.ru';
 $address = is_array($siteSettings) ? trim((string) ($siteSettings['address'] ?? '')) : '';
 $address = $address !== '' ? $address : 'Краснодар, Селезнёва 204';
@@ -596,9 +597,12 @@ if (count($galleryImages) === 0) {
 
 						<!-- Contact Details -->
 						<div class="space-y-5 text-white font-century font-normal text-[18px] leading-[145%] tracking-[0]">
-							<div>
+							<div class="flex flex-wrap gap-x-4 gap-y-2">
 								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>">
 									<?= esc_html((string) $phoneContact['display']); ?>
+								</a>
+								<a href="<?= esc_url($phone2Contact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phone2Contact['display']); ?>">
+									<?= esc_html((string) $phone2Contact['display']); ?>
 								</a>
 							</div>
 							<div><?= esc_html($address); ?></div>
@@ -682,9 +686,12 @@ if (count($galleryImages) === 0) {
 						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
 
 						<div class="mt-8 space-y-[30px] text-white font-century font-normal text-[20px] leading-[145%] tracking-[0]">
-							<div>
+							<div class="flex flex-wrap gap-x-4 gap-y-2">
 								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>">
 									<?= esc_html((string) $phoneContact['display']); ?>
+								</a>
+								<a href="<?= esc_url($phone2Contact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phone2Contact['display']); ?>">
+									<?= esc_html((string) $phone2Contact['display']); ?>
 								</a>
 							</div>
 							<div><?= esc_html($address); ?></div>
@@ -765,9 +772,12 @@ if (count($galleryImages) === 0) {
 						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
 
 						<div class="mt-8 space-y-[30px] text-white font-century font-normal text-[20px] leading-[145%] tracking-[0]">
-							<div>
+							<div class="flex flex-wrap gap-x-4 gap-y-2">
 								<a href="<?= esc_url($phoneContact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phoneContact['display']); ?>">
 									<?= esc_html((string) $phoneContact['display']); ?>
+								</a>
+								<a href="<?= esc_url($phone2Contact['href']); ?>" class="hover:text-primary transition-colors" tabindex="0" aria-label="<?= esc_attr('Позвонить ' . (string) $phone2Contact['display']); ?>">
+									<?= esc_html((string) $phone2Contact['display']); ?>
 								</a>
 							</div>
 							<div><?= esc_html($address); ?></div>

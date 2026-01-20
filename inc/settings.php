@@ -57,11 +57,12 @@ function mosaic_sanitize_home_hero_option($value): array {
 /**
  * Глобальные настройки сайта (контакты/соцсети/адрес/график).
  *
- * @return array{phone:string,email:string,address:string,work_hours:string,socials:array<string,string>}
+ * @return array{phone:string,phone2:string,email:string,address:string,work_hours:string,socials:array<string,string>}
  */
 function mosaic_get_site_settings_defaults(): array {
 	return [
 		'phone' => '+7 (928) 206-07-75',
+		'phone2' => '+7 (928) 400-32-55',
 		'email' => 'si.mosaic@yandex.ru',
 		'address' => 'Краснодар, Селезнёва 204',
 		'work_hours' => 'Пн - Пт: 09:00 - 18:00',
@@ -77,7 +78,7 @@ function mosaic_get_site_settings_defaults(): array {
 
 /**
  * @param mixed $value
- * @return array{phone:string,email:string,address:string,work_hours:string,socials:array<string,string>}
+ * @return array{phone:string,phone2:string,email:string,address:string,work_hours:string,socials:array<string,string>}
  */
 function mosaic_sanitize_site_settings_option($value): array {
 	$defaults = mosaic_get_site_settings_defaults();
@@ -88,6 +89,7 @@ function mosaic_sanitize_site_settings_option($value): array {
 	}
 
 	$phone = sanitize_text_field((string) ($value['phone'] ?? $defaults['phone']));
+	$phone2 = sanitize_text_field((string) ($value['phone2'] ?? $defaults['phone2']));
 	$emailCandidate = (string) ($value['email'] ?? $defaults['email']);
 	$email = sanitize_email($emailCandidate);
 	$address = sanitize_text_field((string) ($value['address'] ?? $defaults['address']));
@@ -106,6 +108,7 @@ function mosaic_sanitize_site_settings_option($value): array {
 
 	return [
 		'phone' => $phone,
+		'phone2' => $phone2,
 		'email' => $email !== '' ? $email : $defaults['email'],
 		'address' => $address !== '' ? $address : $defaults['address'],
 		'work_hours' => $workHours !== '' ? $workHours : $defaults['work_hours'],
@@ -116,7 +119,7 @@ function mosaic_sanitize_site_settings_option($value): array {
 /**
  * Возвращает настройки сайта (с дефолтами и санитайзом).
  *
- * @return array{phone:string,email:string,address:string,work_hours:string,socials:array<string,string>}
+ * @return array{phone:string,phone2:string,email:string,address:string,work_hours:string,socials:array<string,string>}
  */
 function mosaic_get_site_settings(): array {
 	$opt = get_option('mosaic_site_settings', mosaic_get_site_settings_defaults());
@@ -131,6 +134,28 @@ function mosaic_get_phone_contact(): array {
 	$display = trim((string) ($settings['phone'] ?? ''));
 	if ($display === '') {
 		$display = (string) (mosaic_get_site_settings_defaults()['phone'] ?? '');
+	}
+
+	$tel = preg_replace('~[^\d+]~', '', $display) ?? '';
+	$tel = preg_replace('~^\+?8~', '+7', (string) $tel) ?? (string) $tel;
+	if ($tel !== '' && $tel[0] !== '+') {
+		$tel = '+' . $tel;
+	}
+
+	return [
+		'display' => $display,
+		'href' => $tel !== '' ? 'tel:' . $tel : '#',
+	];
+}
+
+/**
+ * @return array{display:string,href:string}
+ */
+function mosaic_get_phone2_contact(): array {
+	$settings = mosaic_get_site_settings();
+	$display = trim((string) ($settings['phone2'] ?? ''));
+	if ($display === '') {
+		$display = (string) (mosaic_get_site_settings_defaults()['phone2'] ?? '');
 	}
 
 	$tel = preg_replace('~[^\d+]~', '', $display) ?? '';
@@ -459,12 +484,26 @@ JS;
 		);
 
 		add_settings_field(
+			'mosaic_site_phone2',
+			'Телефон 2',
+			static function (): void {
+				$opt = mosaic_get_site_settings();
+				$value = (string) ($opt['phone2'] ?? '');
+				echo '<input type="text" name="mosaic_site_settings[phone2]" value="' . esc_attr($value) . '" class="regular-text" placeholder="+7 (___) ___-__-__">';
+				echo '<p class="description">Второй номер телефона. Показывается на сайте рядом с первым.</p>';
+			},
+			'mosaic-site-settings',
+			'mosaic_site_settings_section'
+		);
+
+		add_settings_field(
 			'mosaic_site_email',
 			'Почта',
 			static function (): void {
 				$opt = mosaic_get_site_settings();
 				$value = (string) ($opt['email'] ?? '');
 				echo '<input type="text" name="mosaic_site_settings[email]" value="' . esc_attr($value) . '" class="regular-text" placeholder="name@domain.com">';
+				echo '<p class="description">На эту почту будут приходить заявки с сайта</p>';
 			},
 			'mosaic-site-settings',
 			'mosaic_site_settings_section'

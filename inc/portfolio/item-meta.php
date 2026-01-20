@@ -16,6 +16,7 @@ add_filter('use_block_editor_for_post_type', static function (bool $useBlockEdit
 function mosaic_portfolio_item_meta_keys(): array {
 	return [
 		'gallery_ids' => '_mosaic_portfolio_gallery',
+		'pdf_file_id' => '_mosaic_portfolio_pdf_file',
 	];
 }
 
@@ -36,9 +37,20 @@ add_action('add_meta_boxes', static function (): void {
 			}
 			$galleryIds = array_values(array_filter(array_map('absint', $galleryIds), static fn($v) => $v > 0));
 
+			// PDF файл
+			$pdfFileId = (int) get_post_meta($post->ID, $k['pdf_file_id'], true);
+			$pdfUrl = '';
+			$pdfFilename = '';
+
+			if ($pdfFileId > 0) {
+				$pdfUrl = wp_get_attachment_url($pdfFileId);
+				$pdfFilename = basename(get_attached_file($pdfFileId));
+			}
+
 			wp_nonce_field('mosaic_portfolio_item_save', 'mosaic_portfolio_item_nonce');
 
 			echo '<style>
+				.mosaic-pf-container { display: flex; flex-direction: column; gap: 16px; }
 				.mosaic-pf-gallery { border: 1px dashed #c3c4c7; border-radius: 12px; padding: 12px; background: #fafafa; }
 				.mosaic-pf-thumbs { margin-top: 10px; margin-bottom: 12px; display:flex; flex-wrap:wrap; gap: 8px; max-height:300px; overflow-y:auto; padding-right:4px; }
 				.mosaic-pf-thumb { width:100px; height:100px; border-radius: 10px; border:1px solid #dcdcde; background:#f6f7f7; cursor:move; position:relative; overflow:hidden; flex-shrink:0; }
@@ -52,8 +64,40 @@ add_action('add_meta_boxes', static function (): void {
 				.mosaic-pf-actions { margin-top: 0; display:flex; gap: 8px; flex-wrap:wrap; }
 				.mosaic-pf-actions .button { border-radius: 10px; }
 				.mosaic-pf-muted { color: #7a7a7a; }
+				.mosaic-pf-pdf-box { border: 1px dashed #c3c4c7; border-radius: 12px; padding: 12px; background: #fafafa; }
+				.mosaic-pf-pdf-preview { margin: 10px 0; padding: 10px; background: #fff; border: 1px solid #dcdcde; border-radius: 8px; display: none; }
+				.mosaic-pf-pdf-preview.has-file { display: block; }
+				.mosaic-pf-pdf-info { display: flex; align-items: center; gap: 10px; }
+				.mosaic-pf-pdf-icon { width: 40px; height: 40px; background: #dc3232; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 12px; }
+				.mosaic-pf-pdf-details { flex: 1; }
+				.mosaic-pf-pdf-name { font-weight: 600; color: #2c3338; margin-bottom: 2px; }
 			</style>';
 
+			echo '<div class="mosaic-pf-container">';
+
+			// PDF файл
+			echo '<div class="mosaic-pf-pdf-box">';
+			echo '<div><strong>PDF файл проекта</strong></div>';
+			echo '<input type="hidden" id="mosaic_pf_pdf_file_id" name="mosaic_pf_pdf_file_id" value="' . esc_attr((string) $pdfFileId) . '">';
+
+			echo '<div class="mosaic-pf-pdf-preview' . ($pdfFileId > 0 ? ' has-file' : '') . '" id="mosaic-pf-pdf-preview">';
+			echo '<div class="mosaic-pf-pdf-info">';
+			echo '<div class="mosaic-pf-pdf-icon">PDF</div>';
+			echo '<div class="mosaic-pf-pdf-details">';
+			echo '<div class="mosaic-pf-pdf-name" id="mosaic-pf-pdf-name">' . esc_html($pdfFilename) . '</div>';
+			echo '<a href="' . esc_url($pdfUrl) . '" target="_blank" id="mosaic-pf-pdf-link" style="font-size:12px;">Открыть файл</a>';
+			echo '</div>';
+			echo '</div>';
+			echo '</div>';
+
+			echo '<div class="mosaic-pf-actions">';
+			echo '<button type="button" class="button button-primary" id="mosaic-pf-pdf-upload">Загрузить PDF</button>';
+			echo '<button type="button" class="button" id="mosaic-pf-pdf-remove" style="' . ($pdfFileId > 0 ? '' : 'display:none;') . '">Удалить</button>';
+			echo '</div>';
+			echo '<p class="description" style="margin-top:8px;">Загрузите PDF файл. При клике на проект на странице портфолио файл откроется в новой вкладке.</p>';
+			echo '</div>';
+
+			// Галерея
 			echo '<div class="mosaic-pf-gallery">';
 			echo '<div><strong>Галерея</strong> <span class="mosaic-pf-muted">(изображений: <span id="mosaic-pf-gallery-count">' . esc_html((string) count($galleryIds)) . '</span>)</span></div>';
 			echo '<input type="hidden" id="mosaic_pf_gallery_ids" name="mosaic_pf_gallery_ids" value="' . esc_attr(implode(',', array_map('intval', $galleryIds))) . '">';
@@ -78,6 +122,8 @@ add_action('add_meta_boxes', static function (): void {
 			echo '</div>';
 			echo '<p class="description" style="margin-top:8px;">Перетаскивайте изображения для изменения порядка. Первое изображение будет превью в списке портфолио.</p>';
 			echo '</div>';
+
+			echo '</div>';
 		},
 		'portfolio',
 		'normal',
@@ -97,6 +143,21 @@ add_action('save_post_portfolio', static function (int $postId): void {
 	}
 
 	$k = mosaic_portfolio_item_meta_keys();
+
+	// Сохранение PDF файла
+	$pdfFileId = isset($_POST['mosaic_pf_pdf_file_id']) ? absint($_POST['mosaic_pf_pdf_file_id']) : 0;
+	if ($pdfFileId > 0) {
+		// Проверяем, что это действительно PDF файл
+		$filePath = get_attached_file($pdfFileId);
+		if ($filePath && file_exists($filePath)) {
+			$fileType = wp_check_filetype($filePath);
+			if ($fileType['type'] === 'application/pdf') {
+				update_post_meta($postId, $k['pdf_file_id'], $pdfFileId);
+			}
+		}
+	} else {
+		delete_post_meta($postId, $k['pdf_file_id']);
+	}
 
 	$galleryRaw = isset($_POST['mosaic_pf_gallery_ids']) ? (string) $_POST['mosaic_pf_gallery_ids'] : '';
 	$gallery = [];
@@ -139,6 +200,7 @@ add_action('admin_enqueue_scripts', static function (string $hook): void {
 (function($){
   var frame;
   var addFrame;
+  var pdfFrame;
 
   function parseIds(val){
     if (!val) return [];
@@ -274,6 +336,37 @@ add_action('admin_enqueue_scripts', static function (string $hook): void {
     e.stopPropagation();
     $(this).closest('.mosaic-pf-thumb').remove();
     updateGalleryOrder();
+  });
+
+  // PDF file upload
+  $(document).on('click', '#mosaic-pf-pdf-upload', function(e){
+    e.preventDefault();
+    pdfFrame = wp.media({
+      title: 'Выбрать PDF файл',
+      button: { text: 'Использовать' },
+      multiple: false,
+      library: { type: 'application/pdf' }
+    });
+    pdfFrame.on('select', function(){
+      var attachment = pdfFrame.state().get('selection').first().toJSON();
+      if (attachment.id && attachment.subtype === 'pdf') {
+        $('#mosaic_pf_pdf_file_id').val(attachment.id);
+        $('#mosaic-pf-pdf-name').text(attachment.filename || 'file.pdf');
+        $('#mosaic-pf-pdf-link').attr('href', attachment.url);
+        $('#mosaic-pf-pdf-preview').addClass('has-file');
+        $('#mosaic-pf-pdf-remove').show();
+      }
+    });
+    pdfFrame.open();
+  });
+
+  // PDF file remove
+  $(document).on('click', '#mosaic-pf-pdf-remove', function(e){
+    e.preventDefault();
+    if (!confirm('Удалить PDF файл?')) return;
+    $('#mosaic_pf_pdf_file_id').val('');
+    $('#mosaic-pf-pdf-preview').removeClass('has-file');
+    $('#mosaic-pf-pdf-remove').hide();
   });
 
   // Initialize sortable on page load

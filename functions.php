@@ -32,6 +32,7 @@ require_once __DIR__ . '/inc/admin/process.php';
 require_once __DIR__ . '/inc/admin/about-home.php';
 require_once __DIR__ . '/inc/admin/about-page.php';
 require_once __DIR__ . '/inc/admin/showroom-page.php';
+require_once __DIR__ . '/inc/admin/benefits-page.php';
 
 // Contact form handler
 require_once __DIR__ . '/inc/contact-handler.php';
