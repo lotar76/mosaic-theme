@@ -66,6 +66,8 @@ function mosaic_get_site_settings_defaults(): array {
 		'email' => 'si.mosaic@yandex.ru',
 		'address' => 'Краснодар, Селезнёва 204',
 		'work_hours' => 'Пн - Пт: 09:00 - 18:00',
+		'privacy_policy_url' => '/privacy-policy/',
+		'newsletter_policy_url' => '/newsletter-policy/',
 		'socials' => [
 			'whatsapp' => 'https://wa.me/79282060775',
 			'vk' => 'https://vk.com/simosaic',
@@ -94,6 +96,8 @@ function mosaic_sanitize_site_settings_option($value): array {
 	$email = sanitize_email($emailCandidate);
 	$address = sanitize_text_field((string) ($value['address'] ?? $defaults['address']));
 	$workHours = sanitize_text_field((string) ($value['work_hours'] ?? $defaults['work_hours']));
+	$privacyPolicyUrl = sanitize_text_field((string) ($value['privacy_policy_url'] ?? $defaults['privacy_policy_url']));
+	$newsletterPolicyUrl = sanitize_text_field((string) ($value['newsletter_policy_url'] ?? $defaults['newsletter_policy_url']));
 
 	$socialsIn = $value['socials'] ?? [];
 	$socials = [];
@@ -112,6 +116,8 @@ function mosaic_sanitize_site_settings_option($value): array {
 		'email' => $email !== '' ? $email : $defaults['email'],
 		'address' => $address !== '' ? $address : $defaults['address'],
 		'work_hours' => $workHours !== '' ? $workHours : $defaults['work_hours'],
+		'privacy_policy_url' => $privacyPolicyUrl,
+		'newsletter_policy_url' => $newsletterPolicyUrl,
 		'socials' => $socials,
 	];
 }
@@ -531,6 +537,39 @@ JS;
 			},
 			'mosaic-site-settings',
 			'mosaic_site_settings_section'
+		);
+
+		add_settings_section(
+			'mosaic_site_forms_section',
+			'Формы заявок',
+			'__return_false',
+			'mosaic-site-settings'
+		);
+
+		add_settings_field(
+			'mosaic_site_privacy_policy_url',
+			'Политика обработки данных',
+			static function (): void {
+				$opt = mosaic_get_site_settings();
+				$value = (string) ($opt['privacy_policy_url'] ?? '');
+				echo '<input type="text" name="mosaic_site_settings[privacy_policy_url]" value="' . esc_attr($value) . '" class="regular-text" placeholder="/privacy-policy/">';
+				echo '<p class="description">Путь к странице политики обработки персональных данных</p>';
+			},
+			'mosaic-site-settings',
+			'mosaic_site_forms_section'
+		);
+
+		add_settings_field(
+			'mosaic_site_newsletter_policy_url',
+			'Политика рассылок',
+			static function (): void {
+				$opt = mosaic_get_site_settings();
+				$value = (string) ($opt['newsletter_policy_url'] ?? '');
+				echo '<input type="text" name="mosaic_site_settings[newsletter_policy_url]" value="' . esc_attr($value) . '" class="regular-text" placeholder="/newsletter-policy/">';
+				echo '<p class="description">Путь к странице политики рассылок</p>';
+			},
+			'mosaic-site-settings',
+			'mosaic_site_forms_section'
 		);
 
 		add_settings_section(

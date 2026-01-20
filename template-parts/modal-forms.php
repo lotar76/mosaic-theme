@@ -14,6 +14,10 @@ $address = is_array($siteSettings) ? trim((string) ($siteSettings['address'] ?? 
 $address = $address !== '' ? $address : 'Краснодар, Селезнёва 204';
 $workHours = is_array($siteSettings) ? trim((string) ($siteSettings['work_hours'] ?? '')) : '';
 $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
+
+// URL для чекбоксов согласий
+$privacyPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['privacy_policy_url'] ?? '/privacy-policy/')) : '/privacy-policy/';
+$newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['newsletter_policy_url'] ?? '/newsletter-policy/')) : '/newsletter-policy/';
 ?>
 
 <!-- Modal: Записаться в шоурум -->
@@ -98,6 +102,22 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 							>
 						</div>
 
+						<!-- Consent Checkboxes -->
+						<div class="space-y-3">
+							<label class="flex items-start gap-3 cursor-pointer group">
+								<input type="checkbox" name="consent_privacy" value="1" checked required class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+								<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+									Согласен с <a href="<?= esc_url(home_url($privacyPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">обработкой персональных данных</a>
+								</span>
+							</label>
+							<label class="flex items-start gap-3 cursor-pointer group">
+								<input type="checkbox" name="consent_newsletter" value="1" class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+								<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+									Согласен на <a href="<?= esc_url(home_url($newsletterPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">получение рассылок</a>
+								</span>
+							</label>
+						</div>
+
 						<button
 							type="submit"
 							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
@@ -105,10 +125,6 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 						>
 							Отправить заявку
 						</button>
-
-						<p class="text-white/40 text-xs text-left">
-							Согласен с обработкой персональных данных
-						</p>
 					</form>
 				</div>
 			</div>
@@ -197,6 +213,22 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 							>
 						</div>
 
+						<!-- Consent Checkboxes -->
+						<div class="space-y-3">
+							<label class="flex items-start gap-3 cursor-pointer group">
+								<input type="checkbox" name="consent_privacy" value="1" checked required class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+								<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+									Согласен с <a href="<?= esc_url(home_url($privacyPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">обработкой персональных данных</a>
+								</span>
+							</label>
+							<label class="flex items-start gap-3 cursor-pointer group">
+								<input type="checkbox" name="consent_newsletter" value="1" class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+								<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+									Согласен на <a href="<?= esc_url(home_url($newsletterPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">получение рассылок</a>
+								</span>
+							</label>
+						</div>
+
 						<button
 							type="submit"
 							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors disabled:opacity-50"
@@ -205,10 +237,6 @@ $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 							<span class="btn-text">Отправить заявку</span>
 							<span class="btn-loading hidden">Отправка...</span>
 						</button>
-
-						<p class="text-white/40 text-xs text-left">
-							Согласен с обработкой персональных данных
-						</p>
 
 						<!-- Сообщение результата -->
 						<div id="modal-consultation-result" class="hidden p-4 text-center"></div>

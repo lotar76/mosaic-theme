@@ -95,6 +95,33 @@ function mosaic_migrate_contacts_table(): void
 	update_option($migration_key, true);
 }
 
+// Миграция: добавление колонок для чекбоксов согласий
+add_action('admin_init', 'mosaic_migrate_contacts_consents');
+
+/**
+ * Добавляет колонки для чекбоксов согласий
+ */
+function mosaic_migrate_contacts_consents(): void
+{
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'mosaic_contacts';
+	$migration_key = 'mosaic_contacts_consents_added';
+
+	if (get_option($migration_key)) {
+		return;
+	}
+
+	// Проверяем существование колонки consent_privacy
+	$column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table_name} LIKE 'consent_privacy'");
+
+	if (empty($column_exists)) {
+		$wpdb->query("ALTER TABLE {$table_name} ADD COLUMN consent_privacy tinyint(1) NOT NULL DEFAULT 0 AFTER user_agent");
+		$wpdb->query("ALTER TABLE {$table_name} ADD COLUMN consent_newsletter tinyint(1) NOT NULL DEFAULT 0 AFTER consent_privacy");
+	}
+
+	update_option($migration_key, true);
+}
+
 // Обработчики формы (стандартный POST)
 add_action('admin_post_nopriv_contact_form', 'mosaic_handle_contact_form');
 add_action('admin_post_contact_form', 'mosaic_handle_contact_form');
@@ -121,6 +148,8 @@ function mosaic_handle_contact_form_ajax(): void
 	$email = isset($_POST['email']) ? sanitize_email((string) $_POST['email']) : '';
 	$phone = isset($_POST['phone']) ? sanitize_text_field((string) $_POST['phone']) : '';
 	$form_type = isset($_POST['form_type']) ? sanitize_key((string) $_POST['form_type']) : 'project';
+	$consent_privacy = isset($_POST['consent_privacy']) && $_POST['consent_privacy'] === '1';
+	$consent_newsletter = isset($_POST['consent_newsletter']) && $_POST['consent_newsletter'] === '1';
 
 	$allowed_types = ['project', 'showroom', 'consultation'];
 	if (!in_array($form_type, $allowed_types, true)) {
@@ -143,9 +172,9 @@ function mosaic_handle_contact_form_ajax(): void
 	}
 
 	// Сохранение и отправка
-	$contact_id = mosaic_save_contact($name, $email, $phone, $form_type);
-	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $form_type, $contact_id);
-	$email_sent = mosaic_send_email_notification($name, $email, $phone, $form_type);
+	$contact_id = mosaic_save_contact($name, $email, $phone, $form_type, $consent_privacy, $consent_newsletter);
+	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $form_type, $contact_id, $consent_privacy, $consent_newsletter);
+	$email_sent = mosaic_send_email_notification($name, $email, $phone, $form_type, $consent_privacy, $consent_newsletter);
 
 	if ($contact_id || $telegram_sent || $email_sent) {
 		wp_send_json_success(['message' => 'Заявка отправлена! Мы свяжемся с вами в ближайшее время.']);
@@ -172,6 +201,8 @@ function mosaic_handle_contact_form(): void
 	$email = isset($_POST['email']) ? sanitize_email((string) $_POST['email']) : '';
 	$phone = isset($_POST['phone']) ? sanitize_text_field((string) $_POST['phone']) : '';
 	$form_type = isset($_POST['form_type']) ? sanitize_key((string) $_POST['form_type']) : 'project';
+	$consent_privacy = isset($_POST['consent_privacy']) && $_POST['consent_privacy'] === '1';
+	$consent_newsletter = isset($_POST['consent_newsletter']) && $_POST['consent_newsletter'] === '1';
 
 	// Допустимые типы форм
 	$allowed_types = ['project', 'showroom', 'consultation'];
@@ -200,13 +231,13 @@ function mosaic_handle_contact_form(): void
 	}
 
 	// 3. Сохранение в БД
-	$contact_id = mosaic_save_contact($name, $email, $phone, $form_type);
+	$contact_id = mosaic_save_contact($name, $email, $phone, $form_type, $consent_privacy, $consent_newsletter);
 
 	// 4. Отправка в Telegram
-	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $form_type, $contact_id);
+	$telegram_sent = mosaic_send_to_telegram($name, $email, $phone, $form_type, $contact_id, $consent_privacy, $consent_newsletter);
 
 	// 5. Отправка на email
-	$email_sent = mosaic_send_email_notification($name, $email, $phone, $form_type);
+	$email_sent = mosaic_send_email_notification($name, $email, $phone, $form_type, $consent_privacy, $consent_newsletter);
 
 	// 6. Редирект с результатом
 	$referer = wp_get_referer();
@@ -245,13 +276,15 @@ function mosaic_handle_contact_form(): void
 /**
  * Сохраняет контакт в БД
  *
- * @param string $name      Имя
- * @param string $email     Email
- * @param string $phone     Телефон
- * @param string $form_type Тип формы (project, showroom, consultation)
+ * @param string $name             Имя
+ * @param string $email            Email
+ * @param string $phone            Телефон
+ * @param string $form_type        Тип формы (project, showroom, consultation)
+ * @param bool   $consent_privacy  Согласие на обработку персональных данных
+ * @param bool   $consent_newsletter Согласие на рассылку
  * @return int|false ID записи или false при ошибке
  */
-function mosaic_save_contact(string $name, string $email, string $phone, string $form_type = 'project')
+function mosaic_save_contact(string $name, string $email, string $phone, string $form_type = 'project', bool $consent_privacy = false, bool $consent_newsletter = false)
 {
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'mosaic_contacts';
@@ -268,8 +301,10 @@ function mosaic_save_contact(string $name, string $email, string $phone, string 
 			'form_type' => $form_type,
 			'ip_address' => sanitize_text_field($ip_address),
 			'user_agent' => sanitize_text_field($user_agent),
+			'consent_privacy' => $consent_privacy ? 1 : 0,
+			'consent_newsletter' => $consent_newsletter ? 1 : 0,
 		],
-		['%s', '%s', '%s', '%s', '%s', '%s']
+		['%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d']
 	);
 
 	return $result ? (int) $wpdb->insert_id : false;
@@ -295,14 +330,16 @@ function mosaic_get_form_type_label(string $form_type): string
 /**
  * Отправляет сообщение в Telegram
  *
- * @param string    $name       Имя
- * @param string    $email      Email
- * @param string    $phone      Телефон
- * @param string    $form_type  Тип формы
- * @param int|false $contact_id ID заявки в БД или false при ошибке
+ * @param string    $name               Имя
+ * @param string    $email              Email
+ * @param string    $phone              Телефон
+ * @param string    $form_type          Тип формы
+ * @param int|false $contact_id         ID заявки в БД или false при ошибке
+ * @param bool      $consent_privacy    Согласие на обработку данных
+ * @param bool      $consent_newsletter Согласие на рассылку
  * @return bool True если отправлено успешно
  */
-function mosaic_send_to_telegram(string $name, string $email, string $phone, string $form_type = 'project', $contact_id = 0): bool
+function mosaic_send_to_telegram(string $name, string $email, string $phone, string $form_type = 'project', $contact_id = 0, bool $consent_privacy = false, bool $consent_newsletter = false): bool
 {
 	$bot_token = defined('MOSAIC_TELEGRAM_BOT_TOKEN') ? MOSAIC_TELEGRAM_BOT_TOKEN : '';
 	$chat_id = defined('MOSAIC_TELEGRAM_CHAT_ID') ? MOSAIC_TELEGRAM_CHAT_ID : '';
@@ -321,6 +358,9 @@ function mosaic_send_to_telegram(string $name, string $email, string $phone, str
 	$message .= "👤 <b>Имя:</b> " . esc_html($name) . "\n";
 	$message .= "📧 <b>Email:</b> " . esc_html($email) . "\n";
 	$message .= "📱 <b>Телефон:</b> " . esc_html($phone) . "\n";
+	$message .= "\n✅ <b>Согласия:</b>\n";
+	$message .= "• Обработка данных: " . ($consent_privacy ? "Да" : "Нет") . "\n";
+	$message .= "• Рассылка: " . ($consent_newsletter ? "Да" : "Нет") . "\n";
 	$message .= "\n⏰ <i>" . current_time('d.m.Y H:i') . "</i>";
 
 	$api_url = "https://api.telegram.org/bot{$bot_token}/sendMessage";
@@ -360,13 +400,15 @@ function mosaic_send_to_telegram(string $name, string $email, string $phone, str
 /**
  * Отправляет уведомление о заявке на email из настроек
  *
- * @param string $name      Имя клиента
- * @param string $email     Email клиента
- * @param string $phone     Телефон клиента
- * @param string $form_type Тип формы
+ * @param string $name               Имя клиента
+ * @param string $email              Email клиента
+ * @param string $phone              Телефон клиента
+ * @param string $form_type          Тип формы
+ * @param bool   $consent_privacy    Согласие на обработку данных
+ * @param bool   $consent_newsletter Согласие на рассылку
  * @return bool True если отправлено успешно
  */
-function mosaic_send_email_notification(string $name, string $email, string $phone, string $form_type = 'project'): bool
+function mosaic_send_email_notification(string $name, string $email, string $phone, string $form_type = 'project', bool $consent_privacy = false, bool $consent_newsletter = false): bool
 {
 	$settings = mosaic_get_site_settings();
 	$to_email = $settings['email'] ?? '';
@@ -387,6 +429,9 @@ function mosaic_send_email_notification(string $name, string $email, string $pho
 	$message .= "Имя: {$name}\n";
 	$message .= "Email: {$email}\n";
 	$message .= "Телефон: {$phone}\n\n";
+	$message .= "Согласия:\n";
+	$message .= "• Обработка данных: " . ($consent_privacy ? "Да" : "Нет") . "\n";
+	$message .= "• Рассылка: " . ($consent_newsletter ? "Да" : "Нет") . "\n\n";
 	$message .= "Дата: {$date_time}\n";
 
 	$headers = [
@@ -612,12 +657,12 @@ function mosaic_render_contacts_page(): void
 				<thead>
 					<tr>
 						<th style="width: 50px;">ID</th>
-						<th style="width: 180px;">Форма</th>
+						<th style="width: 150px;">Форма</th>
 						<th>Имя</th>
 						<th>Email</th>
 						<th>Телефон</th>
-						<th>Дата</th>
-						<th>IP</th>
+						<th style="width: 100px;">Согласия</th>
+						<th style="width: 130px;">Дата</th>
 						<th style="width: 100px;">Действия</th>
 					</tr>
 				</thead>
@@ -631,6 +676,8 @@ function mosaic_render_contacts_page(): void
 							'consultation' => 'background: #135e96; color: #fff;',
 							default => 'background: #787c82; color: #fff;',
 						};
+						$consent_privacy = isset($contact->consent_privacy) ? (bool) $contact->consent_privacy : false;
+						$consent_newsletter = isset($contact->consent_newsletter) ? (bool) $contact->consent_newsletter : false;
 						?>
 						<tr>
 							<td><?php echo esc_html((string) $contact->id); ?></td>
@@ -651,12 +698,15 @@ function mosaic_render_contacts_page(): void
 								</a>
 							</td>
 							<td>
+								<span title="Обработка данных" style="cursor: help;"><?php echo $consent_privacy ? '✅' : '❌'; ?></span>
+								<span title="Рассылка" style="cursor: help;"><?php echo $consent_newsletter ? '📧' : '—'; ?></span>
+							</td>
+							<td>
 								<?php
 								$date = new DateTime($contact->created_at);
 								echo esc_html($date->format('d.m.Y H:i'));
 								?>
 							</td>
-							<td><small><?php echo esc_html((string) $contact->ip_address); ?></small></td>
 							<td>
 								<a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=mosaic-contacts&action=delete&id=' . $contact->id), 'delete_contact_' . $contact->id)); ?>"
 								   class="button button-small"
@@ -719,17 +769,21 @@ function mosaic_export_contacts_csv(): void
 	fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
 	// Заголовки
-	fputcsv($output, ['ID', 'Форма', 'Имя', 'Email', 'Телефон', 'Дата', 'IP']);
+	fputcsv($output, ['ID', 'Форма', 'Имя', 'Email', 'Телефон', 'Согласие на обработку', 'Согласие на рассылку', 'Дата', 'IP']);
 
 	// Данные
 	foreach ($contacts as $contact) {
 		$form_type = isset($contact->form_type) ? $contact->form_type : 'project';
+		$consent_privacy = isset($contact->consent_privacy) && $contact->consent_privacy ? 'Да' : 'Нет';
+		$consent_newsletter = isset($contact->consent_newsletter) && $contact->consent_newsletter ? 'Да' : 'Нет';
 		fputcsv($output, [
 			$contact->id,
 			mosaic_get_form_type_label($form_type),
 			$contact->name,
 			$contact->email,
 			$contact->phone,
+			$consent_privacy,
+			$consent_newsletter,
 			$contact->created_at,
 			$contact->ip_address,
 		]);
