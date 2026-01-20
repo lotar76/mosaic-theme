@@ -110,6 +110,16 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 							>
 						</div>
 
+						<!-- Submit Button -->
+						<button
+							type="submit"
+							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
+							tabindex="0"
+							aria-label="Отправить заявку"
+						>
+							Отправить заявку
+						</button>
+
 						<!-- Consent Checkboxes -->
 						<div class="space-y-3">
 							<label class="flex items-start gap-3 cursor-pointer group">
@@ -125,16 +135,6 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 								</span>
 							</label>
 						</div>
-
-						<!-- Submit Button -->
-						<button
-							type="submit"
-							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
-							tabindex="0"
-							aria-label="Отправить заявку"
-						>
-							Отправить заявку
-						</button>
 					</form>
 				</div>
 			</div>
@@ -219,6 +219,15 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 								>
 							</div>
 
+							<button
+								type="submit"
+								class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
+								tabindex="0"
+								aria-label="Отправить заявку"
+							>
+								Отправить заявку
+							</button>
+
 							<!-- Consent Checkboxes -->
 							<div class="space-y-3">
 								<label class="flex items-start gap-3 cursor-pointer group">
@@ -234,15 +243,6 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 									</span>
 								</label>
 							</div>
-
-							<button
-								type="submit"
-								class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
-								tabindex="0"
-								aria-label="Отправить заявку"
-							>
-								Отправить заявку
-							</button>
 						</div>
 					</form>
 				</div>
@@ -328,6 +328,15 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 								>
 							</div>
 
+								<button
+								type="submit"
+								class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
+								tabindex="0"
+								aria-label="Отправить заявку"
+							>
+								Отправить заявку
+							</button>
+
 							<!-- Consent Checkboxes -->
 							<div class="space-y-3">
 								<label class="flex items-start gap-3 cursor-pointer group">
@@ -343,15 +352,6 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 									</span>
 								</label>
 							</div>
-
-							<button
-								type="submit"
-								class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
-								tabindex="0"
-								aria-label="Отправить заявку"
-							>
-								Отправить заявку
-							</button>
 						</div>
 					</form>
 				</div>

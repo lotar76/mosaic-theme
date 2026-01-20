@@ -102,6 +102,14 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 							>
 						</div>
 
+						<button
+							type="submit"
+							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
+							aria-label="Отправить заявку"
+						>
+							Отправить заявку
+						</button>
+
 						<!-- Consent Checkboxes -->
 						<div class="space-y-3">
 							<label class="flex items-start gap-3 cursor-pointer group">
@@ -117,14 +125,6 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 								</span>
 							</label>
 						</div>
-
-						<button
-							type="submit"
-							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors"
-							aria-label="Отправить заявку"
-						>
-							Отправить заявку
-						</button>
 					</form>
 				</div>
 			</div>
@@ -213,6 +213,15 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 							>
 						</div>
 
+						<button
+							type="submit"
+							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors disabled:opacity-50"
+							aria-label="Отправить заявку"
+						>
+							<span class="btn-text">Отправить заявку</span>
+							<span class="btn-loading hidden">Отправка...</span>
+						</button>
+
 						<!-- Consent Checkboxes -->
 						<div class="space-y-3">
 							<label class="flex items-start gap-3 cursor-pointer group">
@@ -228,15 +237,6 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 								</span>
 							</label>
 						</div>
-
-						<button
-							type="submit"
-							class="w-full bg-primary hover:bg-opacity-90 text-white h-[56px] px-6 text-base font-normal transition-colors disabled:opacity-50"
-							aria-label="Отправить заявку"
-						>
-							<span class="btn-text">Отправить заявку</span>
-							<span class="btn-loading hidden">Отправка...</span>
-						</button>
 
 						<!-- Сообщение результата -->
 						<div id="modal-consultation-result" class="hidden p-4 text-center"></div>
