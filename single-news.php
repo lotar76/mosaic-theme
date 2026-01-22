@@ -48,7 +48,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 			<!-- Slider Container -->
 			<div class="relative overflow-hidden" id="news-slider-container">
 				<!-- Slides Wrapper -->
-				<div class="flex transition-transform duration-500 ease-out" id="news-slider-track">
+				<div class="flex gap-4 transition-transform duration-500 ease-out" id="news-slider-track">
 					<?php foreach ($galleryIds as $idx => $gid) : ?>
 						<?php
 						$imageUrl = (string) wp_get_attachment_image_url((int) $gid, 'full');
@@ -56,7 +56,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 							continue;
 						}
 						?>
-						<div class="flex-shrink-0 w-1/4 px-2 first:pl-0 last:pr-0" data-slide-index="<?= esc_attr((string) $idx); ?>">
+						<div class="flex-shrink-0 w-[calc(25%-12px)]" data-slide-index="<?= esc_attr((string) $idx); ?>">
 							<div class="aspect-[4/3] bg-gray/20 overflow-hidden cursor-pointer news-slide-item" data-full-url="<?= esc_attr($imageUrl); ?>">
 								<img
 									src="<?= esc_url($imageUrl); ?>"
@@ -113,9 +113,17 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 				font-weight: 400;
 				line-height: 1.3;
 				margin: 0 0 16px 0;
-				padding-bottom: 16px;
-				border-bottom: 3px solid #A36217;
-				display: inline-block;
+				padding-bottom: 24px;
+				position: relative;
+			}
+			.news-content h2::after {
+				content: '';
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				width: 70px;
+				height: 6px;
+				background-color: #A36217;
 			}
 			.news-content h2:not(:first-child) {
 				margin-top: 48px;
@@ -129,16 +137,16 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 			}
 			.news-content p {
 				color: rgba(255, 255, 255, 0.7);
-				font-size: 16px;
+				font-size: 20px;
 				font-weight: 400;
-				line-height: 1.7;
+				line-height: 1.45;
 				margin: 0 0 24px 0;
 			}
 			.news-content ul,
 			.news-content ol {
 				color: rgba(255, 255, 255, 0.7);
-				font-size: 16px;
-				line-height: 1.7;
+				font-size: 20px;
+				line-height: 1.45;
 				margin: 0 0 24px 0;
 				padding-left: 24px;
 			}
@@ -251,12 +259,16 @@ if (count($galleryIds) > 0) :
 	var fullscreenPrev = document.getElementById('news-fullscreen-prev');
 	var fullscreenNext = document.getElementById('news-fullscreen-next');
 
+	var gap = 16; // gap-4 = 16px
+
 	// Slider functions
 	function updateSlider() {
 		if (!track) return;
-		var slideWidth = 100 / slidesPerView;
-		var offset = currentSlideIndex * slideWidth;
-		track.style.transform = 'translateX(-' + offset + '%)';
+		var container = document.getElementById('news-slider-container');
+		var containerWidth = container ? container.offsetWidth : window.innerWidth;
+		var slideWidth = (containerWidth - gap * (slidesPerView - 1)) / slidesPerView;
+		var offset = currentSlideIndex * (slideWidth + gap);
+		track.style.transform = 'translateX(-' + offset + 'px)';
 	}
 
 	function updateSlidesPerView() {
@@ -275,10 +287,13 @@ if (count($galleryIds) > 0) :
 			currentSlideIndex = maxSlideIndex;
 		}
 
-		// Update slide widths
+		// Update slide widths with gap calculation
+		var container = document.getElementById('news-slider-container');
+		var containerWidth = container ? container.offsetWidth : window.innerWidth;
+		var slideWidth = (containerWidth - gap * (slidesPerView - 1)) / slidesPerView;
 		var slides = track ? track.children : [];
 		for (var i = 0; i < slides.length; i++) {
-			slides[i].style.width = (100 / slidesPerView) + '%';
+			slides[i].style.width = slideWidth + 'px';
 		}
 
 		updateSlider();
