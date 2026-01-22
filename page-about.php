@@ -38,6 +38,10 @@ if ($video['url'] !== '') {
 	elseif (preg_match('/vimeo\.com\/(?:video\/)?(\d+)/', $videoUrl, $matches)) {
 		$videoEmbedUrl = 'https://player.vimeo.com/video/' . $matches[1];
 	}
+	// Rutube
+	elseif (preg_match('/rutube\.ru\/(?:video|play\/embed)\/([a-zA-Z0-9]+)/', $videoUrl, $matches)) {
+		$videoEmbedUrl = 'https://rutube.ru/play/embed/' . $matches[1];
+	}
 }
 
 ?>

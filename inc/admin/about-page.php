@@ -441,9 +441,9 @@ function mosaic_render_about_page_admin(): void {
 	echo '<p class="mosaic-field"><label class="mosaic-label">Заголовок секции</label>';
 	echo '<input type="text" class="mosaic-input" name="video_title" value="' . esc_attr($video['title']) . '"></p>';
 
-	echo '<p class="mosaic-field"><label class="mosaic-label">Ссылка на видео (YouTube или Vimeo)</label>';
+	echo '<p class="mosaic-field"><label class="mosaic-label">Ссылка на видео (YouTube, Vimeo или Rutube)</label>';
 	echo '<input type="url" class="mosaic-input" name="video_url" value="' . esc_attr($video['url']) . '" placeholder="https://www.youtube.com/watch?v=..."></p>';
-	echo '<p class="mosaic-muted">Вставьте ссылку на видео YouTube или Vimeo. Например: https://www.youtube.com/watch?v=xxxxx</p>';
+	echo '<p class="mosaic-muted">Вставьте ссылку на видео YouTube, Vimeo или Rutube. Например: https://www.youtube.com/watch?v=xxxxx или https://rutube.ru/video/xxxxx</p>';
 
 	echo '</div></div>';
 
