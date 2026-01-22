@@ -57,7 +57,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 						}
 						?>
 						<div class="flex-shrink-0 w-[calc(25%-12px)]" data-slide-index="<?= esc_attr((string) $idx); ?>">
-							<div class="aspect-[4/3] bg-gray/20 overflow-hidden cursor-pointer news-slide-item" data-full-url="<?= esc_attr($imageUrl); ?>">
+							<div class="aspect-[302/300] md:aspect-[398/393] lg:aspect-[561/651] bg-gray/20 overflow-hidden cursor-pointer news-slide-item" data-full-url="<?= esc_attr($imageUrl); ?>">
 								<img
 									src="<?= esc_url($imageUrl); ?>"
 									alt="<?= esc_attr($title); ?>"
