@@ -14,7 +14,7 @@ if (!is_array($processBlocks)) {
 ?>
 
 <!-- Work Process Section -->
-<section class="bg-gray py-[80px] min-[1280px]:py-[100px]">
+<section class="bg-gray py-[80px] min-[1280px]:py-[100px] overflow-hidden">
 	<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16">
 		<!-- Section Header -->
 		<div class="flex items-center justify-between mb-8 md:mb-12">
