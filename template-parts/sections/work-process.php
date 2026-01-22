@@ -77,26 +77,28 @@ if (!is_array($processBlocks)) {
 					}
 					?>
 					<div class="process-slide bg-black flex-shrink-0 w-[280px] md:w-[320px]">
-						<div class="p-6">
+						<div class="p-5 md:p-[30px] pb-0 md:pb-0">
 							<div class="text-primary text-4xl md:text-5xl font-normal mb-4"><?= esc_html($stepNumber); ?></div>
 							<?php if ($title !== '') : ?>
-								<h3 class="text-white text-lg md:text-xl font-normal mb-3"><?= esc_html($title); ?></h3>
+								<h3 class="text-white text-lg md:text-xl font-normal mb-3 min-h-[56px] line-clamp-2"><?= esc_html($title); ?></h3>
 							<?php endif; ?>
 							<?php if ($description !== '') : ?>
-								<p class="text-white/70 text-sm leading-relaxed">
+								<p class="text-white/70 text-sm leading-relaxed min-h-[68px] line-clamp-3">
 									<?= esc_html($description); ?>
 								</p>
 							<?php endif; ?>
 						</div>
 						<?php if ($src !== '') : ?>
-							<div class="h-[200px] overflow-hidden">
-								<img
-									src="<?= esc_url($src); ?>"
-									alt="<?= esc_attr($altBase); ?>"
-									class="w-full h-full object-cover"
-									loading="lazy"
-									decoding="async"
-								>
+							<div class="p-5 md:p-[30px]">
+								<div class="aspect-[4/3] overflow-hidden">
+									<img
+										src="<?= esc_url($src); ?>"
+										alt="<?= esc_attr($altBase); ?>"
+										class="w-full h-full object-cover"
+										loading="lazy"
+										decoding="async"
+									>
+								</div>
 							</div>
 						<?php endif; ?>
 					</div>
