@@ -66,7 +66,7 @@ $newsArchiveUrl = home_url('/news/');
 									</div>
 								<?php endif; ?>
 							</div>
-							<p class="p-6 text-white/70 text-sm leading-relaxed">
+							<p class="pt-6 text-white text-[20px] leading-[145%] text-left">
 								<?= esc_html($item['title']); ?>
 							</p>
 						</a>
