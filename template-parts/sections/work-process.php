@@ -83,7 +83,7 @@ if (!is_array($processBlocks)) {
 								<h3 class="text-white text-lg md:text-xl font-normal mb-3 min-h-[56px] line-clamp-2"><?= esc_html($title); ?></h3>
 							<?php endif; ?>
 							<?php if ($description !== '') : ?>
-								<p class="text-white/70 text-sm leading-relaxed min-h-[68px] line-clamp-3">
+								<p class="text-white/70 text-[18px] md:text-[20px] leading-[145%] min-h-[79px] md:min-h-[87px] line-clamp-3">
 									<?= esc_html($description); ?>
 								</p>
 							<?php endif; ?>
