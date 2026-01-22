@@ -76,7 +76,7 @@ if (!is_array($processBlocks)) {
 						$altBase .= ': ' . $title;
 					}
 					?>
-					<div class="process-slide bg-black flex-shrink-0 w-[280px] md:w-[320px]">
+					<div class="process-slide bg-black flex-shrink-0 w-[260px] md:w-[385px] lg:w-[408px]">
 						<div class="p-5 md:p-[30px] pb-0 md:pb-0">
 							<div class="text-primary text-4xl md:text-5xl font-normal mb-4"><?= esc_html($stepNumber); ?></div>
 							<?php if ($title !== '') : ?>
