@@ -1715,8 +1715,8 @@ const initShowroomMap = () => {
                 }
             });
 
-            // Кастомный прямоугольный маркер (ромб) как на дизайне
-            const svgIcon = '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="2.93" width="24" height="24" transform="rotate(45 20 2.93)" fill="#A36217"/></svg>';
+            // Кастомный маркер-пин с градиентом
+            const svgIcon = '<svg width="48" height="62" viewBox="0 0 48 62" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pinGrad" x1="24" y1="0" x2="24" y2="62" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E8B94A"/><stop offset="100%" stop-color="#C76A1A"/></linearGradient></defs><path d="M24 0C10.745 0 0 10.745 0 24c0 18 24 38 24 38s24-20 24-38C48 10.745 37.255 0 24 0z" fill="url(#pinGrad)"/><circle cx="24" cy="24" r="11" fill="white"/></svg>';
             // eslint-disable-next-line no-undef
             const placemark = new ymaps.Placemark([lat, lng], {
                 hintContent: 'Si Mosaic Showroom',
@@ -1724,8 +1724,8 @@ const initShowroomMap = () => {
             }, {
                 iconLayout: 'default#image',
                 iconImageHref: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon),
-                iconImageSize: [40, 40],
-                iconImageOffset: [-20, -20]
+                iconImageSize: [48, 62],
+                iconImageOffset: [-24, -62]
             });
 
             map.geoObjects.add(placemark);
