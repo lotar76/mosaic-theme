@@ -44,7 +44,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 	<!-- News Gallery Slider -->
 	<?php if (count($galleryIds) > 0) : ?>
 	<section class="bg-black">
-		<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
+		<div class="max-w-[1920px] mx-auto pl-4 md:pl-8 lg:pl-16 min-[1920px]:pl-[100px]">
 			<!-- Slider Container -->
 			<div class="relative overflow-hidden" id="news-slider-container">
 				<!-- Slides Wrapper -->
