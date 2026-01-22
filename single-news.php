@@ -102,7 +102,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 	<?php if ($content !== '') : ?>
 	<section class="bg-black py-[60px] min-[1280px]:py-[80px]">
 		<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
-			<div class="max-w-[800px] news-content">
+			<div class="max-w-[1138px] news-content">
 				<?= $content; ?>
 			</div>
 		</div>
