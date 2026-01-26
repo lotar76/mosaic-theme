@@ -49,25 +49,25 @@ if (count($portfolioItems) === 0) {
 			</div>
 
 			<!-- Navigation Arrows -->
-			<div class="flex gap-[37px] max-[1279px]:hidden mr-[99px]">
+			<div class="flex gap-6 max-[1279px]:hidden mr-[99px]">
 				<button
 					type="button"
-					class="portfolio-prev p-2 text-white/60 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
+					class="portfolio-prev hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
 					aria-label="Предыдущий слайд"
 					tabindex="0"
 				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
+					<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M26.6667 31.6665L15 19.9998L26.6667 8.33317" stroke="#847575" stroke-width="2" stroke-linecap="square"/>
 					</svg>
 				</button>
 				<button
 					type="button"
-					class="portfolio-next p-2 text-white/60 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
+					class="portfolio-next hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
 					aria-label="Следующий слайд"
 					tabindex="0"
 				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
+					<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M13.3333 8.3335L25 20.0002L13.3333 31.6668" stroke="#847575" stroke-width="2" stroke-linecap="square"/>
 					</svg>
 				</button>
 			</div>

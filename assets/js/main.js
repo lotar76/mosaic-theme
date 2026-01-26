@@ -1088,17 +1088,18 @@ const initProcessSlider = () => {
 
     if (!track || slides.length === 0) return;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const setScrollMode = () => {
         slider.classList.add('is-scroll');
         track.style.transform = 'none';
         track.style.transition = 'none';
     };
 
-    const getProcessSlidesPerView = () => {
-        const width = getViewportWidth();
-        if (!isMobile(width)) return 4;
-        if (width > MIN_WIDTH) return 2;
-        return 1;
+    const setTranslateMode = () => {
+        slider.classList.remove('is-scroll');
+        slider.classList.remove('is-autoplay');
+        track.style.transition = '';
     };
 
     const getSlideStep = () => {
@@ -1115,12 +1116,15 @@ const initProcessSlider = () => {
             setScrollMode();
             return;
         }
+
+        setTranslateMode();
         const step = getSlideStep();
         const offset = currentIndex * step;
         track.style.transform = `translateX(-${offset}px)`;
     };
 
     const handlePrev = () => {
+        if (isMobile(getViewportWidth())) return;
         if (currentIndex > 0) {
             currentIndex--;
             updateSlider();
@@ -1128,7 +1132,8 @@ const initProcessSlider = () => {
     };
 
     const handleNext = () => {
-        const slidesPerView = getProcessSlidesPerView();
+        if (isMobile(getViewportWidth())) return;
+        const slidesPerView = 4;
         const maxIdx = Math.max(0, slides.length - slidesPerView);
         if (currentIndex < maxIdx) {
             currentIndex++;
@@ -1144,9 +1149,180 @@ const initProcessSlider = () => {
         nextBtn.addEventListener('click', handleNext);
     }
 
-    // init
-    updateSlider();
+    /**
+     * Marquee autoplay (аналогично Portfolio)
+     */
+    const SPEED_PX_PER_S = 38;
 
+    const marqueeTransform = { rafId: null, lastTs: null, offsetX: 0, originalWidth: 0, paused: false };
+    const marqueeScroll = { rafId: null, lastTs: null, originalWidth: 0, pausedUntil: 0 };
+    const MOBILE_USER_PAUSE_MS = 2200;
+
+    const stopMarquee = () => {
+        if (marqueeTransform.rafId !== null) cancelAnimationFrame(marqueeTransform.rafId);
+        marqueeTransform.rafId = null;
+        marqueeTransform.lastTs = null;
+        if (marqueeScroll.rafId !== null) cancelAnimationFrame(marqueeScroll.rafId);
+        marqueeScroll.rafId = null;
+        marqueeScroll.lastTs = null;
+        slider.classList.remove('is-autoplay');
+    };
+
+    const ensureClonesForTransform = () => {
+        const width = getViewportWidth();
+        if (isMobile(width)) return false;
+        if (prefersReducedMotion) return false;
+        if (!document.body.contains(slider)) return false;
+
+        // reset any previous clones
+        Array.from(track.querySelectorAll('[data-process-clone="1"]')).forEach((n) => n.remove());
+
+        const originalChildren = Array.from(track.children);
+        if (originalChildren.length === 0) return false;
+
+        // Measure original width (one set)
+        marqueeTransform.originalWidth = track.scrollWidth;
+        if (marqueeTransform.originalWidth <= 0) return false;
+
+        // Append enough clones to cover at least 2x width for seamless wrap
+        while (track.scrollWidth < marqueeTransform.originalWidth * 2) {
+            originalChildren.forEach((child) => {
+                const clone = child.cloneNode(true);
+                if (clone instanceof HTMLElement) clone.dataset.processClone = '1';
+                track.appendChild(clone);
+            });
+        }
+
+        track.style.transition = 'none';
+        track.style.willChange = 'transform';
+        slider.classList.remove('is-scroll');
+        return true;
+    };
+
+    const tickTransform = (ts) => {
+        if (marqueeTransform.paused) {
+            marqueeTransform.lastTs = ts;
+            marqueeTransform.rafId = requestAnimationFrame(tickTransform);
+            return;
+        }
+
+        if (marqueeTransform.lastTs === null) marqueeTransform.lastTs = ts;
+        const dt = Math.min(48, ts - marqueeTransform.lastTs);
+        marqueeTransform.lastTs = ts;
+
+        marqueeTransform.offsetX += (SPEED_PX_PER_S * dt) / 1000;
+        if (marqueeTransform.originalWidth > 0 && marqueeTransform.offsetX >= marqueeTransform.originalWidth) {
+            marqueeTransform.offsetX -= marqueeTransform.originalWidth;
+        }
+        track.style.transform = `translateX(-${marqueeTransform.offsetX}px)`;
+        marqueeTransform.rafId = requestAnimationFrame(tickTransform);
+    };
+
+    const startMarqueeDesktop = () => {
+        stopMarquee();
+        marqueeTransform.offsetX = 0;
+        marqueeTransform.paused = false;
+        if (!ensureClonesForTransform()) {
+            updateSlider();
+            return;
+        }
+        marqueeTransform.rafId = requestAnimationFrame(tickTransform);
+    };
+
+    const ensureClonesForScroll = () => {
+        const width = getViewportWidth();
+        if (!isMobile(width)) return false;
+        if (prefersReducedMotion) return false;
+        if (!document.body.contains(slider)) return false;
+
+        Array.from(track.querySelectorAll('[data-process-clone="1"]')).forEach((n) => n.remove());
+        marqueeScroll.originalWidth = track.scrollWidth;
+        if (marqueeScroll.originalWidth <= 0) return false;
+
+        const originals = Array.from(track.children);
+        if (originals.length === 0) return false;
+
+        while (track.scrollWidth < marqueeScroll.originalWidth * 2) {
+            originals.forEach((child) => {
+                const clone = child.cloneNode(true);
+                if (clone instanceof HTMLElement) clone.dataset.processClone = '1';
+                track.appendChild(clone);
+            });
+        }
+        return true;
+    };
+
+    const tickScroll = (ts) => {
+        const width = getViewportWidth();
+        if (!isMobile(width)) {
+            stopMarquee();
+            return;
+        }
+
+        if (Date.now() < marqueeScroll.pausedUntil) {
+            marqueeScroll.lastTs = ts;
+            marqueeScroll.rafId = requestAnimationFrame(tickScroll);
+            return;
+        }
+
+        slider.classList.add('is-autoplay');
+        if (marqueeScroll.lastTs === null) marqueeScroll.lastTs = ts;
+        const dt = Math.min(48, ts - marqueeScroll.lastTs);
+        marqueeScroll.lastTs = ts;
+
+        slider.scrollLeft += (SPEED_PX_PER_S * dt) / 1000;
+        if (marqueeScroll.originalWidth > 0 && slider.scrollLeft >= marqueeScroll.originalWidth) {
+            slider.scrollLeft -= marqueeScroll.originalWidth;
+        }
+        marqueeScroll.rafId = requestAnimationFrame(tickScroll);
+    };
+
+    const startMarqueeMobile = () => {
+        stopMarquee();
+        setScrollMode();
+        if (!ensureClonesForScroll()) return;
+        slider.scrollLeft = 0;
+        marqueeScroll.pausedUntil = Date.now() + 700;
+        marqueeScroll.rafId = requestAnimationFrame(tickScroll);
+    };
+
+    // pause on hover/focus for readability
+    slider.addEventListener('mouseenter', () => {
+        marqueeTransform.paused = true;
+    });
+    slider.addEventListener('mouseleave', () => {
+        marqueeTransform.paused = false;
+    });
+    slider.addEventListener('focusin', () => {
+        marqueeTransform.paused = true;
+    });
+    slider.addEventListener('focusout', () => {
+        marqueeTransform.paused = false;
+    });
+
+    // mobile user interaction pauses autoplay so swipe feels normal
+    const pauseMobileByUser = () => {
+        marqueeScroll.pausedUntil = Date.now() + MOBILE_USER_PAUSE_MS;
+        slider.classList.remove('is-autoplay');
+    };
+    slider.addEventListener('pointerdown', pauseMobileByUser, { passive: true });
+    slider.addEventListener('touchstart', pauseMobileByUser, { passive: true });
+    slider.addEventListener('wheel', pauseMobileByUser, { passive: true });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopMarquee();
+            return;
+        }
+        const width = getViewportWidth();
+        if (isMobile(width)) {
+            startMarqueeMobile();
+            return;
+        }
+        startMarqueeDesktop();
+    });
+
+    // Recalculate on resize
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
@@ -1155,16 +1331,21 @@ const initProcessSlider = () => {
                 currentIndex = 0;
                 setScrollMode();
                 slider.scrollLeft = 0;
+                stopMarquee();
+                startMarqueeMobile();
                 return;
             }
-            const slidesPerView = getProcessSlidesPerView();
-            const maxIdx = Math.max(0, slides.length - slidesPerView);
-            if (currentIndex > maxIdx) {
-                currentIndex = maxIdx;
-            }
-            updateSlider();
+
+            startMarqueeDesktop();
         }, 100);
     });
+
+    // Initialize correct mode on load
+    if (isMobile(getViewportWidth())) {
+        startMarqueeMobile();
+    } else {
+        startMarqueeDesktop();
+    }
 };
 
 /**

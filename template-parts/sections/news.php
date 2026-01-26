@@ -12,7 +12,7 @@ $newsArchiveUrl = home_url('/news/');
 
 <!-- News and Blog Section -->
 <section class="bg-black">
-	<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16">
+	<div class="max-w-[1920px] mx-auto pl-4 md:pl-8 min-[1280px]:pl-10 min-[1920px]:pl-[100px] pr-0">
 		<!-- Section Header -->
 		<div class="flex items-center justify-between mb-8 md:mb-12">
 			<div>
@@ -21,25 +21,25 @@ $newsArchiveUrl = home_url('/news/');
 			</div>
 
 			<!-- Navigation Arrows -->
-			<div class="flex gap-[37px] max-[1279px]:hidden">
+			<div class="flex gap-6 max-[1279px]:hidden mr-[99px]">
 				<button
 					type="button"
-					class="news-prev p-2 text-white/60 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
+					class="news-prev hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
 					aria-label="Предыдущий слайд"
 					tabindex="0"
 				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
+					<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M26.6667 31.6665L15 19.9998L26.6667 8.33317" stroke="#847575" stroke-width="2" stroke-linecap="square"/>
 					</svg>
 				</button>
 				<button
 					type="button"
-					class="news-next p-2 text-white/60 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
+					class="news-next hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
 					aria-label="Следующий слайд"
 					tabindex="0"
 				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
+					<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M13.3333 8.3335L25 20.0002L13.3333 31.6668" stroke="#847575" stroke-width="2" stroke-linecap="square"/>
 					</svg>
 				</button>
 			</div>
@@ -50,8 +50,8 @@ $newsArchiveUrl = home_url('/news/');
 			<div class="news-track flex gap-4 md:gap-6 transition-transform duration-500 ease-out">
 				<?php if (count($newsItems) > 0) : ?>
 					<?php foreach ($newsItems as $item) : ?>
-						<a href="<?= esc_url($item['url']); ?>" class="news-slide bg-black group flex-shrink-0 w-[280px] md:w-[320px]" tabindex="0" aria-label="<?= esc_attr($item['title']); ?>">
-							<div class="aspect-[4/3] overflow-hidden">
+						<a href="<?= esc_url($item['url']); ?>" class="news-slide bg-black group flex-shrink-0 w-[300px] min-[1280px]:w-[385px] min-[1920px]:w-[408px]" tabindex="0" aria-label="<?= esc_attr($item['title']); ?>">
+							<div class="w-[300px] h-[340px] min-[1280px]:w-[385px] min-[1280px]:h-[520px] min-[1920px]:w-[408px] overflow-hidden">
 								<?php if ($item['image_url'] !== '') : ?>
 									<img
 										src="<?= esc_url($item['image_url']); ?>"
@@ -66,7 +66,7 @@ $newsArchiveUrl = home_url('/news/');
 									</div>
 								<?php endif; ?>
 							</div>
-							<p class="pt-6 text-white text-[20px] leading-[145%] text-left">
+							<p class="pt-6 text-white text-[18px] min-[1280px]:text-[20px] leading-[145%] text-left">
 								<?= esc_html($item['title']); ?>
 							</p>
 						</a>
