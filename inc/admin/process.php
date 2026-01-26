@@ -492,14 +492,11 @@ JS;
 		}
 
 		// Регистрируем настройки для каждого языка
+		// НЕ создаём опции автоматически - пусть fallback работает
+		// Опция будет создана только при первом сохранении для этого языка
 		$languages = mosaic_get_available_languages();
 		foreach (array_keys($languages) as $lang) {
 			$optionName = mosaic_get_work_process_option_name($lang);
-			$existing = get_option($optionName, null);
-			if ($existing === false) {
-				add_option($optionName, mosaic_get_work_process_defaults(), '', false);
-			}
-
 			register_setting(
 				'mosaic_work_process_group_' . $lang,
 				$optionName,
@@ -658,6 +655,22 @@ function mosaic_render_work_process_page(): void {
 	$defaultLang = mosaic_get_default_language();
 	$currentLang = isset($_GET['lang']) ? sanitize_key((string) $_GET['lang']) : $defaultLang;
 
+	// Обработка инициализации данных для языка
+	if ($action === 'init_lang' && $currentLang !== $defaultLang) {
+		$nonce = isset($_GET['_wpnonce']) ? (string) $_GET['_wpnonce'] : '';
+		if (wp_verify_nonce($nonce, 'mosaic_init_lang_' . $currentLang)) {
+			// Копируем данные из языка по умолчанию
+			$defaultData = mosaic_get_work_process($defaultLang);
+			$targetOptName = mosaic_get_work_process_option_name($currentLang);
+			update_option($targetOptName, $defaultData, false);
+
+			// Редирект на страницу с уведомлением
+			$redirect = add_query_arg(['page' => 'mosaic-work-process', 'lang' => $currentLang, 'initialized' => '1'], admin_url('admin.php'));
+			wp_safe_redirect($redirect);
+			exit;
+		}
+	}
+
 	// Если язык не в списке доступных, используем дефолт
 	if (!array_key_exists($currentLang, $languages)) {
 		$currentLang = $defaultLang;
@@ -668,6 +681,28 @@ function mosaic_render_work_process_page(): void {
 
 	echo '<div class="wrap">';
 	echo '<h1>Процесс работы</h1>';
+
+	// Проверяем, есть ли собственные данные для текущего языка или показывается fallback
+	$currentLangOptName = mosaic_get_work_process_option_name($currentLang);
+	$currentLangOwnData = get_option($currentLangOptName, null);
+	$isUsingFallback = ($currentLangOwnData === null || $currentLangOwnData === false) && $currentLang !== $defaultLang;
+
+	// Показываем предупреждение о fallback и кнопку инициализации
+	if ($isUsingFallback && count($languages) > 1) {
+		$initUrl = add_query_arg([
+			'page' => 'mosaic-work-process',
+			'action' => 'init_lang',
+			'lang' => $currentLang,
+			'_wpnonce' => wp_create_nonce('mosaic_init_lang_' . $currentLang),
+		], admin_url('admin.php'));
+
+		echo '<div class="notice notice-warning" style="padding: 12px;">';
+		echo '<p><strong>⚠️ Для языка "' . esc_html($languages[$currentLang] ?? $currentLang) . '" ещё нет собственных данных.</strong></p>';
+		echo '<p>Сейчас показываются данные из языка по умолчанию (' . esc_html($languages[$defaultLang] ?? $defaultLang) . '). ';
+		echo 'Чтобы редактировать контент для этого языка отдельно, нажмите кнопку ниже.</p>';
+		echo '<p><a href="' . esc_url($initUrl) . '" class="button button-primary">📋 Скопировать данные из ' . esc_html($languages[$defaultLang] ?? $defaultLang) . ' и начать редактирование</a></p>';
+		echo '</div>';
+	}
 
 	// Языковые табы
 	if (count($languages) > 1) {
@@ -720,6 +755,9 @@ function mosaic_render_work_process_page(): void {
 
 	if (isset($_GET['updated']) && (string) $_GET['updated'] === '1') {
 		echo '<div class="notice notice-success is-dismissible"><p>Сохранено.</p></div>';
+	}
+	if (isset($_GET['initialized']) && (string) $_GET['initialized'] === '1') {
+		echo '<div class="notice notice-success is-dismissible"><p>✅ Данные скопированы. Теперь вы можете редактировать контент для этого языка независимо.</p></div>';
 	}
 	if (isset($_GET['error'])) {
 		$err = (string) $_GET['error'];
