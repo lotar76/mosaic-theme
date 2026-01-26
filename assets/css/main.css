@@ -406,7 +406,7 @@ body {
 
 [data-portfolio] [data-portfolio-media] {
   width: 300px;
-  height: 228px;
+  height: 340px;
 }
 
 [data-portfolio] [data-portfolio-caption] {
@@ -463,8 +463,8 @@ body {
   }
 
   [data-portfolio] [data-portfolio-media] {
-    width: 385px;
-    height: 351px;
+    width: 408px;
+    height: 520px;
   }
 
   [data-portfolio] [data-portfolio-caption] {
@@ -479,7 +479,7 @@ body {
 
   [data-portfolio] [data-portfolio-media] {
     width: 408px;
-    height: 408px;
+    height: 520px;
   }
 
   [data-portfolio] [data-portfolio-caption] {

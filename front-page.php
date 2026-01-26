@@ -48,7 +48,7 @@ $heroSubtitleHtml = implode('<br class="hidden md:block">', array_map('esc_html'
         </div>
 
         <!-- Hero Content -->
-        <div class="bg-gray px-4 lg:px-[100px] py-[40px]">
+        <div class="bg-gray px-4 min-[1280px]:px-[100px] py-[40px]">
             <div class="max-w-[1920px] mx-auto">
                 <!-- Title -->
                 <h1 class="text-white mb-6 md:mb-8">

@@ -106,20 +106,18 @@ if (count($portfolioItems) === 0) {
 						<?php else : ?>
 							onclick="return false;"
 						<?php endif; ?>
-						class="portfolio-slide group flex-shrink-0 <?= esc_attr($cursorClass); ?> focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-black"
+						class="portfolio-slide group flex-shrink-0 w-[300px] min-[1280px]:w-[408px] <?= esc_attr($cursorClass); ?> focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-black"
 						tabindex="<?= $hasPdf ? '0' : '-1'; ?>"
 						aria-label="<?= esc_attr("{$title} {$subtitle}"); ?>"
 						data-portfolio-slide
 					>
-						<div class="bg-gray overflow-hidden" data-portfolio-media>
-							<img
-								src="<?= esc_url($imageUrl); ?>"
-								alt="<?= esc_attr($title); ?>"
-								class="w-full h-full object-cover transition-transform duration-500 <?= $hasPdf ? 'group-hover:scale-[1.03]' : ''; ?>"
-								loading="lazy"
-								decoding="async"
-							>
-						</div>
+						<div
+							class="w-[300px] h-[340px] min-[1280px]:w-[408px] min-[1280px]:h-[520px] bg-gray bg-cover bg-center transition-transform duration-500 <?= $hasPdf ? 'group-hover:scale-[1.03]' : ''; ?>"
+							style="background-image: url('<?= esc_url($imageUrl); ?>');"
+							role="img"
+							aria-label="<?= esc_attr($title); ?>"
+							data-portfolio-media
+						></div>
 
 						<div data-portfolio-caption>
 							<div data-portfolio-title><?= esc_html($title); ?></div>
