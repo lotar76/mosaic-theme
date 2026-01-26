@@ -4,7 +4,71 @@ declare(strict_types=1);
 
 /**
  * Процесс работы (Админка -> Процесс работы).
+ * Поддержка мультиязычности через Polylang.
+ */
+
+/**
+ * Получить список доступных языков из Polylang.
  *
+ * @return array<string, string> Массив [slug => name], например ['ru' => 'Русский', 'en' => 'English']
+ */
+function mosaic_get_available_languages(): array {
+	if (!function_exists('pll_languages_list')) {
+		return ['ru' => 'Русский'];
+	}
+
+	$languages = pll_languages_list(['fields' => []]);
+	if (!is_array($languages) || count($languages) === 0) {
+		return ['ru' => 'Русский'];
+	}
+
+	$result = [];
+	foreach ($languages as $lang) {
+		if (is_object($lang) && isset($lang->slug, $lang->name)) {
+			$result[$lang->slug] = $lang->name;
+		}
+	}
+
+	return count($result) > 0 ? $result : ['ru' => 'Русский'];
+}
+
+/**
+ * Получить язык по умолчанию из Polylang.
+ */
+function mosaic_get_default_language(): string {
+	if (function_exists('pll_default_language')) {
+		$default = pll_default_language();
+		if (is_string($default) && $default !== '') {
+			return $default;
+		}
+	}
+	return 'ru';
+}
+
+/**
+ * Получить текущий язык для фронтенда.
+ */
+function mosaic_get_current_frontend_language(): string {
+	if (function_exists('pll_current_language')) {
+		$current = pll_current_language();
+		if (is_string($current) && $current !== '') {
+			return $current;
+		}
+	}
+	return mosaic_get_default_language();
+}
+
+/**
+ * Получить название опции для конкретного языка.
+ */
+function mosaic_get_work_process_option_name(string $lang = ''): string {
+	if ($lang === '') {
+		$lang = mosaic_get_default_language();
+	}
+	return 'mosaic_work_process_' . $lang;
+}
+
+/**
  * @return array{blocks:array<int,array{image_id:int,image_url:string,title:string,description:string}>}
  */
 function mosaic_get_work_process_defaults(): array {
@@ -86,10 +150,33 @@ function mosaic_sanitize_work_process_option($value): array {
 }
 
 /**
+ * Получить данные Процесса работы для конкретного языка.
+ *
+ * @param string $lang Код языка (ru, en). Если пусто — текущий язык фронтенда.
  * @return array{blocks:array<int,array{image_id:int,image_url:string,title:string,description:string}>}
  */
-function mosaic_get_work_process(): array {
-	$opt = get_option('mosaic_work_process', mosaic_get_work_process_defaults());
+function mosaic_get_work_process(string $lang = ''): array {
+	if ($lang === '') {
+		$lang = mosaic_get_current_frontend_language();
+	}
+
+	$optionName = mosaic_get_work_process_option_name($lang);
+	$opt = get_option($optionName, null);
+
+	// Если для данного языка нет данных, пробуем получить данные языка по умолчанию
+	if ($opt === null || $opt === false) {
+		$defaultLang = mosaic_get_default_language();
+		if ($lang !== $defaultLang) {
+			$optionName = mosaic_get_work_process_option_name($defaultLang);
+			$opt = get_option($optionName, null);
+		}
+	}
+
+	// Если данных нет вообще, возвращаем дефолты
+	if ($opt === null || $opt === false) {
+		return mosaic_get_work_process_defaults();
+	}
+
 	return mosaic_sanitize_work_process_option($opt);
 }
 
@@ -150,10 +237,14 @@ if (is_admin()) {
 			wp_register_script('mosaic-process-admin', false, ['jquery', 'jquery-ui-sortable'], '1.0', true);
 			wp_enqueue_script('mosaic-process-admin');
 
+			// Получаем текущий язык из URL
+			$currentLang = isset($_GET['lang']) ? sanitize_key((string) $_GET['lang']) : mosaic_get_default_language();
+
 			$cfg = wp_json_encode(
 				[
 					'postUrl' => admin_url('admin-post.php'),
 					'reorderNonce' => wp_create_nonce('mosaic_work_process_reorder'),
+					'lang' => $currentLang,
 				],
 				JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
 			);
@@ -265,6 +356,7 @@ if (is_admin()) {
         $.post(CFG.postUrl, {
           action: 'mosaic_reorder_work_process_blocks',
           mosaic_work_process_nonce: CFG.reorderNonce,
+          lang: CFG.lang,
           order: order
         }).done(function(resp){
           console.log('Response:', resp);
@@ -382,20 +474,42 @@ JS;
 	});
 
 	add_action('admin_init', static function (): void {
-		$existing = get_option('mosaic_work_process', null);
-		if ($existing === false) {
-			add_option('mosaic_work_process', mosaic_get_work_process_defaults(), '', false);
+		// Миграция: переносим данные из старой опции mosaic_work_process в новую mosaic_work_process_{lang}
+		$migrationKey = 'mosaic_work_process_i18n_migrated';
+		if (get_option($migrationKey) !== '1') {
+			$oldData = get_option('mosaic_work_process', null);
+			if ($oldData !== null && $oldData !== false && is_array($oldData)) {
+				$defaultLang = mosaic_get_default_language();
+				$newOptionName = mosaic_get_work_process_option_name($defaultLang);
+
+				// Проверяем, что новая опция ещё не существует
+				$newData = get_option($newOptionName, null);
+				if ($newData === null || $newData === false) {
+					update_option($newOptionName, $oldData, false);
+				}
+			}
+			update_option($migrationKey, '1', false);
 		}
 
-		register_setting(
-			'mosaic_work_process_group',
-			'mosaic_work_process',
-			[
-				'type' => 'array',
-				'sanitize_callback' => 'mosaic_sanitize_work_process_option',
-				'default' => [],
-			]
-		);
+		// Регистрируем настройки для каждого языка
+		$languages = mosaic_get_available_languages();
+		foreach (array_keys($languages) as $lang) {
+			$optionName = mosaic_get_work_process_option_name($lang);
+			$existing = get_option($optionName, null);
+			if ($existing === false) {
+				add_option($optionName, mosaic_get_work_process_defaults(), '', false);
+			}
+
+			register_setting(
+				'mosaic_work_process_group_' . $lang,
+				$optionName,
+				[
+					'type' => 'array',
+					'sanitize_callback' => 'mosaic_sanitize_work_process_option',
+					'default' => [],
+				]
+			);
+		}
 	});
 }
 
@@ -406,6 +520,7 @@ add_action('admin_post_mosaic_save_work_process_block', static function (): void
 
 	check_admin_referer('mosaic_work_process_save', 'mosaic_work_process_nonce');
 
+	$lang = isset($_POST['lang']) ? sanitize_key((string) $_POST['lang']) : mosaic_get_default_language();
 	$index = isset($_POST['index']) ? absint($_POST['index']) : -1;
 	$isNew = isset($_POST['is_new']) ? absint($_POST['is_new']) === 1 : false;
 
@@ -422,12 +537,12 @@ add_action('admin_post_mosaic_save_work_process_block', static function (): void
 	]);
 
 	if ($block === null) {
-		$redirect = add_query_arg(['page' => 'mosaic-work-process', 'error' => 'empty'], admin_url('admin.php'));
+		$redirect = add_query_arg(['page' => 'mosaic-work-process', 'lang' => $lang, 'error' => 'empty'], admin_url('admin.php'));
 		wp_safe_redirect($redirect);
 		exit;
 	}
 
-	$opt = mosaic_get_work_process();
+	$opt = mosaic_get_work_process($lang);
 	$blocks = is_array($opt['blocks'] ?? null) ? $opt['blocks'] : [];
 
 	if (($block['image_id'] ?? 0) > 0) {
@@ -438,7 +553,7 @@ add_action('admin_post_mosaic_save_work_process_block', static function (): void
 		$blocks[] = $block;
 	} else {
 		if ($index < 0 || !array_key_exists($index, $blocks)) {
-			$redirect = add_query_arg(['page' => 'mosaic-work-process', 'error' => 'not_found'], admin_url('admin.php'));
+			$redirect = add_query_arg(['page' => 'mosaic-work-process', 'lang' => $lang, 'error' => 'not_found'], admin_url('admin.php'));
 			wp_safe_redirect($redirect);
 			exit;
 		}
@@ -446,9 +561,10 @@ add_action('admin_post_mosaic_save_work_process_block', static function (): void
 	}
 
 	$next = mosaic_sanitize_work_process_option(['blocks' => $blocks]);
-	update_option('mosaic_work_process', $next, false);
+	$optionName = mosaic_get_work_process_option_name($lang);
+	update_option($optionName, $next, false);
 
-	$redirect = add_query_arg(['page' => 'mosaic-work-process', 'updated' => '1'], admin_url('admin.php'));
+	$redirect = add_query_arg(['page' => 'mosaic-work-process', 'lang' => $lang, 'updated' => '1'], admin_url('admin.php'));
 	wp_safe_redirect($redirect);
 	exit;
 });
@@ -460,12 +576,13 @@ add_action('admin_post_mosaic_delete_work_process_block', static function (): vo
 
 	check_admin_referer('mosaic_work_process_delete', 'mosaic_work_process_nonce');
 
+	$lang = isset($_POST['lang']) ? sanitize_key((string) $_POST['lang']) : mosaic_get_default_language();
 	$index = isset($_POST['index']) ? absint($_POST['index']) : -1;
-	$opt = mosaic_get_work_process();
+	$opt = mosaic_get_work_process($lang);
 	$blocks = is_array($opt['blocks'] ?? null) ? $opt['blocks'] : [];
 
 	if ($index < 0 || !array_key_exists($index, $blocks)) {
-		$redirect = add_query_arg(['page' => 'mosaic-work-process', 'error' => 'not_found'], admin_url('admin.php'));
+		$redirect = add_query_arg(['page' => 'mosaic-work-process', 'lang' => $lang, 'error' => 'not_found'], admin_url('admin.php'));
 		wp_safe_redirect($redirect);
 		exit;
 	}
@@ -474,9 +591,10 @@ add_action('admin_post_mosaic_delete_work_process_block', static function (): vo
 	$blocks = array_values($blocks);
 
 	$next = mosaic_sanitize_work_process_option(['blocks' => $blocks]);
-	update_option('mosaic_work_process', $next, false);
+	$optionName = mosaic_get_work_process_option_name($lang);
+	update_option($optionName, $next, false);
 
-	$redirect = add_query_arg(['page' => 'mosaic-work-process', 'updated' => '1'], admin_url('admin.php'));
+	$redirect = add_query_arg(['page' => 'mosaic-work-process', 'lang' => $lang, 'updated' => '1'], admin_url('admin.php'));
 	wp_safe_redirect($redirect);
 	exit;
 });
@@ -488,6 +606,7 @@ add_action('admin_post_mosaic_reorder_work_process_blocks', static function (): 
 
 	check_admin_referer('mosaic_work_process_reorder', 'mosaic_work_process_nonce');
 
+	$lang = isset($_POST['lang']) ? sanitize_key((string) $_POST['lang']) : mosaic_get_default_language();
 	$orderIn = $_POST['order'] ?? [];
 	if (!is_array($orderIn)) {
 		wp_send_json_error(['message' => 'bad_request'], 400);
@@ -497,7 +616,7 @@ add_action('admin_post_mosaic_reorder_work_process_blocks', static function (): 
 	// например [2, 0, 1] означает: элемент с индекса 2 теперь первый, с 0 - второй, с 1 - третий
 	$order = array_map('absint', $orderIn);
 
-	$opt = mosaic_get_work_process();
+	$opt = mosaic_get_work_process($lang);
 	$blocks = is_array($opt['blocks'] ?? null) ? $opt['blocks'] : [];
 	$blocksCount = count($blocks);
 
@@ -520,7 +639,8 @@ add_action('admin_post_mosaic_reorder_work_process_blocks', static function (): 
 	}
 
 	$next = mosaic_sanitize_work_process_option(['blocks' => $nextBlocks]);
-	update_option('mosaic_work_process', $next, false);
+	$optionName = mosaic_get_work_process_option_name($lang);
+	update_option($optionName, $next, false);
 
 	wp_send_json_success(['ok' => true]);
 });
@@ -533,11 +653,70 @@ function mosaic_render_work_process_page(): void {
 	$action = isset($_GET['action']) ? sanitize_key((string) $_GET['action']) : '';
 	$index = isset($_GET['index']) ? absint($_GET['index']) : -1;
 
-	$opt = mosaic_get_work_process();
+	// Определяем текущий язык
+	$languages = mosaic_get_available_languages();
+	$defaultLang = mosaic_get_default_language();
+	$currentLang = isset($_GET['lang']) ? sanitize_key((string) $_GET['lang']) : $defaultLang;
+
+	// Если язык не в списке доступных, используем дефолт
+	if (!array_key_exists($currentLang, $languages)) {
+		$currentLang = $defaultLang;
+	}
+
+	$opt = mosaic_get_work_process($currentLang);
 	$blocks = is_array($opt['blocks'] ?? null) ? $opt['blocks'] : [];
 
 	echo '<div class="wrap">';
 	echo '<h1>Процесс работы</h1>';
+
+	// Языковые табы
+	if (count($languages) > 1) {
+		echo '<style>
+			.mosaic-lang-tabs { display: flex; gap: 0; margin: 16px 0 20px; border-bottom: 1px solid #c3c4c7; }
+			.mosaic-lang-tab {
+				padding: 10px 20px;
+				background: #f0f0f1;
+				border: 1px solid #c3c4c7;
+				border-bottom: none;
+				margin-bottom: -1px;
+				text-decoration: none;
+				color: #50575e;
+				font-weight: 500;
+				border-radius: 4px 4px 0 0;
+				margin-right: 4px;
+				transition: background-color 0.2s;
+			}
+			.mosaic-lang-tab:hover { background: #fff; color: #2271b1; }
+			.mosaic-lang-tab.active {
+				background: #fff;
+				border-bottom-color: #fff;
+				color: #1d2327;
+				font-weight: 600;
+			}
+			.mosaic-lang-tab .dashicons { margin-right: 4px; vertical-align: text-bottom; }
+		</style>';
+
+		echo '<div class="mosaic-lang-tabs">';
+		foreach ($languages as $langSlug => $langName) {
+			$tabUrl = add_query_arg(['page' => 'mosaic-work-process', 'lang' => $langSlug], admin_url('admin.php'));
+			$isActive = ($langSlug === $currentLang);
+			$activeClass = $isActive ? ' active' : '';
+			$flag = '';
+			if ($langSlug === 'ru') {
+				$flag = '🇷🇺 ';
+			} elseif ($langSlug === 'en') {
+				$flag = '🇬🇧 ';
+			} elseif ($langSlug === 'de') {
+				$flag = '🇩🇪 ';
+			} elseif ($langSlug === 'fr') {
+				$flag = '🇫🇷 ';
+			}
+			echo '<a href="' . esc_url($tabUrl) . '" class="mosaic-lang-tab' . $activeClass . '">' . $flag . esc_html($langName) . '</a>';
+		}
+		echo '</div>';
+
+		echo '<p class="description" style="margin-top: -10px; margin-bottom: 16px;">Редактируете контент для языка: <strong>' . esc_html($languages[$currentLang] ?? $currentLang) . '</strong></p>';
+	}
 
 	if (isset($_GET['updated']) && (string) $_GET['updated'] === '1') {
 		echo '<div class="notice notice-success is-dismissible"><p>Сохранено.</p></div>';
@@ -580,7 +759,7 @@ function mosaic_render_work_process_page(): void {
 				$previewUrl = $imageUrl;
 			}
 
-			$backUrl = add_query_arg(['page' => 'mosaic-work-process'], admin_url('admin.php'));
+			$backUrl = add_query_arg(['page' => 'mosaic-work-process', 'lang' => $currentLang], admin_url('admin.php'));
 			echo '<p><a href="' . esc_url($backUrl) . '" class="button">← Назад к списку</a></p>';
 
 			$badge = $isNew ? 'NEW' : ('Шаг ' . str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT));
@@ -589,13 +768,14 @@ function mosaic_render_work_process_page(): void {
 			echo '<div class="mosaic-process-card-header">';
 			echo '<div>';
 			echo '<p style="margin:0; font-size:16px; font-weight:600;">' . esc_html($isNew ? 'Добавить шаг' : 'Редактировать шаг') . '</p>';
-			echo '<p style="margin:4px 0 0; opacity:.75;">Изменения сразу идут в секцию “Процесс работы” на главной.</p>';
+			echo '<p style="margin:4px 0 0; opacity:.75;">Изменения сразу идут в секцию "Процесс работы" на главной.</p>';
 			echo '</div>';
 			echo '<div class="mosaic-process-badge">' . esc_html($badge) . '</div>';
 			echo '</div>';
 			echo '<div class="mosaic-process-card-body">';
 			echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
 			echo '<input type="hidden" name="action" value="mosaic_save_work_process_block">';
+			echo '<input type="hidden" name="lang" value="' . esc_attr($currentLang) . '">';
 			echo '<input type="hidden" name="index" value="' . esc_attr((string) $index) . '">';
 			echo '<input type="hidden" name="is_new" value="' . esc_attr($isNew ? '1' : '0') . '">';
 			wp_nonce_field('mosaic_work_process_save', 'mosaic_work_process_nonce');
@@ -629,7 +809,7 @@ function mosaic_render_work_process_page(): void {
 	}
 
 	echo '<p class="description">Сначала список шагов (таблица), потом редактирование каждого шага отдельно.</p>';
-	$newUrl = add_query_arg(['page' => 'mosaic-work-process', 'action' => 'new'], admin_url('admin.php'));
+	$newUrl = add_query_arg(['page' => 'mosaic-work-process', 'action' => 'new', 'lang' => $currentLang], admin_url('admin.php'));
 	echo '<p><a href="' . esc_url($newUrl) . '" class="button button-primary">+ Добавить шаг</a></p>';
 
 	echo '<div id="mosaic-process-notices"></div>';
@@ -667,6 +847,7 @@ function mosaic_render_work_process_page(): void {
 				'page' => 'mosaic-work-process',
 				'action' => 'edit',
 				'index' => (string) $i,
+				'lang' => $currentLang,
 			],
 			admin_url('admin.php')
 		);
@@ -687,6 +868,7 @@ function mosaic_render_work_process_page(): void {
 		echo '<a class="button" href="' . esc_url($editUrl) . '">Редактировать</a>';
 		echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="display:inline-block; margin-left:6px;" onsubmit="return confirm(\'Удалить шаг?\');">';
 		echo '<input type="hidden" name="action" value="mosaic_delete_work_process_block">';
+		echo '<input type="hidden" name="lang" value="' . esc_attr($currentLang) . '">';
 		echo '<input type="hidden" name="index" value="' . esc_attr((string) $i) . '">';
 		wp_nonce_field('mosaic_work_process_delete', 'mosaic_work_process_nonce');
 		echo '<button type="submit" class="button button-link-delete">Удалить</button>';
