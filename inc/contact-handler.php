@@ -151,7 +151,7 @@ function mosaic_handle_contact_form_ajax(): void
 	$consent_privacy = isset($_POST['consent_privacy']) && $_POST['consent_privacy'] === '1';
 	$consent_newsletter = isset($_POST['consent_newsletter']) && $_POST['consent_newsletter'] === '1';
 
-	$allowed_types = ['project', 'showroom', 'consultation'];
+	$allowed_types = ['project', 'showroom', 'consultation', 'partnership'];
 	if (!in_array($form_type, $allowed_types, true)) {
 		$form_type = 'project';
 	}
@@ -205,7 +205,7 @@ function mosaic_handle_contact_form(): void
 	$consent_newsletter = isset($_POST['consent_newsletter']) && $_POST['consent_newsletter'] === '1';
 
 	// Допустимые типы форм
-	$allowed_types = ['project', 'showroom', 'consultation'];
+	$allowed_types = ['project', 'showroom', 'consultation', 'partnership'];
 	if (!in_array($form_type, $allowed_types, true)) {
 		$form_type = 'project';
 	}
@@ -322,6 +322,7 @@ function mosaic_get_form_type_label(string $form_type): string
 		'project' => 'Обсудить проект',
 		'showroom' => 'Записаться в шоурум',
 		'consultation' => 'Получить консультацию',
+		'partnership' => 'Партнерская программа',
 	];
 
 	return $labels[$form_type] ?? $form_type;
