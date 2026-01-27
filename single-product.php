@@ -23,6 +23,9 @@ $material = trim((string) get_post_meta($postId, $kMaterial, true));
 $technique = trim((string) get_post_meta($postId, $kTechnique, true));
 $sizeColor = trim((string) get_post_meta($postId, $kSizeColor, true));
 
+$k3dMaxUrl = (string) ($keys['3dmax_url'] ?? '_mosaic_catalog_3dmax_url');
+$maxUrl = trim((string) get_post_meta($postId, $k3dMaxUrl, true));
+
 $description = trim((string) get_post_field('post_content', $postId));
 
 // Первое изображение для главного слайда
@@ -63,7 +66,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                                         id="product-main-image"
                                         src="<?= esc_url($mainImageUrl); ?>"
                                         alt="<?= esc_attr($title); ?>"
-                                        class="block w-full max-w-full h-auto aspect-square object-cover min-[1280px]:w-[700px] min-[1280px]:h-[700px]"
+                                        class="block w-[328px] h-[400px] object-cover md:w-[490px] md:h-[560px] min-[1280px]:w-[700px] min-[1280px]:h-[860px]"
                                         loading="eager"
                                         decoding="async"
                                     >
@@ -112,7 +115,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 
                         <!-- Thumbnails -->
 						<?php if (count($galleryIds) > 1) : ?>
-                            <div class="flex gap-2 overflow-x-auto pb-2 justify-center min-[1280px]:justify-start">
+                            <div class="flex gap-2 overflow-x-auto pb-2 justify-start">
 								<?php foreach ($galleryIds as $idx => $gid) : ?>
 									<?php
 									$thumbUrl = (string) wp_get_attachment_image_url((int) $gid, 'medium');
@@ -182,7 +185,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 
                     <!-- Specifications -->
 					<?php if ($material !== '' || $technique !== '' || $sizeColor !== '') : ?>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 							<?php if ($material !== '') : ?>
                                 <div>
                                     <div class="text-white/60 text-sm mb-1">Материал изделия</div>
@@ -201,6 +204,21 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                                     <div class="text-white"><?= esc_html($sizeColor); ?></div>
                                 </div>
 							<?php endif; ?>
+                        </div>
+					<?php endif; ?>
+
+                    <!-- 3D Max Button -->
+					<?php if ($maxUrl !== '') : ?>
+                        <div class="mt-6">
+                            <a
+                                href="<?= esc_url($maxUrl); ?>"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-block bg-white hover:bg-white/90 transition-colors text-black py-3 px-6 text-base font-medium"
+                                aria-label="Открыть файл 3D Max"
+                            >
+                                3d Max
+                            </a>
                         </div>
 					<?php endif; ?>
                 </div>

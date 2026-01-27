@@ -20,6 +20,7 @@ function mosaic_catalog_item_meta_keys(): array {
 		'technique' => '_mosaic_catalog_technique',
 		'size_color' => '_mosaic_catalog_size_color',
 		'related_ids' => '_mosaic_catalog_related_ids',
+		'3dmax_url' => '_mosaic_catalog_3dmax_url',
 	];
 }
 
@@ -44,6 +45,7 @@ add_action('add_meta_boxes', static function (): void {
 			$material = (string) get_post_meta($post->ID, $k['material'], true);
 			$technique = (string) get_post_meta($post->ID, $k['technique'], true);
 			$sizeColor = (string) get_post_meta($post->ID, $k['size_color'], true);
+			$maxUrl = (string) get_post_meta($post->ID, $k['3dmax_url'], true);
 
 			wp_nonce_field('mosaic_catalog_item_save', 'mosaic_catalog_item_nonce');
 
@@ -108,6 +110,8 @@ add_action('add_meta_boxes', static function (): void {
 			echo '<input class="mosaic-ci-input" type="text" name="mosaic_ci_technique" value="' . esc_attr($technique) . '" placeholder="Например: наборная мозаика"></p>';
 			echo '<p class="mosaic-ci-field"><label class="mosaic-ci-label">Размер и цветовая гамма</label>';
 			echo '<input class="mosaic-ci-input" type="text" name="mosaic_ci_size_color" value="' . esc_attr($sizeColor) . '" placeholder="Например: 120×80 см, тёплая палитра"></p>';
+			echo '<p class="mosaic-ci-field"><label class="mosaic-ci-label">Ссылка на 3D Max</label>';
+			echo '<input class="mosaic-ci-input" type="url" name="mosaic_ci_3dmax_url" value="' . esc_attr($maxUrl) . '" placeholder="https://example.com/3dmax-file"></p>';
 			echo '</div>';
 
 			echo '</div>';
@@ -230,10 +234,12 @@ add_action('save_post_product', static function (int $postId): void {
 	$material = isset($_POST['mosaic_ci_material']) ? sanitize_text_field((string) $_POST['mosaic_ci_material']) : '';
 	$technique = isset($_POST['mosaic_ci_technique']) ? sanitize_text_field((string) $_POST['mosaic_ci_technique']) : '';
 	$sizeColor = isset($_POST['mosaic_ci_size_color']) ? sanitize_text_field((string) $_POST['mosaic_ci_size_color']) : '';
+	$maxUrl = isset($_POST['mosaic_ci_3dmax_url']) ? esc_url_raw((string) $_POST['mosaic_ci_3dmax_url']) : '';
 
 	update_post_meta($postId, $k['material'], $material);
 	update_post_meta($postId, $k['technique'], $technique);
 	update_post_meta($postId, $k['size_color'], $sizeColor);
+	update_post_meta($postId, $k['3dmax_url'], $maxUrl);
 
 	$galleryRaw = isset($_POST['mosaic_ci_gallery_ids']) ? (string) $_POST['mosaic_ci_gallery_ids'] : '';
 	$gallery = [];
