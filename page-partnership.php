@@ -32,7 +32,7 @@ $content = $data['content'];
 	<!-- Content Section -->
 	<section class="bg-black py-[40px] min-[1280px]:py-[60px]">
 		<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
-			<div class="max-w-[900px]">
+			<div class="max-w-[900px] mx-auto">
 				<div class="text-white text-base md:text-[18px] leading-[160%] prose prose-invert max-w-none">
 					<?= wp_kses_post($content); ?>
 				</div>
@@ -43,7 +43,7 @@ $content = $data['content'];
 	<!-- Consultation Form Section -->
 	<section class="bg-black pb-[60px] min-[1280px]:pb-[80px]">
 		<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
-			<div class="max-w-[900px]">
+			<div class="max-w-[900px] mx-auto">
 				<div class="bg-gray p-8 min-[1280px]:p-12">
 					<div class="mb-8">
 						<h2 class="text-white text-[24px] md:text-[32px] min-[1280px]:text-[40px] leading-[110%] tracking-[-0.01em] font-normal mb-0">
