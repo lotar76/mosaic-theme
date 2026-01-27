@@ -429,10 +429,16 @@ function mosaic_get_portfolio_projects(string $category = '', int $limit = -1): 
 			$terms = get_the_terms($postId, 'portfolio_category');
 			$categoryName = '';
 			$categorySlug = '';
+			$categories = [];
+			$categorySlugs = [];
 			if (!empty($terms) && !is_wp_error($terms)) {
-				$term = reset($terms);
-				$categoryName = $term->name;
-				$categorySlug = $term->slug;
+				foreach ($terms as $term) {
+					$categories[] = $term->name;
+					$categorySlugs[] = $term->slug;
+				}
+				// Первая категория для обратной совместимости
+				$categoryName = $categories[0] ?? '';
+				$categorySlug = $categorySlugs[0] ?? '';
 			}
 
 			// Получаем первое изображение из галереи или миниатюру
@@ -465,6 +471,8 @@ function mosaic_get_portfolio_projects(string $category = '', int $limit = -1): 
 				'image_url' => $imageUrl,
 				'category' => $categoryName,
 				'category_slug' => $categorySlug,
+				'categories' => $categories,
+				'category_slugs' => $categorySlugs,
 				'pdf_file_url' => $pdfFileUrl,
 			];
 		}

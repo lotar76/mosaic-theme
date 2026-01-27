@@ -74,7 +74,7 @@ $projects = function_exists('mosaic_get_portfolio_projects') ? mosaic_get_portfo
 						tabindex="<?= $hasPdf ? '0' : '-1'; ?>"
 						aria-label="<?= esc_attr($project['title']); ?>"
 						data-portfolio-card
-						data-category="<?= esc_attr($project['category_slug']); ?>"
+						data-categories="<?= esc_attr(implode(',', $project['category_slugs'] ?? [])); ?>"
 					>
 						<div class="bg-gray/20" data-portfolio-media>
 							<?php if ($project['image_url'] !== '') : ?>
@@ -96,7 +96,10 @@ $projects = function_exists('mosaic_get_portfolio_projects') ? mosaic_get_portfo
 								<?= esc_html($project['title']); ?>
 							</div>
 							<div data-portfolio-category>
-								<?= esc_html($project['category'] !== '' ? $project['category'] : '—'); ?>
+								<?php
+						$categoryNames = $project['categories'] ?? [];
+						echo esc_html(!empty($categoryNames) ? implode(', ', $categoryNames) : '—');
+						?>
 							</div>
 						</div>
 					</a>
@@ -132,7 +135,8 @@ $projects = function_exists('mosaic_get_portfolio_projects') ? mosaic_get_portfo
 
 			// Filter cards
 			cards.forEach(card => {
-				if (filter === 'all' || card.dataset.category === filter) {
+				const cardCategories = (card.dataset.categories || '').split(',').map(c => c.trim()).filter(Boolean);
+			if (filter === 'all' || cardCategories.includes(filter)) {
 					card.style.display = '';
 				} else {
 					card.style.display = 'none';
