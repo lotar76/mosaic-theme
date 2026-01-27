@@ -33,6 +33,20 @@ if (!$hasData) {
 
 		<!-- Requisites Grid -->
 		<div class="grid grid-cols-2 min-[1280px]:grid-cols-4 gap-6 min-[1280px]:gap-8">
+			<?php if ($requisites['okved'] !== '') : ?>
+				<div>
+					<p class="text-white/40 text-sm min-[1280px]:text-base mb-2">Наименование</p>
+					<p class="text-white text-base min-[1280px]:text-lg"><?= esc_html($requisites['okved']); ?></p>
+				</div>
+			<?php endif; ?>
+
+			<?php if ($requisites['inn'] !== '') : ?>
+				<div>
+					<p class="text-white/40 text-sm min-[1280px]:text-base mb-2">ИНН</p>
+					<p class="text-white text-base min-[1280px]:text-lg"><?= esc_html($requisites['inn']); ?></p>
+				</div>
+			<?php endif; ?>
+
 			<?php if ($requisites['legal_address'] !== '') : ?>
 				<div>
 					<p class="text-white/40 text-sm min-[1280px]:text-base mb-2">Юридический адрес</p>
@@ -44,20 +58,6 @@ if (!$hasData) {
 				<div>
 					<p class="text-white/40 text-sm min-[1280px]:text-base mb-2">Фактический адрес</p>
 					<p class="text-white text-base min-[1280px]:text-lg"><?= esc_html($requisites['actual_address']); ?></p>
-				</div>
-			<?php endif; ?>
-
-			<?php if ($requisites['inn'] !== '') : ?>
-				<div>
-					<p class="text-white/40 text-sm min-[1280px]:text-base mb-2">ИНН</p>
-					<p class="text-white text-base min-[1280px]:text-lg"><?= esc_html($requisites['inn']); ?></p>
-				</div>
-			<?php endif; ?>
-
-			<?php if ($requisites['okved'] !== '') : ?>
-				<div>
-					<p class="text-white/40 text-sm min-[1280px]:text-base mb-2">Основной код ОКВЭД</p>
-					<p class="text-white text-base min-[1280px]:text-lg"><?= esc_html($requisites['okved']); ?></p>
 				</div>
 			<?php endif; ?>
 		</div>

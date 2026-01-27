@@ -10,7 +10,19 @@ declare(strict_types=1);
 <!-- Showroom Section -->
 <section class="bg-black">
 	<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16">
-		<?php $showroomImageUrl = get_template_directory_uri() . '/img/shaurum.png'; ?>
+		<?php
+		// Получаем настройки шоурума из админки
+		$showroomData = mosaic_get_showroom_page();
+		$homepageImageId = $showroomData['homepage_image_id'] ?? 0;
+
+		// Если картинка выбрана в админке, используем её, иначе fallback на статическую
+		if ($homepageImageId > 0) {
+			$showroomImageUrl = wp_get_attachment_image_url($homepageImageId, 'full');
+		}
+		if (empty($showroomImageUrl)) {
+			$showroomImageUrl = get_template_directory_uri() . '/img/shaurum.png';
+		}
+		?>
 
 		<!-- Mobile: <=1279 -->
 		<div class="max-[1279px]:block min-[1280px]:hidden">

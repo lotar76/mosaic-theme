@@ -35,7 +35,8 @@ declare(strict_types=1);
  *     latitude: string,
  *     longitude: string,
  *     zoom: int
- *   }
+ *   },
+ *   homepage_image_id: int
  * }
  */
 function mosaic_get_showroom_page_defaults(): array {
@@ -83,6 +84,7 @@ function mosaic_get_showroom_page_defaults(): array {
 			'longitude' => '38.9753',
 			'zoom' => 15,
 		],
+		'homepage_image_id' => 0,
 	];
 }
 
@@ -202,6 +204,9 @@ function mosaic_sanitize_showroom_page_option(mixed $value): array {
 		$mapZoom = 15;
 	}
 
+	// Homepage image
+	$homepageImageId = absint($value['homepage_image_id'] ?? 0);
+
 	return [
 		'hero' => [
 			'title' => $heroTitle !== '' ? $heroTitle : $defaults['hero']['title'],
@@ -225,6 +230,7 @@ function mosaic_sanitize_showroom_page_option(mixed $value): array {
 			'longitude' => $mapLng !== '' ? $mapLng : $defaults['map']['longitude'],
 			'zoom' => $mapZoom,
 		],
+		'homepage_image_id' => $homepageImageId,
 	];
 }
 
@@ -547,12 +553,16 @@ add_action('admin_post_mosaic_save_showroom_page', static function (): void {
 		'zoom' => isset($_POST['map_zoom']) ? absint($_POST['map_zoom']) : 15,
 	];
 
+	// Homepage image
+	$homepageImageId = isset($_POST['homepage_image_id']) ? absint($_POST['homepage_image_id']) : 0;
+
 	$data = mosaic_sanitize_showroom_page_option([
 		'hero' => $hero,
 		'blocks' => $blocks,
 		'collections' => $collections,
 		'events' => $events,
 		'map' => $map,
+		'homepage_image_id' => $homepageImageId,
 	]);
 
 	update_option('mosaic_showroom_page', $data, false);
@@ -573,6 +583,7 @@ function mosaic_render_showroom_page_admin(): void {
 	$collections = $data['collections'];
 	$events = $data['events'];
 	$map = $data['map'];
+	$homepageImageId = $data['homepage_image_id'];
 
 	// Get gallery previews
 	$galleryPreviews = [];
@@ -839,6 +850,28 @@ function mosaic_render_showroom_page_admin(): void {
 	echo '<input type="number" class="mosaic-input" name="map_zoom" value="' . esc_attr((string) $map['zoom']) . '" min="1" max="20" style="width:100px;"></p>';
 
 	echo '<p class="mosaic-muted">Координаты можно найти на Яндекс.Картах или Google Maps. Рекомендуемый zoom: 15-16.</p>';
+
+	echo '</div></div>';
+
+	// Homepage Image Section
+	echo '<div class="mosaic-section">';
+	echo '<div class="mosaic-section-header"><p class="mosaic-section-title">Картинка на главной</p></div>';
+	echo '<div class="mosaic-section-body">';
+
+	$homepageImagePreview = '';
+	if ($homepageImageId > 0) {
+		$homepageImagePreview = (string) wp_get_attachment_image_url($homepageImageId, 'medium');
+	}
+
+	echo '<input type="hidden" name="homepage_image_id" id="homepage_image_id" value="' . esc_attr((string) $homepageImageId) . '">';
+	echo '<div class="mosaic-uploader">';
+	echo '<img id="homepage_image_preview" class="mosaic-single-preview" src="' . esc_url($homepageImagePreview) . '">';
+	echo '<div class="mosaic-actions">';
+	echo '<button type="button" class="button mosaic-image-select" data-prefix="homepage_image">Выбрать фото</button>';
+	echo '<button type="button" class="button mosaic-image-remove" id="homepage_image_remove" data-prefix="homepage_image" style="display:none;">Удалить</button>';
+	echo '</div>';
+	echo '<p class="mosaic-muted">Изображение для секции "Приглашаем в шоурум" на главной странице. Рекомендуемый размер: 1920×700px</p>';
+	echo '</div>';
 
 	echo '</div></div>';
 

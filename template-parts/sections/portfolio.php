@@ -141,4 +141,3 @@ if (count($portfolioItems) === 0) {
 		</div>
 	</div>
 </section>
-

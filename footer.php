@@ -2,8 +2,9 @@
 <?php
 $homeUrl = esc_url(home_url('/'));
 $logoUrl = esc_url(get_template_directory_uri() . '/img/logo/Logo.svg');
-$privacyUrlRaw = function_exists('get_privacy_policy_url') ? (string) get_privacy_policy_url() : '';
-$privacyUrl = $privacyUrlRaw !== '' ? esc_url($privacyUrlRaw) : '#';
+$siteSettings = function_exists('mosaic_get_site_settings') ? mosaic_get_site_settings() : [];
+$privacyUrlRaw = is_array($siteSettings) ? (string) ($siteSettings['privacy_policy_url'] ?? '') : '';
+$privacyUrl = $privacyUrlRaw !== '' ? esc_url(home_url($privacyUrlRaw)) : esc_url(home_url('/privacy-policy-2/'));
 $currentYear = (string) wp_date('Y');
 $phoneContact = function_exists('mosaic_get_phone_contact') ? mosaic_get_phone_contact() : ['display' => '+7 (928) 206-07-75', 'href' => 'tel:+79282060775'];
 ?>

@@ -137,8 +137,8 @@ if ($video['url'] !== '') {
 				<div class="about-gallery-slider relative overflow-hidden" data-about-gallery-slider>
 					<div class="about-gallery-track flex transition-transform duration-700 ease-in-out" data-about-gallery-track>
 						<?php foreach ($galleryImages as $img) : ?>
-							<div class="about-gallery-slide flex-shrink-0 w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-2" data-about-gallery-slide>
-								<div class="relative w-full aspect-[4/3] overflow-hidden">
+							<div class="about-gallery-slide flex-shrink-0 p-2" data-about-gallery-slide>
+								<div class="relative overflow-hidden w-[300px] h-[300px] md:w-[395px] md:h-[395px] min-[1280px]:w-[561px] min-[1280px]:h-[561px]">
 									<img
 										src="<?= esc_url($img['url']); ?>"
 										alt="<?= esc_attr($img['alt']); ?>"
@@ -175,7 +175,7 @@ if ($video['url'] !== '') {
 				</div>
 			<?php else : ?>
 				<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
-					<div class="relative w-full aspect-[16/9] max-h-[600px] overflow-hidden">
+					<div class="relative w-[300px] h-[300px] md:w-[395px] md:h-[395px] min-[1280px]:w-[561px] min-[1280px]:h-[561px] overflow-hidden">
 						<img
 							src="<?= esc_url($galleryImages[0]['url']); ?>"
 							alt="<?= esc_attr($galleryImages[0]['alt']); ?>"
@@ -297,10 +297,14 @@ if ($video['url'] !== '') {
 	let slidesPerView = getSlidesPerView();
 
 	function getSlidesPerView() {
-		if (window.innerWidth >= 1280) return 4;
-		if (window.innerWidth >= 1024) return 3;
-		if (window.innerWidth >= 768) return 2;
-		return 1;
+		const containerWidth = slider.offsetWidth;
+		let slideWidth = 300; // mobile
+		if (window.innerWidth >= 1280) slideWidth = 561;
+		else if (window.innerWidth >= 768) slideWidth = 395;
+
+		// Calculate how many slides fit in the container (including padding)
+		const slideWithPadding = slideWidth + 16; // 16px = p-2 padding
+		return Math.floor(containerWidth / slideWithPadding);
 	}
 
 	function updateSlider() {

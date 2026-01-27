@@ -490,7 +490,7 @@ function mosaic_get_portfolio_projects(string $category = '', int $limit = -1): 
 function mosaic_get_portfolio_categories(): array {
 	$terms = get_terms([
 		'taxonomy' => 'portfolio_category',
-		'hide_empty' => false,
+		'hide_empty' => true,
 	]);
 
 	if (is_wp_error($terms) || !is_array($terms)) {

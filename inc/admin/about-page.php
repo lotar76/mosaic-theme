@@ -426,9 +426,9 @@ function mosaic_render_about_page_admin(): void {
 	}
 	echo '</div>';
 	echo '<div class="mosaic-actions">';
-	echo '<button type="button" class="button mosaic-image-select" data-prefix="gallery" data-mode="gallery">Добавить изображения</button>';
+	echo '<button type="button" class="button mosaic-image-select" data-prefix="gallery" data-mode="gallery">Выберите изображения</button>';
 	echo '</div>';
-	echo '<p class="mosaic-muted">Рекомендуемый размер: 600×400px. Изображения можно перетаскивать для изменения порядка.</p>';
+	echo '<p class="mosaic-muted">Чтобы выделить несколько картинок нажмите shift. Изображения можно перетаскивать для изменения порядка.</p>';
 	echo '</div>';
 
 	echo '</div></div>';
@@ -453,17 +453,17 @@ function mosaic_render_about_page_admin(): void {
 	echo '<div class="mosaic-section-body">';
 
 	echo '<div class="two-cols">';
+	echo '<p class="mosaic-field"><label class="mosaic-label">Наименование</label>';
+	echo '<input type="text" class="mosaic-input" name="requisites_okved" value="' . esc_attr($requisites['okved']) . '"></p>';
+	echo '<p class="mosaic-field"><label class="mosaic-label">ИНН</label>';
+	echo '<input type="text" class="mosaic-input" name="requisites_inn" value="' . esc_attr($requisites['inn']) . '"></p>';
+	echo '</div>';
+
+	echo '<div class="two-cols">';
 	echo '<p class="mosaic-field"><label class="mosaic-label">Юридический адрес</label>';
 	echo '<input type="text" class="mosaic-input" name="requisites_legal_address" value="' . esc_attr($requisites['legal_address']) . '"></p>';
 	echo '<p class="mosaic-field"><label class="mosaic-label">Фактический адрес</label>';
 	echo '<input type="text" class="mosaic-input" name="requisites_actual_address" value="' . esc_attr($requisites['actual_address']) . '"></p>';
-	echo '</div>';
-
-	echo '<div class="two-cols">';
-	echo '<p class="mosaic-field"><label class="mosaic-label">ИНН</label>';
-	echo '<input type="text" class="mosaic-input" name="requisites_inn" value="' . esc_attr($requisites['inn']) . '"></p>';
-	echo '<p class="mosaic-field"><label class="mosaic-label">Основной код ОКВЭД</label>';
-	echo '<input type="text" class="mosaic-input" name="requisites_okved" value="' . esc_attr($requisites['okved']) . '"></p>';
 	echo '</div>';
 
 	echo '<p class="mosaic-muted">Эти данные отображаются в блоке "Реквизиты" на странице О нас.</p>';
