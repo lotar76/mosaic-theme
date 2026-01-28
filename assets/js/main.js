@@ -605,13 +605,13 @@ const initPortfolioSlider = () => {
             // Добавляем transition для плавного перехода
             track.style.transition = 'transform 0.7s ease-in-out';
             handlePrev();
-            // Возобновляем marquee после анимации
+            // Возобновляем marquee после анимации с текущей позиции
             setTimeout(() => {
                 const width = getViewportWidth();
                 if (isMobile(width)) {
                     startMarqueeMobile();
                 } else {
-                    startMarqueeDesktop();
+                    resumeMarqueeFromCurrentPosition();
                 }
             }, 700);
         });
@@ -623,13 +623,13 @@ const initPortfolioSlider = () => {
             // Добавляем transition для плавного перехода
             track.style.transition = 'transform 0.7s ease-in-out';
             handleNext();
-            // Возобновляем marquee после анимации
+            // Возобновляем marquee после анимации с текущей позиции
             setTimeout(() => {
                 const width = getViewportWidth();
                 if (isMobile(width)) {
                     startMarqueeMobile();
                 } else {
-                    startMarqueeDesktop();
+                    resumeMarqueeFromCurrentPosition();
                 }
             }, 700);
         });
@@ -693,6 +693,21 @@ const initPortfolioSlider = () => {
             updateSlider();
             return;
         }
+        marqueeTransform.rafId = requestAnimationFrame(tickTransform);
+    };
+
+    // Resume marquee from current manual navigation position
+    const resumeMarqueeFromCurrentPosition = () => {
+        if (!ensureClonesForTransform()) {
+            updateSlider();
+            return;
+        }
+        // Calculate current offset based on currentIndex
+        const step = getSlideStep();
+        marqueeTransform.offsetX = currentIndex * step;
+        marqueeTransform.paused = false;
+        marqueeTransform.lastTs = null;
+        track.style.transition = 'none';
         marqueeTransform.rafId = requestAnimationFrame(tickTransform);
     };
 
@@ -1189,13 +1204,13 @@ const initProcessSlider = () => {
             // Добавляем transition для плавного перехода
             track.style.transition = 'transform 0.7s ease-in-out';
             handlePrev();
-            // Возобновляем marquee после анимации
+            // Возобновляем marquee после анимации с текущей позиции
             setTimeout(() => {
                 const width = getViewportWidth();
                 if (isMobile(width)) {
                     startMarqueeMobile();
                 } else {
-                    startMarqueeDesktop();
+                    resumeMarqueeFromCurrentPosition();
                 }
             }, 700);
         });
@@ -1207,13 +1222,13 @@ const initProcessSlider = () => {
             // Добавляем transition для плавного перехода
             track.style.transition = 'transform 0.7s ease-in-out';
             handleNext();
-            // Возобновляем marquee после анимации
+            // Возобновляем marquee после анимации с текущей позиции
             setTimeout(() => {
                 const width = getViewportWidth();
                 if (isMobile(width)) {
                     startMarqueeMobile();
                 } else {
-                    startMarqueeDesktop();
+                    resumeMarqueeFromCurrentPosition();
                 }
             }, 700);
         });
@@ -1277,6 +1292,21 @@ const initProcessSlider = () => {
             updateSlider();
             return;
         }
+        marqueeTransform.rafId = requestAnimationFrame(tickTransform);
+    };
+
+    // Resume marquee from current manual navigation position
+    const resumeMarqueeFromCurrentPosition = () => {
+        if (!ensureClonesForTransform()) {
+            updateSlider();
+            return;
+        }
+        // Calculate current offset based on currentIndex
+        const step = getSlideStep();
+        marqueeTransform.offsetX = currentIndex * step;
+        marqueeTransform.paused = false;
+        marqueeTransform.lastTs = null;
+        track.style.transition = 'none';
         marqueeTransform.rafId = requestAnimationFrame(tickTransform);
     };
 
