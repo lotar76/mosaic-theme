@@ -575,15 +575,6 @@ const initPortfolioSlider = () => {
         }
     };
 
-    // Event listeners
-    if (prevBtn) {
-        prevBtn.addEventListener('click', handlePrev);
-    }
-
-    if (nextBtn) {
-        nextBtn.addEventListener('click', handleNext);
-    }
-
     /**
      * Marquee autoplay:
      * - tablet+desktop: transform-based loop
@@ -606,6 +597,21 @@ const initPortfolioSlider = () => {
         marqueeScroll.lastTs = null;
         slider.classList.remove('is-autoplay');
     };
+
+    // Attach arrow button event listeners
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            stopMarquee();
+            handlePrev();
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            stopMarquee();
+            handleNext();
+        });
+    }
 
     const ensureClonesForTransform = () => {
         const width = getViewportWidth();
@@ -1135,14 +1141,6 @@ const initProcessSlider = () => {
         }
     };
 
-    if (prevBtn) {
-        prevBtn.addEventListener('click', handlePrev);
-    }
-
-    if (nextBtn) {
-        nextBtn.addEventListener('click', handleNext);
-    }
-
     /**
      * Marquee autoplay (аналогично Portfolio)
      */
@@ -1161,6 +1159,21 @@ const initProcessSlider = () => {
         marqueeScroll.lastTs = null;
         slider.classList.remove('is-autoplay');
     };
+
+    // Attach arrow button event listeners (after stopMarquee is defined)
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            stopMarquee();
+            handlePrev();
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            stopMarquee();
+            handleNext();
+        });
+    }
 
     const ensureClonesForTransform = () => {
         const width = getViewportWidth();
