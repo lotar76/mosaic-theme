@@ -560,7 +560,6 @@ const initPortfolioSlider = () => {
     };
 
     const handlePrev = () => {
-        if (isMobile(getViewportWidth())) return;
         if (currentIndex > 0) {
             currentIndex--;
             updateSlider();
@@ -568,7 +567,6 @@ const initPortfolioSlider = () => {
     };
 
     const handleNext = () => {
-        if (isMobile(getViewportWidth())) return;
         const slidesPerView = getPortfolioSlidesPerView();
         const maxIdx = Math.max(0, slides.length - slidesPerView);
         if (currentIndex < maxIdx) {
@@ -853,7 +851,6 @@ const initRelatedProductsSlider = () => {
     };
 
     const handlePrev = () => {
-        if (isMobile(getViewportWidth())) return;
         if (currentIndex > 0) {
             currentIndex--;
             updateSlider();
@@ -861,7 +858,6 @@ const initRelatedProductsSlider = () => {
     };
 
     const handleNext = () => {
-        if (isMobile(getViewportWidth())) return;
         const slidesPerView = getPortfolioSlidesPerView();
         const maxIdx = Math.max(0, slides.length - slidesPerView);
         if (currentIndex < maxIdx) {
