@@ -1120,7 +1120,6 @@ const initProcessSlider = () => {
     };
 
     const handlePrev = () => {
-        if (isMobile(getViewportWidth())) return;
         if (currentIndex > 0) {
             currentIndex--;
             updateSlider();
@@ -1128,7 +1127,6 @@ const initProcessSlider = () => {
     };
 
     const handleNext = () => {
-        if (isMobile(getViewportWidth())) return;
         const slidesPerView = 4;
         const maxIdx = Math.max(0, slides.length - slidesPerView);
         if (currentIndex < maxIdx) {
