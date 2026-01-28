@@ -602,14 +602,36 @@ const initPortfolioSlider = () => {
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
             stopMarquee();
+            // Добавляем transition для плавного перехода
+            track.style.transition = 'transform 0.7s ease-in-out';
             handlePrev();
+            // Возобновляем marquee после анимации
+            setTimeout(() => {
+                const width = getViewportWidth();
+                if (isMobile(width)) {
+                    startMarqueeMobile();
+                } else {
+                    startMarqueeDesktop();
+                }
+            }, 700);
         });
     }
 
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
             stopMarquee();
+            // Добавляем transition для плавного перехода
+            track.style.transition = 'transform 0.7s ease-in-out';
             handleNext();
+            // Возобновляем marquee после анимации
+            setTimeout(() => {
+                const width = getViewportWidth();
+                if (isMobile(width)) {
+                    startMarqueeMobile();
+                } else {
+                    startMarqueeDesktop();
+                }
+            }, 700);
         });
     }
 
@@ -1164,14 +1186,36 @@ const initProcessSlider = () => {
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
             stopMarquee();
+            // Добавляем transition для плавного перехода
+            track.style.transition = 'transform 0.7s ease-in-out';
             handlePrev();
+            // Возобновляем marquee после анимации
+            setTimeout(() => {
+                const width = getViewportWidth();
+                if (isMobile(width)) {
+                    startMarqueeMobile();
+                } else {
+                    startMarqueeDesktop();
+                }
+            }, 700);
         });
     }
 
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
             stopMarquee();
+            // Добавляем transition для плавного перехода
+            track.style.transition = 'transform 0.7s ease-in-out';
             handleNext();
+            // Возобновляем marquee после анимации
+            setTimeout(() => {
+                const width = getViewportWidth();
+                if (isMobile(width)) {
+                    startMarqueeMobile();
+                } else {
+                    startMarqueeDesktop();
+                }
+            }, 700);
         });
     }
 
