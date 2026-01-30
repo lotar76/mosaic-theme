@@ -14,6 +14,7 @@ declare(strict_types=1);
 		// Получаем настройки шоурума из админки
 		$showroomData = mosaic_get_showroom_page();
 		$homepageImageId = $showroomData['homepage_image_id'] ?? 0;
+		$features = $showroomData['hero']['features'] ?? [];
 
 		// Если картинка выбрана в админке, используем её, иначе fallback на статическую
 		if ($homepageImageId > 0) {
@@ -49,26 +50,12 @@ declare(strict_types=1);
 				<!-- Right: Features List -->
 				<div class="flex items-start">
 					<ul class="space-y-3 text-white text-base md:text-lg">
-						<li class="flex items-start gap-3">
-							<span class="text-primary mt-1 flex-shrink-0">◆</span>
-							<span>Образцы работы</span>
-						</li>
-						<li class="flex items-start gap-3">
-							<span class="text-primary mt-1 flex-shrink-0">◆</span>
-							<span>Большие готовые панно</span>
-						</li>
-						<li class="flex items-start gap-3">
-							<span class="text-primary mt-1 flex-shrink-0">◆</span>
-							<span>Каталог материалов</span>
-						</li>
-						<li class="flex items-start gap-3">
-							<span class="text-primary mt-1 flex-shrink-0">◆</span>
-							<span>Встречи с дизайнером студии</span>
-						</li>
-						<li class="flex items-start gap-3">
-							<span class="text-primary mt-1 flex-shrink-0">◆</span>
-							<span>Встречи дизайнеров и мастер-классы</span>
-						</li>
+						<?php foreach ($features as $feature): ?>
+							<li class="flex items-start gap-3">
+								<span class="text-primary mt-1 flex-shrink-0">◆</span>
+								<span><?= esc_html($feature); ?></span>
+							</li>
+						<?php endforeach; ?>
 					</ul>
 				</div>
 			</div>
@@ -111,26 +98,12 @@ declare(strict_types=1);
 					<!-- Right -->
 					<div class="flex items-start justify-end justify-self-end w-[658px]">
 						<ul class="space-y-5 text-white font-century font-normal text-[22px] leading-[145%] tracking-[0] text-left">
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Образцы работы</span>
-							</li>
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Большие готовые панно</span>
-							</li>
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Каталог материалов</span>
-							</li>
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Встречи с дизайнером студии</span>
-							</li>
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Встречи дизайнеров и мастер-классы</span>
-							</li>
+							<?php foreach ($features as $feature): ?>
+								<li class="flex items-start gap-4">
+									<span class="text-primary mt-1 flex-shrink-0">◆</span>
+									<span><?= esc_html($feature); ?></span>
+								</li>
+							<?php endforeach; ?>
 						</ul>
 					</div>
 				</div>
@@ -173,26 +146,12 @@ declare(strict_types=1);
 					<!-- Right -->
 					<div class="flex items-start justify-end justify-self-end w-[702px]">
 						<ul class="space-y-5 text-white font-century font-normal text-[20px] leading-[145%] tracking-[0] text-left">
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Образцы работы</span>
-							</li>
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Большие готовые панно</span>
-							</li>
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Каталог материалов</span>
-							</li>
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Встречи с дизайнером студии</span>
-							</li>
-							<li class="flex items-start gap-4">
-								<span class="text-primary mt-1 flex-shrink-0">◆</span>
-								<span>Встречи дизайнеров и мастер-классы</span>
-							</li>
+							<?php foreach ($features as $feature): ?>
+								<li class="flex items-start gap-4">
+									<span class="text-primary mt-1 flex-shrink-0">◆</span>
+									<span><?= esc_html($feature); ?></span>
+								</li>
+							<?php endforeach; ?>
 						</ul>
 					</div>
 				</div>
