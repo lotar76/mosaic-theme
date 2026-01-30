@@ -30,8 +30,12 @@ if ($imageUrl === '' && $founders['image_url'] !== '') {
 				<p class="text-white/60 text-lg md:text-xl mb-0"><?= esc_html($founders['title']); ?></p>
 				<div class="w-[70px] h-[6px] bg-primary mt-6 mb-8"></div>
 
+				<p class="text-white/80 text-base md:text-lg mb-4 leading-relaxed">
+					<?= esc_html($founders['description_1']); ?>
+				</p>
+
 				<p class="text-white/80 text-base md:text-lg leading-relaxed">
-					<?= esc_html($founders['description']); ?>
+					<?= esc_html($founders['description_2']); ?>
 				</p>
 			</div>
 

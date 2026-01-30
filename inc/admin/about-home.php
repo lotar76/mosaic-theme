@@ -6,7 +6,7 @@ declare(strict_types=1);
  * О нас на главной (Админка -> О нас (главная)).
  * Два блока: "О компании" и "Основатели".
  *
- * @return array{company:array{image_id:int,image_url:string,title:string,text_1:string,text_2:string,button_text:string,button_url:string},founders:array{image_id:int,image_url:string,name:string,title:string,description:string}}
+ * @return array{company:array{image_id:int,image_url:string,title:string,text_1:string,text_2:string,button_text:string,button_url:string},founders:array{image_id:int,image_url:string,name:string,title:string,description_1:string,description_2:string}}
  */
 function mosaic_get_about_home_defaults(): array {
 	$base = get_template_directory_uri() . '/img';
@@ -26,7 +26,8 @@ function mosaic_get_about_home_defaults(): array {
 			'image_url' => $base . '/13.png',
 			'name' => 'Алексей и Светлана Исаевы',
 			'title' => 'Основатели компании Si Mosaic',
-			'description' => 'Мы верим, что искусство должно быть живым и может передавать эмоции. Каждый проект имеет свою историю, наполненную смыслом. Мы имеем свой уникальный почерк и это отражается в наших работах. Разработали собственную технологию обучения мастеров, благодаря которой команда работает в едином стиле и качестве. Каждый проект проходит через наш личный контроль: от идеи и художественного замысла до финального исполнения.',
+			'description_1' => 'Мы верим, что искусство должно быть живым и может передавать эмоции. Каждый проект имеет свою историю, наполненную смыслом. Мы имеем свой уникальный почерк и это отражается в наших работах.',
+			'description_2' => 'Разработали собственную технологию обучения мастеров, благодаря которой команда работает в едином стиле и качестве. Каждый проект проходит через наш личный контроль: от идеи и художественного замысла до финального исполнения.',
 		],
 	];
 }
@@ -67,7 +68,7 @@ function mosaic_sanitize_about_home_company(mixed $row): array {
 
 /**
  * @param mixed $row
- * @return array{image_id:int,image_url:string,name:string,title:string,description:string}
+ * @return array{image_id:int,image_url:string,name:string,title:string,description_1:string,description_2:string}
  */
 function mosaic_sanitize_about_home_founders(mixed $row): array {
 	$defaults = mosaic_get_about_home_defaults()['founders'];
@@ -83,20 +84,22 @@ function mosaic_sanitize_about_home_founders(mixed $row): array {
 
 	$name = sanitize_text_field((string) ($row['name'] ?? ''));
 	$title = sanitize_text_field((string) ($row['title'] ?? ''));
-	$description = sanitize_textarea_field((string) ($row['description'] ?? ''));
+	$description1 = sanitize_textarea_field((string) ($row['description_1'] ?? ''));
+	$description2 = sanitize_textarea_field((string) ($row['description_2'] ?? ''));
 
 	return [
 		'image_id' => $imageId,
 		'image_url' => $imageUrl,
 		'name' => $name !== '' ? $name : $defaults['name'],
 		'title' => $title !== '' ? $title : $defaults['title'],
-		'description' => $description !== '' ? $description : $defaults['description'],
+		'description_1' => $description1 !== '' ? $description1 : $defaults['description_1'],
+		'description_2' => $description2 !== '' ? $description2 : $defaults['description_2'],
 	];
 }
 
 /**
  * @param mixed $value
- * @return array{company:array{image_id:int,image_url:string,title:string,text_1:string,text_2:string,button_text:string,button_url:string},founders:array{image_id:int,image_url:string,name:string,title:string,description:string}}
+ * @return array{company:array{image_id:int,image_url:string,title:string,text_1:string,text_2:string,button_text:string,button_url:string},founders:array{image_id:int,image_url:string,name:string,title:string,description_1:string,description_2:string}}
  */
 function mosaic_sanitize_about_home_option(mixed $value): array {
 	$defaults = mosaic_get_about_home_defaults();
@@ -112,7 +115,7 @@ function mosaic_sanitize_about_home_option(mixed $value): array {
 }
 
 /**
- * @return array{company:array{image_id:int,image_url:string,title:string,text_1:string,text_2:string,button_text:string,button_url:string},founders:array{image_id:int,image_url:string,name:string,title:string,description:string}}
+ * @return array{company:array{image_id:int,image_url:string,title:string,text_1:string,text_2:string,button_text:string,button_url:string},founders:array{image_id:int,image_url:string,name:string,title:string,description_1:string,description_2:string}}
  */
 function mosaic_get_about_home(): array {
 	$opt = get_option('mosaic_about_home', mosaic_get_about_home_defaults());
@@ -272,7 +275,8 @@ add_action('admin_post_mosaic_save_about_home', static function (): void {
 		'image_url' => isset($_POST['founders_image_url']) ? (string) $_POST['founders_image_url'] : '',
 		'name' => isset($_POST['founders_name']) ? (string) $_POST['founders_name'] : '',
 		'title' => isset($_POST['founders_title']) ? (string) $_POST['founders_title'] : '',
-		'description' => isset($_POST['founders_description']) ? (string) $_POST['founders_description'] : '',
+		'description_1' => isset($_POST['founders_description_1']) ? (string) $_POST['founders_description_1'] : '',
+		'description_2' => isset($_POST['founders_description_2']) ? (string) $_POST['founders_description_2'] : '',
 	];
 
 	if ($founders['image_id'] > 0) {
@@ -397,8 +401,11 @@ function mosaic_render_about_home_page(): void {
 	echo '<p class="mosaic-about-field"><label class="mosaic-about-label">Должность / подпись</label>';
 	echo '<input type="text" class="mosaic-about-input" name="founders_title" value="' . esc_attr($founders['title']) . '" placeholder="Основатели компании Si Mosaic"></p>';
 
-	echo '<p class="mosaic-about-field"><label class="mosaic-about-label">Описание</label>';
-	echo '<textarea class="mosaic-about-textarea" style="min-height:160px;" name="founders_description" placeholder="Текст об основателях...">' . esc_textarea($founders['description']) . '</textarea></p>';
+	echo '<p class="mosaic-about-field"><label class="mosaic-about-label">Текст (абзац 1)</label>';
+	echo '<textarea class="mosaic-about-textarea" name="founders_description_1" placeholder="Первый абзац...">' . esc_textarea($founders['description_1']) . '</textarea></p>';
+
+	echo '<p class="mosaic-about-field"><label class="mosaic-about-label">Текст (абзац 2)</label>';
+	echo '<textarea class="mosaic-about-textarea" name="founders_description_2" placeholder="Второй абзац...">' . esc_textarea($founders['description_2']) . '</textarea></p>';
 
 	echo '</div></div>';
 

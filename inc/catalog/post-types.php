@@ -539,3 +539,54 @@ function mosaic_unique_product_slug(string $slug, int $postId): string {
 
 	return $slug;
 }
+
+/**
+ * Добавляем фильтр по разделам каталога в админке
+ */
+add_action('restrict_manage_posts', static function (string $postType): void {
+	if ($postType !== 'product') {
+		return;
+	}
+
+	$taxonomy = 'product_section';
+	$selected = isset($_GET[$taxonomy]) ? sanitize_text_field($_GET[$taxonomy]) : '';
+
+	wp_dropdown_categories([
+		'show_option_all' => 'Все разделы',
+		'taxonomy' => $taxonomy,
+		'name' => $taxonomy,
+		'orderby' => 'name',
+		'selected' => $selected,
+		'hierarchical' => true,
+		'show_count' => true,
+		'hide_empty' => false,
+		'value_field' => 'slug',
+	]);
+});
+
+/**
+ * Применяем фильтр по разделам
+ */
+add_filter('parse_query', static function (WP_Query $query): void {
+	global $pagenow;
+
+	if (!is_admin() || $pagenow !== 'edit.php') {
+		return;
+	}
+
+	$postType = $query->get('post_type');
+	if ($postType !== 'product') {
+		return;
+	}
+
+	$taxonomy = 'product_section';
+	if (!empty($_GET[$taxonomy])) {
+		$query->query_vars['tax_query'] = [
+			[
+				'taxonomy' => $taxonomy,
+				'field' => 'slug',
+				'terms' => sanitize_text_field($_GET[$taxonomy]),
+			],
+		];
+	}
+});

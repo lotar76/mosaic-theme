@@ -427,7 +427,7 @@ function mosaic_send_email_notification(string $name, string $email, string $pho
 	$site_name = get_bloginfo('name');
 	$date_time = current_time('d.m.Y H:i');
 
-	$subject = "Новая заявка с сайта: {$form_label}";
+	$subject = "Заявки с сайта";
 
 	$message = "Новая заявка с сайта {$site_name}\n\n";
 	$message .= "Форма: {$form_label}\n";
