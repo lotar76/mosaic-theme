@@ -165,6 +165,8 @@ function mosaic_handle_contact_form_ajax(): void
 	}
 	if (empty($phone)) {
 		$errors[] = 'Укажите телефон';
+	} elseif (!preg_match('/^[+]?[0-9]+$/', $phone)) {
+		$errors[] = 'Телефон должен содержать только цифры';
 	}
 
 	if (!empty($errors)) {
@@ -224,6 +226,8 @@ function mosaic_handle_contact_form(): void
 
 	if (empty($phone)) {
 		$errors[] = 'Укажите телефон';
+	} elseif (!preg_match('/^[+]?[0-9]+$/', $phone)) {
+		$errors[] = 'Телефон должен содержать только цифры';
 	}
 
 	if (!empty($errors)) {

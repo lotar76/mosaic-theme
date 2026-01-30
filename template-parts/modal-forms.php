@@ -97,6 +97,8 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 								name="phone"
 								placeholder="Телефон"
 								required
+								inputmode="tel"
+								oninput="this.value=this.value.replace(/[^0-9+]/g,'').replace(/(?!^)\+/g,'')"
 								class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
 								aria-label="Ваш телефон"
 							>
@@ -208,6 +210,8 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 								name="phone"
 								placeholder="Телефон"
 								required
+								inputmode="tel"
+								oninput="this.value=this.value.replace(/[^0-9+]/g,'').replace(/(?!^)\+/g,'')"
 								class="w-full h-[56px] bg-white/5 border-0 border-b border-primary px-6 text-white placeholder:text-white/40 focus:outline-none focus:border-primary"
 								aria-label="Ваш телефон"
 							>
