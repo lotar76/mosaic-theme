@@ -872,3 +872,12 @@ body {
   
   См. .cursor/rules/workflow.mdc для деталей
 */
+
+/* Cookie Consent Banner */
+[data-cookie-consent] {
+  transform: translateY(100%);
+}
+
+[data-cookie-consent].is-visible {
+  transform: translateY(0);
+}

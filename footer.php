@@ -140,6 +140,27 @@ $phoneContact = function_exists('mosaic_get_phone_contact') ? mosaic_get_phone_c
 
 <?php get_template_part('template-parts/modal-forms'); ?>
 
+<!-- Cookie Consent Banner -->
+<div id="cookie-consent" class="fixed bottom-0 left-0 right-0 z-[9999] translate-y-full transition-transform duration-300" data-cookie-consent>
+    <div class="bg-gray/95 backdrop-blur-sm border-t border-white/10">
+        <div class="max-w-[1920px] mx-auto px-4 lg:px-[100px] py-4 lg:py-5">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <p class="text-white/80 font-century text-[14px] lg:text-[16px] leading-[145%] max-w-[800px]">
+                    Мы используем файлы cookie для улучшения работы сайта. Продолжая использовать сайт, вы соглашаетесь с
+                    <a href="<?= $privacyUrl; ?>" class="text-primary hover:text-white transition-colors underline">политикой конфиденциальности</a>.
+                </p>
+                <button
+                    type="button"
+                    class="shrink-0 px-6 py-2.5 bg-primary hover:bg-primary/80 text-white font-century text-[14px] lg:text-[16px] transition-colors"
+                    data-cookie-accept
+                >
+                    Принять
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php wp_footer(); ?>
 </body>
 </html>

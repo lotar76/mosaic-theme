@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initShowroomEventsSlider();
     initShowroomMap();
     initShowroomLightbox();
+    initCookieConsent();
 });
 
 /**
@@ -2055,4 +2056,31 @@ const initShowroomLightbox = () => {
             close();
         }
     });
+};
+
+/**
+ * Cookie Consent Banner
+ */
+const initCookieConsent = () => {
+    const banner = document.querySelector('[data-cookie-consent]');
+    const acceptBtn = document.querySelector('[data-cookie-accept]');
+
+    if (!banner || !acceptBtn) return;
+
+    const COOKIE_KEY = 'mosaic_cookie_consent';
+    const isAccepted = localStorage.getItem(COOKIE_KEY) === 'accepted';
+
+    if (isAccepted) return;
+
+    // Show banner after a short delay
+    setTimeout(() => {
+        banner.classList.add('is-visible');
+    }, 1000);
+
+    const accept = () => {
+        localStorage.setItem(COOKIE_KEY, 'accepted');
+        banner.classList.remove('is-visible');
+    };
+
+    acceptBtn.addEventListener('click', accept);
 };
