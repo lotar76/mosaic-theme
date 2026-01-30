@@ -50,7 +50,7 @@ if (!is_array($processBlocks)) {
 
 		<!-- Process Slider -->
 		<div class="process-slider overflow-hidden" data-process>
-			<div class="process-track flex gap-4 md:gap-6" data-process-track>
+			<div class="process-track flex gap-4 md:gap-6 transition-transform duration-700 ease-in-out" data-process-track>
 				<?php foreach ($processBlocks as $idx => $row) : ?>
 					<?php
 					if (!is_array($row)) {

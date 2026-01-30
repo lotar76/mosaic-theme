@@ -377,7 +377,7 @@ if (count($galleryImages) === 0) {
 				<!-- Collections Grid/Slider -->
 				<?php if ($useCollectionsSlider) : ?>
 					<div class="collections-slider overflow-hidden" data-collections-slider>
-						<div class="collections-track flex gap-6" data-collections-track>
+						<div class="collections-track flex gap-6 transition-transform duration-700 ease-in-out" data-collections-track>
 							<?php foreach ($collections['items'] as $item) :
 								$itemImageUrl = '';
 								$itemImageUrlFull = '';
