@@ -526,7 +526,7 @@ if (count($galleryImages) === 0) {
 									data-lightbox-src="<?= esc_attr($itemImageUrlFull); ?>"
 									data-lightbox-title="<?= esc_attr($item['title']); ?>"
 								>
-									<div class="aspect-[4/3] overflow-hidden bg-gray mb-4">
+									<div class="aspect-square overflow-hidden bg-gray mb-4">
 										<img
 											src="<?= esc_url($itemImageUrl); ?>"
 											alt="<?= esc_attr($item['title']); ?>"
@@ -561,7 +561,7 @@ if (count($galleryImages) === 0) {
 								data-lightbox-src="<?= esc_attr($itemImageUrlFull); ?>"
 								data-lightbox-title="<?= esc_attr($item['title']); ?>"
 							>
-								<div class="aspect-[4/3] overflow-hidden bg-gray mb-4">
+								<div class="aspect-square overflow-hidden bg-gray mb-4">
 									<img
 										src="<?= esc_url($itemImageUrl); ?>"
 										alt="<?= esc_attr($item['title']); ?>"

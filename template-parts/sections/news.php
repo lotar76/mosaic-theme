@@ -50,8 +50,8 @@ $newsArchiveUrl = home_url('/news/');
 			<div class="news-track flex gap-4 md:gap-6 transition-transform duration-500 ease-out">
 				<?php if (count($newsItems) > 0) : ?>
 					<?php foreach ($newsItems as $item) : ?>
-						<a href="<?= esc_url($item['url']); ?>" class="news-slide bg-black group flex-shrink-0 w-[300px] min-[1280px]:w-[385px] min-[1920px]:w-[408px]" tabindex="0" aria-label="<?= esc_attr($item['title']); ?>">
-							<div class="w-[300px] h-[340px] min-[1280px]:w-[385px] min-[1280px]:h-[520px] min-[1920px]:w-[408px] overflow-hidden">
+						<a href="<?= esc_url($item['url']); ?>" class="news-slide bg-black group flex-shrink-0 w-[340px] min-[1280px]:w-[400px] min-[1920px]:w-[420px]" tabindex="0" aria-label="<?= esc_attr($item['title']); ?>">
+							<div class="w-[340px] h-[340px] min-[1280px]:w-[400px] min-[1280px]:h-[400px] min-[1920px]:w-[420px] min-[1920px]:h-[420px] overflow-hidden">
 								<?php if ($item['image_url'] !== '') : ?>
 									<img
 										src="<?= esc_url($item['image_url']); ?>"

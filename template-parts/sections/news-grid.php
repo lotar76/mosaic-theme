@@ -39,7 +39,7 @@ $news = function_exists('mosaic_get_news_posts') ? mosaic_get_news_posts($limit)
 						aria-label="<?= esc_attr($item['title']); ?>"
 						data-news-card
 					>
-						<div class="aspect-[4/3] bg-gray/20 overflow-hidden">
+						<div class="aspect-square bg-gray/20 overflow-hidden">
 							<?php if ($item['image_url'] !== '') : ?>
 								<img
 									src="<?= esc_url($item['image_url']); ?>"
