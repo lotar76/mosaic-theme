@@ -111,6 +111,7 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
                     <div class="flex items-center gap-4">
                         <?php get_template_part('template-parts/social-icons'); ?>
                     </div>
+                    <?php get_template_part('template-parts/language-switcher'); ?>
                 </div>
 
                 <!-- Right: 1280..1919 (phone + socials) - планшет -->
@@ -126,6 +127,7 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
                     <div class="flex items-center gap-4">
                         <?php get_template_part('template-parts/social-icons'); ?>
                     </div>
+                    <?php get_template_part('template-parts/language-switcher'); ?>
                 </div>
 
                 <!-- Right: <= 1279 (hamburger) - мобилка -->
@@ -189,6 +191,9 @@ $telegramUrl = $telegramUrl !== '' ? esc_url($telegramUrl) : 'https://t.me/simos
                     </a>
                     <div class="mt-6 flex items-center gap-4">
                         <?php get_template_part('template-parts/social-icons'); ?>
+                    </div>
+                    <div class="mt-6">
+                        <?php get_template_part('template-parts/language-switcher', null, ['variant' => 'mobile']); ?>
                     </div>
                 </div>
             </div>

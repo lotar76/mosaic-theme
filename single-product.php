@@ -113,35 +113,61 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                             </div>
                         </div>
 
-                        <!-- Thumbnails -->
+                        <!-- Thumbnails Carousel -->
 						<?php if (count($galleryIds) > 1) : ?>
-                            <div class="flex gap-2 overflow-x-auto pb-2 justify-start">
-								<?php foreach ($galleryIds as $idx => $gid) : ?>
-									<?php
-									$thumbUrl = (string) wp_get_attachment_image_url((int) $gid, 'medium');
-									$fullUrl = (string) wp_get_attachment_image_url((int) $gid, 'full');
-									if ($thumbUrl === '') {
-										continue;
-									}
-									$isActive = $idx === 0;
-									?>
-                                    <button
-                                        type="button"
-                                        class="gallery-thumb flex-shrink-0 w-16 h-16 md:w-20 md:h-20 min-[1280px]:w-24 min-[1280px]:h-24 overflow-hidden bg-gray/20 border-2 transition-all <?= $isActive ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'; ?>"
-                                        data-image-url="<?= esc_attr($fullUrl); ?>"
-                                        data-index="<?= esc_attr((string) $idx); ?>"
-                                        aria-label="<?= esc_attr('Изображение ' . (string) ($idx + 1)); ?>"
-                                        tabindex="0"
-                                    >
-                                        <img
-                                            src="<?= esc_url($thumbUrl); ?>"
-                                            alt=""
-                                            class="w-full h-full object-cover"
-                                            loading="lazy"
-                                            decoding="async"
-                                        >
-                                    </button>
-								<?php endforeach; ?>
+                            <div class="relative w-[328px] md:w-[490px] min-[1280px]:w-[700px]" data-thumb-carousel>
+                                <!-- Carousel Container -->
+                                <div class="overflow-hidden" data-thumb-viewport>
+                                    <div class="flex gap-2 transition-transform duration-300 ease-out" data-thumb-track>
+                                        <?php foreach ($galleryIds as $idx => $gid) : ?>
+                                            <?php
+                                            $thumbUrl = (string) wp_get_attachment_image_url((int) $gid, 'medium');
+                                            $fullUrl = (string) wp_get_attachment_image_url((int) $gid, 'full');
+                                            if ($thumbUrl === '') {
+                                                continue;
+                                            }
+                                            $isActive = $idx === 0;
+                                            ?>
+                                            <button
+                                                type="button"
+                                                class="gallery-thumb flex-shrink-0 w-16 h-16 md:w-20 md:h-20 min-[1280px]:w-24 min-[1280px]:h-24 overflow-hidden bg-gray/20 border-2 transition-all <?= $isActive ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'; ?>"
+                                                data-image-url="<?= esc_attr($fullUrl); ?>"
+                                                data-index="<?= esc_attr((string) $idx); ?>"
+                                                aria-label="<?= esc_attr('Изображение ' . (string) ($idx + 1)); ?>"
+                                                tabindex="0"
+                                            >
+                                                <img
+                                                    src="<?= esc_url($thumbUrl); ?>"
+                                                    alt=""
+                                                    class="w-full h-full object-cover"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                >
+                                            </button>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <!-- Navigation Arrows -->
+                                <button
+                                    type="button"
+                                    class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-2 text-white/60 hover:text-white transition-colors hidden"
+                                    aria-label="Предыдущие превью"
+                                    data-thumb-prev
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full pl-2 text-white/60 hover:text-white transition-colors hidden"
+                                    aria-label="Следующие превью"
+                                    data-thumb-next
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </button>
                             </div>
 						<?php endif; ?>
 
@@ -538,6 +564,126 @@ if (count($galleryIds) > 0) :
 			closeFullscreen();
 		}
 	});
+
+	// Thumbnail Carousel
+	var thumbCarousel = document.querySelector('[data-thumb-carousel]');
+	if (thumbCarousel) {
+		var thumbTrack = thumbCarousel.querySelector('[data-thumb-track]');
+		var thumbViewport = thumbCarousel.querySelector('[data-thumb-viewport]');
+		var thumbPrev = thumbCarousel.querySelector('[data-thumb-prev]');
+		var thumbNext = thumbCarousel.querySelector('[data-thumb-next]');
+		var thumbOffset = 0;
+
+		function getThumbSize() {
+			var w = window.innerWidth;
+			if (w >= 1280) return 96 + 8; // w-24 + gap-2
+			if (w >= 768) return 80 + 8;  // w-20 + gap-2
+			return 64 + 8; // w-16 + gap-2
+		}
+
+		function getVisibleCount() {
+			if (!thumbViewport) return 1;
+			var viewportWidth = thumbViewport.offsetWidth;
+			var thumbSize = getThumbSize();
+			return Math.floor(viewportWidth / thumbSize);
+		}
+
+		function getMaxOffset() {
+			if (!thumbTrack || !thumbViewport) return 0;
+			var trackWidth = thumbTrack.scrollWidth;
+			var viewportWidth = thumbViewport.offsetWidth;
+			return Math.max(0, trackWidth - viewportWidth);
+		}
+
+		function updateThumbArrows() {
+			var maxOffset = getMaxOffset();
+			if (thumbPrev) {
+				if (thumbOffset > 0) {
+					thumbPrev.classList.remove('hidden');
+				} else {
+					thumbPrev.classList.add('hidden');
+				}
+			}
+			if (thumbNext) {
+				if (thumbOffset < maxOffset) {
+					thumbNext.classList.remove('hidden');
+				} else {
+					thumbNext.classList.add('hidden');
+				}
+			}
+		}
+
+		function scrollThumbs(direction) {
+			var thumbSize = getThumbSize();
+			var visibleCount = getVisibleCount();
+			var scrollAmount = thumbSize * Math.max(1, visibleCount - 1);
+			var maxOffset = getMaxOffset();
+
+			if (direction === 'next') {
+				thumbOffset = Math.min(thumbOffset + scrollAmount, maxOffset);
+			} else {
+				thumbOffset = Math.max(thumbOffset - scrollAmount, 0);
+			}
+
+			if (thumbTrack) {
+				thumbTrack.style.transform = 'translateX(-' + thumbOffset + 'px)';
+			}
+			updateThumbArrows();
+		}
+
+		function scrollToActiveThumb(index) {
+			if (!thumbTrack || !thumbViewport) return;
+			var thumbSize = getThumbSize();
+			var viewportWidth = thumbViewport.offsetWidth;
+			var thumbPosition = index * thumbSize;
+			var maxOffset = getMaxOffset();
+
+			// Check if thumb is outside visible area
+			if (thumbPosition < thumbOffset) {
+				thumbOffset = thumbPosition;
+			} else if (thumbPosition + thumbSize > thumbOffset + viewportWidth) {
+				thumbOffset = Math.min(thumbPosition + thumbSize - viewportWidth, maxOffset);
+			}
+
+			thumbTrack.style.transform = 'translateX(-' + thumbOffset + 'px)';
+			updateThumbArrows();
+		}
+
+		if (thumbPrev) {
+			thumbPrev.addEventListener('click', function() {
+				scrollThumbs('prev');
+			});
+		}
+
+		if (thumbNext) {
+			thumbNext.addEventListener('click', function() {
+				scrollThumbs('next');
+			});
+		}
+
+		// Update arrows on resize
+		var resizeTimer;
+		window.addEventListener('resize', function() {
+			clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(function() {
+				thumbOffset = 0;
+				if (thumbTrack) {
+					thumbTrack.style.transform = 'translateX(0)';
+				}
+				updateThumbArrows();
+			}, 150);
+		});
+
+		// Scroll to active thumb when main image changes
+		var originalUpdateMainImage = updateMainImage;
+		updateMainImage = function(index) {
+			originalUpdateMainImage(index);
+			scrollToActiveThumb(index);
+		};
+
+		// Initial check
+		setTimeout(updateThumbArrows, 100);
+	}
 })();
 </script>
 <?php endif; ?>

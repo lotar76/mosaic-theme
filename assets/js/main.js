@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initShowroomMap();
     initShowroomLightbox();
     initCookieConsent();
+    initLanguageSwitcher();
 });
 
 /**
@@ -1713,4 +1714,68 @@ const initCookieConsent = () => {
     };
 
     acceptBtn.addEventListener('click', accept);
+};
+
+/**
+ * Language Switcher Dropdowns
+ */
+const initLanguageSwitcher = () => {
+    const switchers = document.querySelectorAll('[data-lang-switcher]');
+    if (!switchers.length) return;
+
+    switchers.forEach((switcher) => {
+        const toggle = switcher.querySelector('[data-lang-toggle]');
+        const panel = switcher.querySelector('[data-lang-panel]');
+
+        if (!toggle || !panel) return;
+
+        const open = () => {
+            if (panel.classList.contains('is-open')) return;
+            panel.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                panel.classList.add('is-open');
+            });
+            toggle.setAttribute('aria-expanded', 'true');
+        };
+
+        const close = () => {
+            if (!panel.classList.contains('is-open')) return;
+            panel.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+            setTimeout(() => {
+                if (!panel.classList.contains('is-open')) {
+                    panel.classList.add('hidden');
+                }
+            }, 200);
+        };
+
+        const togglePanel = () => {
+            if (panel.classList.contains('is-open')) {
+                close();
+            } else {
+                open();
+            }
+        };
+
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            togglePanel();
+        });
+
+        // Close on click outside
+        document.addEventListener('click', (e) => {
+            if (!panel.classList.contains('is-open')) return;
+            if (!(e.target instanceof Node)) return;
+            if (switcher.contains(e.target)) return;
+            close();
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                close();
+            }
+        });
+    });
 };

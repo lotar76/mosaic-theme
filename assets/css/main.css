@@ -881,3 +881,55 @@ body {
 [data-cookie-consent].is-visible {
   transform: translateY(0);
 }
+
+/* Language Switcher */
+[data-lang-panel] {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0s 0.2s;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+[data-lang-panel].is-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0s 0s;
+}
+
+/* Mobile variant - opens upward */
+[data-lang-panel="mobile"] {
+  transform: translateY(8px);
+}
+
+[data-lang-panel="mobile"].is-open {
+  transform: translateY(0);
+}
+
+/* Chevron rotation: closed = down, open = up */
+[data-lang-toggle] [data-lang-chevron] {
+  transition: transform 0.2s ease-out;
+}
+
+[data-lang-toggle][aria-expanded="true"] [data-lang-chevron] {
+  transform: rotate(180deg);
+}
+
+/* Product Thumbnail Carousel */
+[data-thumb-carousel] {
+  position: relative;
+}
+
+[data-thumb-carousel] [data-thumb-prev],
+[data-thumb-carousel] [data-thumb-next] {
+  z-index: 10;
+}
+
+[data-thumb-carousel] [data-thumb-prev]:not(.hidden),
+[data-thumb-carousel] [data-thumb-next]:not(.hidden) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
