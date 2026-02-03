@@ -1135,6 +1135,14 @@ const initProcessSlider = () => {
         track.style.transition = 'none';
     };
 
+    const getProcessSlidesPerView = () => {
+        const width = getViewportWidth();
+        if (isDesktop(width)) return 4;
+        if (isTablet(width)) return 3;
+        if (width > MIN_WIDTH) return 2;
+        return 1;
+    };
+
     const getSlideStep = () => {
         const slide = slides[0];
         const style = window.getComputedStyle(track);
@@ -1162,7 +1170,7 @@ const initProcessSlider = () => {
     };
 
     const handleNext = () => {
-        const slidesPerView = 4;
+        const slidesPerView = getProcessSlidesPerView();
         const maxIdx = Math.max(0, slides.length - slidesPerView);
         if (currentIndex < maxIdx) {
             currentIndex++;
@@ -1191,7 +1199,7 @@ const initProcessSlider = () => {
                 slider.scrollLeft = 0;
                 return;
             }
-            const slidesPerView = 4;
+            const slidesPerView = getProcessSlidesPerView();
             const maxIdx = Math.max(0, slides.length - slidesPerView);
             if (currentIndex > maxIdx) {
                 currentIndex = maxIdx;
@@ -1223,7 +1231,8 @@ const initNewsSlider = () => {
 
     const getNewsSlidesPerView = () => {
         const width = getViewportWidth();
-        if (!isMobile(width)) return 4;
+        if (isDesktop(width)) return 4;
+        if (isTablet(width)) return 3;
         if (width > MIN_WIDTH) return 2;
         return 1;
     };
