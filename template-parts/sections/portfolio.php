@@ -42,39 +42,13 @@ if (count($portfolioItems) === 0) {
 <section class="bg-black" data-portfolio>
 	<div class="max-w-[1920px] mx-auto pl-4 md:pl-8 min-[1280px]:pl-10 min-[1920px]:pl-[100px] pr-0">
 		<!-- Section Header -->
-		<div class="flex items-center justify-between mb-8 md:mb-12">
-			<div>
-				<h2 class="text-white text-3xl md:text-4xl lg:text-5xl font-normal mb-0">Портфолио</h2>
-				<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
-			</div>
-
-			<!-- Navigation Arrows -->
-			<div class="flex gap-6 max-[1279px]:hidden mr-[99px]">
-				<button
-					type="button"
-					class="portfolio-prev hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
-					aria-label="Предыдущий слайд"
-					tabindex="0"
-				>
-					<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M26.6667 31.6665L15 19.9998L26.6667 8.33317" stroke="#847575" stroke-width="2" stroke-linecap="square"/>
-					</svg>
-				</button>
-				<button
-					type="button"
-					class="portfolio-next hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-gray"
-					aria-label="Следующий слайд"
-					tabindex="0"
-				>
-					<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M13.3333 8.3335L25 20.0002L13.3333 31.6668" stroke="#847575" stroke-width="2" stroke-linecap="square"/>
-					</svg>
-				</button>
-			</div>
+		<div class="mb-8 md:mb-12">
+			<h2 class="text-white text-3xl md:text-4xl lg:text-5xl font-normal mb-0">Портфолио</h2>
+			<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
 		</div>
 
 		<!-- Portfolio Slider -->
-		<div class="portfolio-slider overflow-hidden">
+		<div class="portfolio-slider relative overflow-hidden">
 			<div class="portfolio-track flex transition-transform duration-700 ease-in-out" data-portfolio-track>
 				<?php foreach ($portfolioItems as $item) : ?>
 					<?php
@@ -126,6 +100,28 @@ if (count($portfolioItems) === 0) {
 					</a>
 				<?php endforeach; ?>
 			</div>
+
+			<!-- Navigation Arrows -->
+			<button
+				type="button"
+				class="portfolio-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+				aria-label="Предыдущий слайд"
+				tabindex="0"
+			>
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+				</svg>
+			</button>
+			<button
+				type="button"
+				class="portfolio-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+				aria-label="Следующий слайд"
+				tabindex="0"
+			>
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+				</svg>
+			</button>
 		</div>
 
 		<!-- All Projects Button -->

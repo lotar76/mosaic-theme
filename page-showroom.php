@@ -343,44 +343,16 @@ if (count($galleryImages) === 0) {
 		<section class="bg-black pb-[40px] min-[1280px]:pb-[60px]" data-showroom-collections>
 			<div class="max-w-[1920px] mx-auto pl-4 md:pl-8 lg:pl-16 min-[1920px]:pl-[100px] <?= $useCollectionsSlider ? 'pr-0' : 'pr-4 md:pr-8 lg:pr-16 min-[1920px]:pr-[100px]'; ?>">
 				<!-- Section Header -->
-				<div class="flex items-center justify-between mb-8 min-[1280px]:mb-12 <?= $useCollectionsSlider ? 'pr-4 md:pr-8 lg:pr-16 min-[1920px]:pr-[100px]' : ''; ?>">
-					<div>
-						<h2 class="text-white text-[24px] min-[1280px]:text-[40px] min-[1920px]:text-[48px] font-normal mb-0">
-							<?= esc_html($collections['title']); ?>
-						</h2>
-						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
-					</div>
-
-					<?php if ($useCollectionsSlider) : ?>
-						<!-- Navigation Arrows (show if more than 4 items) -->
-						<div class="flex gap-[37px] max-[1279px]:hidden">
-							<button
-								type="button"
-								class="collections-prev p-2 text-white/60 hover:text-primary transition-colors"
-								aria-label="Предыдущий слайд"
-								data-collections-prev
-							>
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
-								</svg>
-							</button>
-							<button
-								type="button"
-								class="collections-next p-2 text-white/60 hover:text-primary transition-colors"
-								aria-label="Следующий слайд"
-								data-collections-next
-							>
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
-								</svg>
-							</button>
-						</div>
-					<?php endif; ?>
+				<div class="mb-8 min-[1280px]:mb-12 <?= $useCollectionsSlider ? 'pr-4 md:pr-8 lg:pr-16 min-[1920px]:pr-[100px]' : ''; ?>">
+					<h2 class="text-white text-[24px] min-[1280px]:text-[40px] min-[1920px]:text-[48px] font-normal mb-0">
+						<?= esc_html($collections['title']); ?>
+					</h2>
+					<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
 				</div>
 
 				<!-- Collections Grid/Slider -->
 				<?php if ($useCollectionsSlider) : ?>
-					<div class="collections-slider overflow-hidden" data-collections-slider>
+					<div class="collections-slider relative overflow-hidden" data-collections-slider>
 						<div class="collections-track flex gap-6 transition-transform duration-700 ease-in-out" data-collections-track>
 							<?php foreach ($collections['items'] as $item) :
 								$itemImageUrl = '';
@@ -420,6 +392,28 @@ if (count($galleryImages) === 0) {
 								</button>
 							<?php endforeach; ?>
 						</div>
+
+						<!-- Navigation Arrows -->
+						<button
+							type="button"
+							class="collections-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+							aria-label="Предыдущий слайд"
+							data-collections-prev
+						>
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+							</svg>
+						</button>
+						<button
+							type="button"
+							class="collections-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+							aria-label="Следующий слайд"
+							data-collections-next
+						>
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+							</svg>
+						</button>
 					</div>
 				<?php else : ?>
 					<div class="grid grid-cols-2 min-[1280px]:grid-cols-4 gap-6">
@@ -470,45 +464,17 @@ if (count($galleryImages) === 0) {
 		<section class="bg-black pb-[40px] min-[1280px]:pb-[60px]" data-showroom-events>
 			<div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
 				<!-- Section Header -->
-				<div class="flex items-center justify-between mb-8 min-[1280px]:mb-12">
-					<div>
-						<h2 class="text-white text-[24px] min-[1280px]:text-[40px] min-[1920px]:text-[48px] font-normal mb-0">
-							<?= esc_html($events['title']); ?>
-						</h2>
-						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
-					</div>
-
-					<?php if (count($events['items']) > 4) : ?>
-						<!-- Navigation Arrows -->
-						<div class="flex gap-[37px] max-[1279px]:hidden">
-							<button
-								type="button"
-								class="events-prev p-2 text-white/60 hover:text-primary transition-colors"
-								aria-label="Предыдущий слайд"
-								data-events-prev
-							>
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
-								</svg>
-							</button>
-							<button
-								type="button"
-								class="events-next p-2 text-white/60 hover:text-primary transition-colors"
-								aria-label="Следующий слайд"
-								data-events-next
-							>
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
-								</svg>
-							</button>
-						</div>
-					<?php endif; ?>
+				<div class="mb-8 min-[1280px]:mb-12">
+					<h2 class="text-white text-[24px] min-[1280px]:text-[40px] min-[1920px]:text-[48px] font-normal mb-0">
+						<?= esc_html($events['title']); ?>
+					</h2>
+					<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
 				</div>
 
 				<!-- Events Grid/Slider -->
 				<?php $useEventsSlider = count($events['items']) > 4; ?>
 				<?php if ($useEventsSlider) : ?>
-					<div class="events-slider overflow-hidden" data-events-slider>
+					<div class="events-slider relative overflow-hidden" data-events-slider>
 						<div class="events-track flex gap-6 transition-transform duration-700 ease-in-out" data-events-track>
 							<?php foreach ($events['items'] as $item) :
 								$itemImageUrl = '';
@@ -543,6 +509,28 @@ if (count($galleryImages) === 0) {
 								</button>
 							<?php endforeach; ?>
 						</div>
+
+						<!-- Navigation Arrows -->
+						<button
+							type="button"
+							class="events-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+							aria-label="Предыдущий слайд"
+							data-events-prev
+						>
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+							</svg>
+						</button>
+						<button
+							type="button"
+							class="events-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+							aria-label="Следующий слайд"
+							data-events-next
+						>
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+							</svg>
+						</button>
 					</div>
 				<?php else : ?>
 					<div class="grid grid-cols-2 min-[1280px]:grid-cols-4 gap-6">
