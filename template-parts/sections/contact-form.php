@@ -126,13 +126,13 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 						<div class="space-y-3">
 							<label class="flex items-start gap-3 cursor-pointer group">
 								<input type="checkbox" name="consent_privacy" value="1" checked required class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
-								<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+								<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
 									Согласен с <a href="<?= esc_url(home_url($privacyPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">обработкой персональных данных</a>
 								</span>
 							</label>
 							<label class="flex items-start gap-3 cursor-pointer group">
 								<input type="checkbox" name="consent_newsletter" value="1" class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
-								<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+								<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
 									Согласен на <a href="<?= esc_url(home_url($newsletterPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">получение рассылок</a>
 								</span>
 							</label>
@@ -236,13 +236,13 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 							<div class="space-y-3">
 								<label class="flex items-start gap-3 cursor-pointer group">
 									<input type="checkbox" name="consent_privacy" value="1" checked required class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
-									<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+									<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
 										Согласен с <a href="<?= esc_url(home_url($privacyPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">обработкой персональных данных</a>
 									</span>
 								</label>
 								<label class="flex items-start gap-3 cursor-pointer group">
 									<input type="checkbox" name="consent_newsletter" value="1" class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
-									<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+									<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
 										Согласен на <a href="<?= esc_url(home_url($newsletterPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">получение рассылок</a>
 									</span>
 								</label>
@@ -347,13 +347,13 @@ $newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['n
 							<div class="space-y-3">
 								<label class="flex items-start gap-3 cursor-pointer group">
 									<input type="checkbox" name="consent_privacy" value="1" checked required class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
-									<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+									<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
 										Согласен с <a href="<?= esc_url(home_url($privacyPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">обработкой персональных данных</a>
 									</span>
 								</label>
 								<label class="flex items-start gap-3 cursor-pointer group">
 									<input type="checkbox" name="consent_newsletter" value="1" class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
-									<span class="text-white/60 text-xs text-left group-hover:text-white/80 transition-colors">
+									<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
 										Согласен на <a href="<?= esc_url(home_url($newsletterPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">получение рассылок</a>
 									</span>
 								</label>

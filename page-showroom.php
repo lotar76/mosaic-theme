@@ -25,6 +25,10 @@ $address = $address !== '' ? $address : 'Краснодар, Селезнёва 
 $workHours = is_array($siteSettings) ? trim((string) ($siteSettings['work_hours'] ?? '')) : '';
 $workHours = $workHours !== '' ? $workHours : 'Пн - Пт: 09:00 - 18:00';
 
+// URL для чекбоксов согласий
+$privacyPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['privacy_policy_url'] ?? '/privacy-policy/')) : '/privacy-policy/';
+$newsletterPolicyUrl = is_array($siteSettings) ? trim((string) ($siteSettings['newsletter_policy_url'] ?? '/newsletter-policy/')) : '/newsletter-policy/';
+
 // Parse title lines
 $titleLines = preg_split("/\r\n|\r|\n/", trim($hero['title'])) ?: [];
 $titleLines = array_values(array_filter(array_map('trim', $titleLines), static fn($v) => $v !== ''));
@@ -615,6 +619,7 @@ if (count($galleryImages) === 0) {
 						<form class="flex flex-col gap-4" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
 							<input type="hidden" name="action" value="contact_form">
 							<input type="hidden" name="form_type" value="showroom">
+							<input type="hidden" name="form_source" value="page">
 							<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
 
 							<!-- Name Field -->
@@ -668,10 +673,21 @@ if (count($galleryImages) === 0) {
 								Отправить заявку
 							</button>
 
-							<!-- Privacy Consent -->
-							<p class="text-white/40 text-xs text-left">
-								Согласен с обработкой персональных данных
-							</p>
+							<!-- Consent Checkboxes -->
+							<div class="space-y-3">
+								<label class="flex items-start gap-3 cursor-pointer group">
+									<input type="checkbox" name="consent_privacy" value="1" checked required class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+									<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
+										Согласен с <a href="<?= esc_url(home_url($privacyPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">обработкой персональных данных</a>
+									</span>
+								</label>
+								<label class="flex items-start gap-3 cursor-pointer group">
+									<input type="checkbox" name="consent_newsletter" value="1" class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+									<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
+										Согласен на <a href="<?= esc_url(home_url($newsletterPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">получение рассылок</a>
+									</span>
+								</label>
+							</div>
 						</form>
 					</div>
 				</div>
@@ -706,6 +722,7 @@ if (count($galleryImages) === 0) {
 						<form class="h-full" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
 							<input type="hidden" name="action" value="contact_form">
 							<input type="hidden" name="form_type" value="showroom">
+							<input type="hidden" name="form_source" value="page">
 							<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
 
 							<div class="flex flex-col gap-5">
@@ -756,9 +773,21 @@ if (count($galleryImages) === 0) {
 									Отправить заявку
 								</button>
 
-								<p class="text-white/40 text-xs text-left">
-									Согласен с обработкой персональных данных
-								</p>
+								<!-- Consent Checkboxes -->
+								<div class="space-y-3">
+									<label class="flex items-start gap-3 cursor-pointer group">
+										<input type="checkbox" name="consent_privacy" value="1" checked required class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+										<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
+											Согласен с <a href="<?= esc_url(home_url($privacyPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">обработкой персональных данных</a>
+										</span>
+									</label>
+									<label class="flex items-start gap-3 cursor-pointer group">
+										<input type="checkbox" name="consent_newsletter" value="1" class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+										<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
+											Согласен на <a href="<?= esc_url(home_url($newsletterPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">получение рассылок</a>
+										</span>
+									</label>
+								</div>
 							</div>
 						</form>
 					</div>
@@ -794,6 +823,7 @@ if (count($galleryImages) === 0) {
 						<form class="h-full flex flex-col" method="post" action="<?= esc_url(admin_url('admin-post.php')); ?>">
 							<input type="hidden" name="action" value="contact_form">
 							<input type="hidden" name="form_type" value="showroom">
+							<input type="hidden" name="form_source" value="page">
 							<?php wp_nonce_field('contact_form_nonce', 'contact_nonce'); ?>
 
 							<div class="flex flex-col gap-5">
@@ -844,9 +874,21 @@ if (count($galleryImages) === 0) {
 									Отправить заявку
 								</button>
 
-								<p class="text-white/40 text-xs text-left">
-									Согласен с обработкой персональных данных
-								</p>
+								<!-- Consent Checkboxes -->
+								<div class="space-y-3">
+									<label class="flex items-start gap-3 cursor-pointer group">
+										<input type="checkbox" name="consent_privacy" value="1" checked required class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+										<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
+											Согласен с <a href="<?= esc_url(home_url($privacyPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">обработкой персональных данных</a>
+										</span>
+									</label>
+									<label class="flex items-start gap-3 cursor-pointer group">
+										<input type="checkbox" name="consent_newsletter" value="1" class="mt-0.5 w-4 h-4 accent-primary cursor-pointer">
+										<span class="text-white/60 text-sm text-left group-hover:text-white/80 transition-colors">
+											Согласен на <a href="<?= esc_url(home_url($newsletterPolicyUrl)); ?>" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline" onclick="event.stopPropagation();">получение рассылок</a>
+										</span>
+									</label>
+								</div>
 							</div>
 						</form>
 					</div>
