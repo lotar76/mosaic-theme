@@ -266,16 +266,24 @@ function mosaic_benefits_page_render(): void {
 			e.preventDefault();
 			var index = $(this).data('index');
 
-			if (frames[index]) {
-				frames[index].open();
-				return;
-			}
-
-			frames[index] = wp.media({
+			if (!frames[index]) {
+				frames[index] = wp.media({
 				title: 'Выбрать изображение',
 				button: { text: 'Использовать' },
 				multiple: false,
 				library: { type: 'image' }
+			});
+
+			frames[index].on('open', function(){
+				var selection = frames[index].state().get('selection');
+				var existingId = parseInt($('#benefits_item_' + index + '_image_id').val());
+				if (existingId > 0) {
+					var att = wp.media.attachment(existingId);
+					att.fetch();
+					selection.reset([att]);
+				} else {
+					selection.reset([]);
+				}
 			});
 
 			frames[index].on('select', function(){
@@ -286,6 +294,7 @@ function mosaic_benefits_page_render(): void {
 				$('.benefits-upload-image[data-index="' + index + '"]').text('Изменить изображение');
 				$('.benefits-remove-image[data-index="' + index + '"]').show();
 			});
+			}
 
 			frames[index].open();
 		});

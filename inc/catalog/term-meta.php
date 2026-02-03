@@ -285,6 +285,17 @@ if (is_admin()) {
   $(document).on('click', '#mosaic-cat-image-select', function(e){
     e.preventDefault();
     frameImage = wp.media({ title: 'Выбрать картинку раздела', button: { text: 'Использовать' }, multiple: false, library: { type: 'image' } });
+    frameImage.on('open', function(){
+      var selection = frameImage.state().get('selection');
+      var existingId = parseInt($('#mosaic_cat_image_id').val());
+      if (existingId > 0) {
+        var att = wp.media.attachment(existingId);
+        att.fetch();
+        selection.reset([att]);
+      } else {
+        selection.reset([]);
+      }
+    });
     frameImage.on('select', function(){
       var a = frameImage.state().get('selection').first().toJSON();
       $('#mosaic_cat_image_id').val(a.id || 0);
@@ -301,6 +312,17 @@ if (is_admin()) {
   $(document).on('click', '#mosaic-cat-interior-image-select', function(e){
     e.preventDefault();
     frameInterior = wp.media({ title: 'Выбрать картинку в интерьере', button: { text: 'Использовать' }, multiple: false, library: { type: 'image' } });
+    frameInterior.on('open', function(){
+      var selection = frameInterior.state().get('selection');
+      var existingId = parseInt($('#mosaic_cat_interior_image_id').val());
+      if (existingId > 0) {
+        var att = wp.media.attachment(existingId);
+        att.fetch();
+        selection.reset([att]);
+      } else {
+        selection.reset([]);
+      }
+    });
     frameInterior.on('select', function(){
       var a = frameInterior.state().get('selection').first().toJSON();
       $('#mosaic_cat_interior_image_id').val(a.id || 0);
@@ -317,6 +339,17 @@ if (is_admin()) {
   $(document).on('click', '#mosaic-cat-video-select', function(e){
     e.preventDefault();
     frameVideo = wp.media({ title: 'Выбрать видео (mp4)', button: { text: 'Использовать' }, multiple: false, library: { type: 'video' } });
+    frameVideo.on('open', function(){
+      var selection = frameVideo.state().get('selection');
+      var existingId = parseInt($('#mosaic_cat_video_id').val());
+      if (existingId > 0) {
+        var att = wp.media.attachment(existingId);
+        att.fetch();
+        selection.reset([att]);
+      } else {
+        selection.reset([]);
+      }
+    });
     frameVideo.on('select', function(){
       var a = frameVideo.state().get('selection').first().toJSON();
       var maxBytes = __MOSAIC_MAX_VIDEO_BYTES__;

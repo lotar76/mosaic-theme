@@ -97,17 +97,22 @@ add_action('add_meta_boxes', static function (): void {
 			echo '<p class="description" style="margin-top:8px;">Загрузите PDF файл. При клике на проект на странице портфолио файл откроется в новой вкладке.</p>';
 			echo '</div>';
 
-			// Галерея
-			echo '<div class="mosaic-pf-gallery">';
-			echo '<div><strong>Галерея</strong> <span class="mosaic-pf-muted">(изображений: <span id="mosaic-pf-gallery-count">' . esc_html((string) count($galleryIds)) . '</span>)</span></div>';
-			echo '<input type="hidden" id="mosaic_pf_gallery_ids" name="mosaic_pf_gallery_ids" value="' . esc_attr(implode(',', array_map('intval', $galleryIds))) . '">';
-			echo '<div class="mosaic-pf-thumbs" id="mosaic-pf-gallery-thumbs">';
-			foreach ($galleryIds as $idx => $gid) {
+			// Галерея — фильтруем мёртвые ID (удалённые вложения)
+			$validGalleryIds = [];
+			foreach ($galleryIds as $gid) {
 				$src = (string) wp_get_attachment_image_url((int) $gid, 'thumbnail');
-				if ($src === '') {
-					continue;
+				if ($src !== '') {
+					$validGalleryIds[$gid] = $src;
 				}
-				$orderNum = $idx + 1;
+			}
+
+			echo '<div class="mosaic-pf-gallery">';
+			echo '<div><strong>Галерея</strong> <span class="mosaic-pf-muted">(изображений: <span id="mosaic-pf-gallery-count">' . esc_html((string) count($validGalleryIds)) . '</span>)</span></div>';
+			echo '<input type="hidden" id="mosaic_pf_gallery_ids" name="mosaic_pf_gallery_ids" value="' . esc_attr(implode(',', array_map('intval', array_keys($validGalleryIds)))) . '">';
+			echo '<div class="mosaic-pf-thumbs" id="mosaic-pf-gallery-thumbs">';
+			$orderNum = 0;
+			foreach ($validGalleryIds as $gid => $src) {
+				$orderNum++;
 				echo '<div class="mosaic-pf-thumb" data-id="' . esc_attr((string) $gid) . '">';
 				echo '<span class="mosaic-pf-thumb-order">' . esc_html((string) $orderNum) . '</span>';
 				echo '<button type="button" class="mosaic-pf-thumb-remove" title="Удалить">&times;</button>';
@@ -283,11 +288,22 @@ add_action('admin_enqueue_scripts', static function (string $hook): void {
   // Add images (append to existing)
   $(document).on('click', '#mosaic-pf-gallery-add', function(e){
     e.preventDefault();
+    var existingIds = parseIds($('#mosaic_pf_gallery_ids').val());
     addFrame = wp.media({
       title: 'Добавить изображения в галерею',
       button: { text: 'Добавить' },
       multiple: true,
       library: { type: 'image' }
+    });
+    addFrame.on('open', function(){
+      var selection = addFrame.state().get('selection');
+      existingIds.forEach(function(id){
+        if (id > 0) {
+          var att = wp.media.attachment(id);
+          att.fetch();
+          selection.add(att);
+        }
+      });
     });
     addFrame.on('select', function(){
       var selection = addFrame.state().get('selection').toArray();
@@ -300,20 +316,11 @@ add_action('admin_enqueue_scripts', static function (string $hook): void {
   // Replace entire gallery
   $(document).on('click', '#mosaic-pf-gallery-select', function(e){
     e.preventDefault();
-    var existingIds = parseIds($('#mosaic_pf_gallery_ids').val());
     frame = wp.media({
       title: 'Выбрать изображения галереи',
       button: { text: 'Использовать' },
       multiple: true,
       library: { type: 'image' }
-    });
-    frame.on('open', function(){
-      var selection = frame.state().get('selection');
-      existingIds.forEach(function(id){
-        var att = wp.media.attachment(id);
-        att.fetch();
-        selection.add(att);
-      });
     });
     frame.on('select', function(){
       var selection = frame.state().get('selection').toArray();

@@ -47,7 +47,7 @@ $content = $data['content'];
 				<div class="bg-gray p-8 min-[1280px]:p-12">
 					<div class="mb-8">
 						<h2 class="text-white text-[24px] md:text-[32px] min-[1280px]:text-[40px] leading-[110%] tracking-[-0.01em] font-normal mb-0">
-							Получить<br>консультацию
+							Обсудить<br>партнерство
 						</h2>
 						<div class="w-[70px] h-[6px] bg-primary mt-6"></div>
 					</div>

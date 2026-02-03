@@ -174,13 +174,13 @@ if (is_admin()) {
   var currentTarget = null;
   var currentMode = 'single';
 
+  function makeThumbHtml(id, url, target) {
+    return '<div class="mosaic-gallery-thumb" data-id="' + id + '"><img src="' + url + '"><button type="button" class="remove-thumb" data-target="' + target + '">&times;</button></div>';
+  }
+
   function openMedia(targetId, mode){
     currentTarget = targetId;
     currentMode = mode || 'single';
-
-    if (frame) {
-      frame.dispose();
-    }
 
     frame = wp.media({
       title: mode === 'gallery' ? 'Выбрать изображения' : 'Выбрать изображение',
@@ -202,7 +202,7 @@ if (is_admin()) {
         var $preview = $('#' + currentTarget + '_preview');
         $preview.empty();
         urls.forEach(function(url, i) {
-          $preview.append('<div class="mosaic-gallery-thumb" data-id="' + ids[i] + '"><img src="' + url + '"><button type="button" class="remove-thumb" data-target="' + currentTarget + '">&times;</button></div>');
+          $preview.append(makeThumbHtml(ids[i], url, currentTarget));
         });
         $preview.show();
       } else {
@@ -219,11 +219,68 @@ if (is_admin()) {
     frame.open();
   }
 
+  function addToGallery(targetId){
+    var existingIds = $('#' + targetId + '_ids').val()
+      ? $('#' + targetId + '_ids').val().split(',').map(Number).filter(Boolean)
+      : [];
+
+    var addFrame = wp.media({
+      title: 'Добавить изображения',
+      button: { text: 'Добавить' },
+      multiple: true,
+      library: { type: 'image' }
+    });
+
+    addFrame.on('open', function(){
+      var selection = addFrame.state().get('selection');
+      existingIds.forEach(function(id){
+        if (id > 0) {
+          var att = wp.media.attachment(id);
+          att.fetch();
+          selection.add(att);
+        }
+      });
+    });
+
+    addFrame.on('select', function(){
+      var selection = addFrame.state().get('selection').toJSON();
+      var $input = $('#' + targetId + '_ids');
+      var $preview = $('#' + targetId + '_preview');
+      var currentIds = $input.val() ? $input.val().split(',').map(Number).filter(Boolean) : [];
+
+      selection.forEach(function(a) {
+        if (currentIds.indexOf(a.id) === -1) {
+          currentIds.push(a.id);
+          $preview.append(makeThumbHtml(a.id, a.url, targetId));
+        }
+      });
+
+      $input.val(currentIds.join(','));
+      $preview.show();
+    });
+
+    addFrame.open();
+  }
+
   $(document).on('click', '.mosaic-image-select', function(e){
     e.preventDefault();
     var prefix = $(this).data('prefix');
     var mode = $(this).data('mode') || 'single';
     openMedia(prefix, mode);
+  });
+
+  $(document).on('click', '.mosaic-gallery-add', function(e){
+    e.preventDefault();
+    var prefix = $(this).data('prefix');
+    addToGallery(prefix);
+  });
+
+  $(document).on('click', '.mosaic-gallery-clear', function(e){
+    e.preventDefault();
+    var prefix = $(this).data('prefix');
+    if (!confirm('Очистить всю галерею?')) return;
+    $('#' + prefix + '_ids').val('');
+    $('#' + prefix + '_preview').empty();
   });
 
   $(document).on('click', '.mosaic-image-remove', function(e){
@@ -426,9 +483,11 @@ function mosaic_render_about_page_admin(): void {
 	}
 	echo '</div>';
 	echo '<div class="mosaic-actions">';
-	echo '<button type="button" class="button mosaic-image-select" data-prefix="gallery" data-mode="gallery">Выберите изображения</button>';
+	echo '<button type="button" class="button mosaic-gallery-add" data-prefix="gallery">Добавить изображения</button>';
+	echo '<button type="button" class="button mosaic-image-select" data-prefix="gallery" data-mode="gallery">Заменить всю галерею</button>';
+	echo '<button type="button" class="button mosaic-gallery-clear" data-prefix="gallery">Очистить</button>';
 	echo '</div>';
-	echo '<p class="mosaic-muted">Чтобы выделить несколько картинок нажмите shift. Изображения можно перетаскивать для изменения порядка.</p>';
+	echo '<p class="mosaic-muted">Изображения можно перетаскивать для изменения порядка. Удалить отдельное фото — кнопка &times; на миниатюре.</p>';
 	echo '</div>';
 
 	echo '</div></div>';

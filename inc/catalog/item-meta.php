@@ -63,6 +63,8 @@ add_action('add_meta_boxes', static function (): void {
 				.mosaic-ci-thumb.ui-sortable-placeholder { border:2px dashed #A36217; background:#fffdf2; }
 				.mosaic-ci-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
 				.mosaic-ci-thumb-order { position:absolute; top:2px; left:2px; background:#A36217; color:#fff; font-size:10px; font-weight:bold; padding:2px 4px; border-radius:3px; line-height:1; z-index:10; pointer-events:none; }
+				.mosaic-ci-thumb-remove { position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.6); color:#fff; font-size:14px; font-weight:bold; width:20px; height:20px; border-radius:50%; line-height:18px; text-align:center; cursor:pointer; z-index:10; border:none; padding:0; }
+				.mosaic-ci-thumb-remove:hover { background:#d63638; }
 				.mosaic-ci-actions { margin-top: 0; display:flex; gap: 8px; flex-wrap:wrap; }
 				.mosaic-ci-actions .button { border-radius: 10px; }
 				.mosaic-ci-muted { color: #7a7a7a; }
@@ -77,28 +79,36 @@ add_action('add_meta_boxes', static function (): void {
 			echo '<div class="mosaic-ci-grid">';
 
 			// Left: Gallery
+			// Фильтруем мёртвые ID (удалённые вложения)
+			$validGalleryIds = [];
+			foreach ($galleryIds as $gid) {
+				$src = (string) wp_get_attachment_image_url((int) $gid, 'thumbnail');
+				if ($src !== '') {
+					$validGalleryIds[$gid] = $src;
+				}
+			}
+
 			echo '<div>';
 			echo '<div class="mosaic-ci-gallery">';
-			echo '<div><strong>Галерея</strong> <span class="mosaic-ci-muted">(изображений: <span id="mosaic-ci-gallery-count">' . esc_html((string) count($galleryIds)) . '</span>)</span></div>';
-			echo '<input type="hidden" id="mosaic_ci_gallery_ids" name="mosaic_ci_gallery_ids" value="' . esc_attr(implode(',', array_map('intval', $galleryIds))) . '">';
+			echo '<div><strong>Галерея</strong> <span class="mosaic-ci-muted">(изображений: <span id="mosaic-ci-gallery-count">' . esc_html((string) count($validGalleryIds)) . '</span>)</span></div>';
+			echo '<input type="hidden" id="mosaic_ci_gallery_ids" name="mosaic_ci_gallery_ids" value="' . esc_attr(implode(',', array_map('intval', array_keys($validGalleryIds)))) . '">';
 			echo '<div class="mosaic-ci-thumbs" id="mosaic-ci-gallery-thumbs">';
-			foreach ($galleryIds as $idx => $gid) {
-				$src = (string) wp_get_attachment_image_url((int) $gid, 'thumbnail');
-				if ($src === '') {
-					continue;
-				}
-				$orderNum = $idx + 1;
+			$orderNum = 0;
+			foreach ($validGalleryIds as $gid => $src) {
+				$orderNum++;
 				echo '<div class="mosaic-ci-thumb" data-id="' . esc_attr((string) $gid) . '">';
 				echo '<span class="mosaic-ci-thumb-order">' . esc_html((string) $orderNum) . '</span>';
+				echo '<button type="button" class="mosaic-ci-thumb-remove" title="Удалить">&times;</button>';
 				echo '<img src="' . esc_url($src) . '" alt="">';
 				echo '</div>';
 			}
 			echo '</div>';
 			echo '<div class="mosaic-ci-actions">';
-			echo '<button type="button" class="button" id="mosaic-ci-gallery-select">Выбрать галерею</button>';
+			echo '<button type="button" class="button button-primary" id="mosaic-ci-gallery-add">Добавить изображения</button>';
+			echo '<button type="button" class="button" id="mosaic-ci-gallery-select">Заменить всю галерею</button>';
 			echo '<button type="button" class="button" id="mosaic-ci-gallery-clear">Очистить</button>';
 			echo '</div>';
-			echo '<p class="description" style="margin-top:8px;">Выбирай несколько изображений. Первая будет превью в списках/на главной.</p>';
+			echo '<p class="description" style="margin-top:8px;">Первое изображение будет превью в списках/на главной. Перетаскивайте для изменения порядка.</p>';
 			echo '</div>';
 			echo '</div>';
 
@@ -431,6 +441,7 @@ add_action('admin_enqueue_scripts', static function (string $hook): void {
       }
     });
     $('#mosaic_ci_gallery_ids').val(ids.join(','));
+    $('#mosaic-ci-gallery-count').text(String(ids.length));
   }
 
   function initGallerySortable(){
@@ -459,6 +470,7 @@ add_action('admin_enqueue_scripts', static function (string $hook): void {
         var orderNum = idx + 1;
         html += '<div class="mosaic-ci-thumb" data-id="'+m.id+'">';
         html += '<span class="mosaic-ci-thumb-order">'+orderNum+'</span>';
+        html += '<button type="button" class="mosaic-ci-thumb-remove" title="Удалить">&times;</button>';
         html += '<img src="' + url + '" alt="">';
         html += '</div>';
       });
@@ -468,22 +480,66 @@ add_action('admin_enqueue_scripts', static function (string $hook): void {
     updateGalleryOrder();
   }
 
-  $(document).on('click', '#mosaic-ci-gallery-select', function(e){
+  function addToGallery(newIds, newSelection){
+    var existingIds = parseIds($('#mosaic_ci_gallery_ids').val());
+    var $thumbs = $('#mosaic-ci-gallery-thumbs');
+
+    newSelection.forEach(function(m){
+      if (existingIds.indexOf(m.id) !== -1) return;
+      existingIds.push(m.id);
+      var json = m.toJSON();
+      var url = (json.sizes && json.sizes.thumbnail && json.sizes.thumbnail.url) ? json.sizes.thumbnail.url : (json.url || '');
+      if (!url) return;
+      var orderNum = existingIds.length;
+      var html = '<div class="mosaic-ci-thumb" data-id="'+m.id+'">';
+      html += '<span class="mosaic-ci-thumb-order">'+orderNum+'</span>';
+      html += '<button type="button" class="mosaic-ci-thumb-remove" title="Удалить">&times;</button>';
+      html += '<img src="' + url + '" alt="">';
+      html += '</div>';
+      $thumbs.append(html);
+    });
+
+    $('#mosaic_ci_gallery_ids').val(existingIds.join(','));
+    $('#mosaic-ci-gallery-count').text(String(existingIds.length));
+    initGallerySortable();
+  }
+
+  // Add images (append to existing)
+  $(document).on('click', '#mosaic-ci-gallery-add', function(e){
     e.preventDefault();
     var existingIds = parseIds($('#mosaic_ci_gallery_ids').val());
+    var addFrame = wp.media({
+      title: 'Добавить изображения в галерею',
+      button: { text: 'Добавить' },
+      multiple: true,
+      library: { type: 'image' }
+    });
+    addFrame.on('open', function(){
+      var selection = addFrame.state().get('selection');
+      existingIds.forEach(function(id){
+        if (id > 0) {
+          var att = wp.media.attachment(id);
+          att.fetch();
+          selection.add(att);
+        }
+      });
+    });
+    addFrame.on('select', function(){
+      var selection = addFrame.state().get('selection').toArray();
+      var ids = selection.map(function(m){ return m.id; }).filter(Boolean);
+      addToGallery(ids, selection);
+    });
+    addFrame.open();
+  });
+
+  // Replace entire gallery
+  $(document).on('click', '#mosaic-ci-gallery-select', function(e){
+    e.preventDefault();
     frame = wp.media({
       title: 'Выбрать изображения галереи',
       button: { text: 'Использовать' },
       multiple: true,
       library: { type: 'image' }
-    });
-    frame.on('open', function(){
-      var selection = frame.state().get('selection');
-      existingIds.forEach(function(id){
-        var att = wp.media.attachment(id);
-        att.fetch();
-        selection.add(att);
-      });
     });
     frame.on('select', function(){
       var selection = frame.state().get('selection').toArray();
@@ -495,7 +551,16 @@ add_action('admin_enqueue_scripts', static function (string $hook): void {
 
   $(document).on('click', '#mosaic-ci-gallery-clear', function(e){
     e.preventDefault();
+    if (!confirm('Очистить всю галерею?')) return;
     setGallery([], []);
+  });
+
+  // Remove single image
+  $(document).on('click', '.mosaic-ci-thumb-remove', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).closest('.mosaic-ci-thumb').remove();
+    updateGalleryOrder();
   });
 
   // Initialize sortable on page load
