@@ -66,7 +66,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                                         id="product-main-image"
                                         src="<?= esc_url($mainImageUrl); ?>"
                                         alt="<?= esc_attr($title); ?>"
-                                        class="block w-[328px] h-[400px] object-cover md:w-[490px] md:h-[560px] min-[1280px]:w-[700px] min-[1280px]:h-[860px]"
+                                        class="block w-[302px] h-[302px] object-cover md:w-[395px] md:h-[395px] min-[1280px]:w-[562px] min-[1280px]:h-[562px]"
                                         loading="eager"
                                         decoding="async"
                                     >
@@ -115,7 +115,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
 
                         <!-- Thumbnails Carousel -->
 						<?php if (count($galleryIds) > 1) : ?>
-                            <div class="relative w-[328px] md:w-[490px] min-[1280px]:w-[700px]" data-thumb-carousel>
+                            <div class="relative w-[302px] md:w-[395px] min-[1280px]:w-[562px]" data-thumb-carousel>
                                 <!-- Carousel Container -->
                                 <div class="overflow-hidden" data-thumb-viewport>
                                     <div class="flex gap-2 transition-transform duration-300 ease-out" data-thumb-track>
