@@ -53,7 +53,7 @@ $q = new WP_Query([
 
 	<?php if ($termDescription !== '') : ?>
         <!-- Category Description Block (без фона, белый текст) -->
-        <section class="bg-black">
+        <section class="bg-black pb-[40px]">
             <div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
                 <div class="text3 text-white max-w-none">
 					<?= wp_kses_post(wpautop($termDescription)); ?>
@@ -63,10 +63,10 @@ $q = new WP_Query([
 	<?php endif; ?>
 
     <!-- Catalog Items Grid -->
-    <section class="bg-black pb-[80px] min-[1280px]:pb-[100px]">
-        <div class="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 min-[1920px]:px-[100px]">
+    <section class="bg-black pb-[80px] min-[1280px]:pb-[100px]" data-catalog>
+        <div class="mx-auto w-full" data-catalog-inner>
 			<?php if ($q->have_posts()) : ?>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 min-[1280px]:grid-cols-4 gap-6">
+                <div data-catalog-grid>
 					<?php
 					$keys = function_exists('mosaic_catalog_item_meta_keys') ? mosaic_catalog_item_meta_keys() : [];
 					$kGallery = (string) ($keys['gallery_ids'] ?? '_mosaic_catalog_gallery_ids');
@@ -89,24 +89,24 @@ $q = new WP_Query([
 						?>
                         <a
                             href="<?= esc_url($url); ?>"
-                            class="group bg-black block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-black"
+                            class="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-black"
                             tabindex="0"
                             aria-label="<?= esc_attr($title); ?>"
+                            data-catalog-card
                         >
-                            <!-- Card Image: 408x520px на desktop, адаптивно на меньших экранах -->
-                            <div class="w-full h-[320px] md:h-[420px] min-[1280px]:h-[520px] overflow-hidden bg-gray/20">
+                            <div class="bg-gray/20" data-catalog-media>
 								<?php if ($thumb !== '') : ?>
                                     <img
                                         src="<?= esc_url($thumb); ?>"
                                         alt="<?= esc_attr($title); ?>"
-                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                                         loading="lazy"
                                         decoding="async"
                                     >
 								<?php endif; ?>
                             </div>
-                            <div class="py-6">
-                                <div class="text-white text-lg text-left hover:text-primary transition-colors"><?= esc_html($title); ?></div>
+                            <div class="mt-3 md:mt-4" data-catalog-meta>
+                                <span data-catalog-caption><?= esc_html($title); ?></span>
                             </div>
                         </a>
 					<?php endwhile; ?>
@@ -121,8 +121,8 @@ $q = new WP_Query([
 							'total' => $q->max_num_pages,
 							'current' => $paged,
 							'format' => '?paged=%#%',
-							'prev_text' => '← Назад',
-							'next_text' => 'Вперёд →',
+							'prev_text' => '&larr; Назад',
+							'next_text' => 'Вперёд &rarr;',
 							'type' => 'array',
 							'end_size' => 2,
 							'mid_size' => 2,
