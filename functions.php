@@ -37,3 +37,7 @@ require_once __DIR__ . '/inc/admin/partnership-page.php';
 
 // Contact form handler
 require_once __DIR__ . '/inc/contact-handler.php';
+
+// 301 Редиректы (фронтенд + админ)
+require_once __DIR__ . '/inc/redirects.php';
+require_once __DIR__ . '/inc/admin/redirects.php';
