@@ -80,7 +80,7 @@ add_action('init', static function (): void {
 		'menu_icon' => 'dashicons-screenoptions',
 		'menu_position' => 56, // Позиция в админ-меню (перед "Баннер на главной" = 57)
 
-		'supports' => ['title', 'thumbnail'],
+		'supports' => ['title', 'thumbnail', 'page-attributes'],
 
 		'has_archive' => false,
 		'show_in_rest' => true,

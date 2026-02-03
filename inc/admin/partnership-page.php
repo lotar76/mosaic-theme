@@ -55,8 +55,8 @@ if (is_admin()) {
 		}
 
 		$hook = add_menu_page(
-			'Партнерская программа',
-			'Партнерская программа',
+			'Партнеры',
+			'Партнеры',
 			'edit_theme_options',
 			'mosaic-partnership-page',
 			'mosaic_render_partnership_page_admin',

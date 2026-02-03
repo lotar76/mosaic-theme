@@ -72,19 +72,6 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                                     >
 								<?php endif; ?>
 
-                                <!-- Fullscreen Button -->
-                                <button
-                                    type="button"
-                                    id="gallery-fullscreen-btn"
-                                    class="absolute top-4 right-4 w-10 h-10 bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
-                                    aria-label="Открыть на весь экран"
-                                    tabindex="0"
-                                >
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-                                    </svg>
-                                </button>
-
                                 <!-- Navigation Arrows -->
 								<?php if (count($galleryIds) > 1) : ?>
                                     <button
@@ -449,7 +436,7 @@ if (count($galleryIds) > 0) :
 	var nextBtn = document.getElementById('gallery-next');
 	var fullscreenModal = document.getElementById('gallery-fullscreen-modal');
 	var fullscreenImg = document.getElementById('gallery-fullscreen-image');
-	var fullscreenBtn = document.getElementById('gallery-fullscreen-btn');
+	var mainContainer = document.getElementById('gallery-main-container');
 	var fullscreenClose = document.getElementById('gallery-fullscreen-close');
 	var fullscreenPrev = document.getElementById('gallery-fullscreen-prev');
 	var fullscreenNext = document.getElementById('gallery-fullscreen-next');
@@ -521,9 +508,9 @@ if (count($galleryIds) > 0) :
 		});
 	}
 
-	if (fullscreenBtn) {
-		fullscreenBtn.addEventListener('click', function(e) {
-			e.stopPropagation();
+	if (mainContainer) {
+		mainContainer.addEventListener('click', function(e) {
+			if (e.target.closest('#gallery-prev') || e.target.closest('#gallery-next')) return;
 			openFullscreen();
 		});
 	}
@@ -534,9 +521,8 @@ if (count($galleryIds) > 0) :
 
 	if (fullscreenModal) {
 		fullscreenModal.addEventListener('click', function(e) {
-			if (e.target === fullscreenModal) {
-				closeFullscreen();
-			}
+			if (e.target.closest('#gallery-fullscreen-image') || e.target.closest('button')) return;
+			closeFullscreen();
 		});
 	}
 
@@ -558,10 +544,19 @@ if (count($galleryIds) > 0) :
 		});
 	}
 
-	// Close on Escape key
+	// Keyboard navigation in fullscreen
 	document.addEventListener('keydown', function(e) {
-		if (e.key === 'Escape' && fullscreenModal && !fullscreenModal.classList.contains('hidden')) {
-			closeFullscreen();
+		if (!fullscreenModal || fullscreenModal.classList.contains('hidden')) return;
+		if (e.key === 'Escape') closeFullscreen();
+		if (e.key === 'ArrowLeft') {
+			var idx = currentIndex - 1;
+			if (idx < 0) idx = galleryUrls.length - 1;
+			updateFullscreenImage(idx);
+		}
+		if (e.key === 'ArrowRight') {
+			var idx = currentIndex + 1;
+			if (idx >= galleryUrls.length) idx = 0;
+			updateFullscreenImage(idx);
 		}
 	});
 

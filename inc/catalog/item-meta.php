@@ -760,6 +760,7 @@ add_filter('manage_product_posts_columns', static function (array $columns): arr
 	$newColumns['title'] = 'Название';
 	$newColumns['mosaic_slug'] = 'Slug';
 	$newColumns['taxonomy-product_section'] = 'Раздел';
+	$newColumns['mosaic_order'] = 'Порядок';
 	$newColumns['date'] = $columns['date'] ?? 'Дата';
 
 	return $newColumns;
@@ -801,6 +802,13 @@ add_action('manage_product_posts_custom_column', static function (string $column
 				echo '<code style="background:#f6f7f7;padding:2px 6px;border-radius:3px;font-size:12px;">' . esc_html($post->post_name) . '</code>';
 			}
 			break;
+
+		case 'mosaic_order':
+			$post = get_post($postId);
+			if ($post instanceof WP_Post) {
+				echo (int) $post->menu_order;
+			}
+			break;
 	}
 }, 10, 2);
 
@@ -809,6 +817,7 @@ add_action('manage_product_posts_custom_column', static function (string $column
  */
 add_filter('manage_edit-product_sortable_columns', static function (array $columns): array {
 	$columns['mosaic_slug'] = 'name'; // Сортировка по post_name
+	$columns['mosaic_order'] = 'menu_order'; // Сортировка по порядку
 	return $columns;
 });
 
@@ -830,6 +839,10 @@ add_action('admin_head', static function (): void {
 		}
 		.column-taxonomy-product_section {
 			width: 150px;
+		}
+		.column-mosaic_order {
+			width: 80px;
+			text-align: center;
 		}
 		/* Выравниваем изображение по центру в ячейке */
 		.wp-list-table .column-mosaic_thumb {

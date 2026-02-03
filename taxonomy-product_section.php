@@ -21,6 +21,7 @@ $q = new WP_Query([
 	'post_type' => 'product',
 	'posts_per_page' => 16,
 	'paged' => $paged,
+	'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
 	'tax_query' => $term
 		? [
 			[
