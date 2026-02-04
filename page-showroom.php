@@ -169,7 +169,7 @@ if (count($galleryImages) === 0) {
 					<!-- Navigation Arrows (только если >1 фото) -->
 					<button
 						type="button"
-						class="showroom-hero-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10"
+						class="showroom-hero-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-primary hover:brightness-110 hover:scale-110 transition-all text-white z-10"
 						aria-label="Предыдущий слайд"
 						data-showroom-hero-prev
 					>
@@ -179,7 +179,7 @@ if (count($galleryImages) === 0) {
 					</button>
 					<button
 						type="button"
-						class="showroom-hero-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10"
+						class="showroom-hero-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-primary hover:brightness-110 hover:scale-110 transition-all text-white z-10"
 						aria-label="Следующий слайд"
 						data-showroom-hero-next
 					>
@@ -396,7 +396,7 @@ if (count($galleryImages) === 0) {
 						<!-- Navigation Arrows -->
 						<button
 							type="button"
-							class="collections-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+							class="collections-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-primary hover:brightness-110 hover:scale-110 transition-all text-white z-10 max-[1279px]:hidden"
 							aria-label="Предыдущий слайд"
 							data-collections-prev
 						>
@@ -406,7 +406,7 @@ if (count($galleryImages) === 0) {
 						</button>
 						<button
 							type="button"
-							class="collections-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+							class="collections-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-primary hover:brightness-110 hover:scale-110 transition-all text-white z-10 max-[1279px]:hidden"
 							aria-label="Следующий слайд"
 							data-collections-next
 						>
@@ -513,7 +513,7 @@ if (count($galleryImages) === 0) {
 						<!-- Navigation Arrows -->
 						<button
 							type="button"
-							class="events-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+							class="events-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-primary hover:brightness-110 hover:scale-110 transition-all text-white z-10 max-[1279px]:hidden"
 							aria-label="Предыдущий слайд"
 							data-events-prev
 						>
@@ -523,7 +523,7 @@ if (count($galleryImages) === 0) {
 						</button>
 						<button
 							type="button"
-							class="events-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10 max-[1279px]:hidden"
+							class="events-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-primary hover:brightness-110 hover:scale-110 transition-all text-white z-10 max-[1279px]:hidden"
 							aria-label="Следующий слайд"
 							data-events-next
 						>

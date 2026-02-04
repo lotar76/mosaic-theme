@@ -77,7 +77,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                                     <button
                                         type="button"
                                         id="gallery-prev"
-                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 text-primary hover:scale-110 hover:brightness-110 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
                                         aria-label="Предыдущее изображение"
                                         tabindex="0"
                                     >
@@ -88,7 +88,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                                     <button
                                         type="button"
                                         id="gallery-next"
-                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:scale-110 hover:brightness-110 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
                                         aria-label="Следующее изображение"
                                         tabindex="0"
                                     >
@@ -137,7 +137,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                                 <!-- Navigation Arrows -->
                                 <button
                                     type="button"
-                                    class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-2 text-white/60 hover:text-white transition-colors hidden"
+                                    class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-2 text-primary/80 hover:text-primary hover:scale-110 transition-all hidden"
                                     aria-label="Предыдущие превью"
                                     data-thumb-prev
                                 >
@@ -147,7 +147,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                                 </button>
                                 <button
                                     type="button"
-                                    class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full pl-2 text-white/60 hover:text-white transition-colors hidden"
+                                    class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full pl-2 text-primary/80 hover:text-primary hover:scale-110 transition-all hidden"
                                     aria-label="Следующие превью"
                                     data-thumb-next
                                 >

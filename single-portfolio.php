@@ -85,7 +85,7 @@ if (!empty($terms) && !is_wp_error($terms)) {
 							<button
 								type="button"
 								id="gallery-prev"
-								class="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
+								class="absolute left-4 top-1/2 -translate-y-1/2 text-primary hover:scale-110 hover:brightness-110 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
 								aria-label="Предыдущее изображение"
 								tabindex="0"
 							>
@@ -96,7 +96,7 @@ if (!empty($terms) && !is_wp_error($terms)) {
 							<button
 								type="button"
 								id="gallery-next"
-								class="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
+								class="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:scale-110 hover:brightness-110 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
 								aria-label="Следующее изображение"
 								tabindex="0"
 							>

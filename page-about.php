@@ -154,7 +154,7 @@ if ($video['url'] !== '') {
 					<!-- Navigation Arrows -->
 					<button
 						type="button"
-						class="about-gallery-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10"
+						class="about-gallery-prev absolute left-4 min-[1280px]:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-primary hover:brightness-110 hover:scale-110 transition-all text-white z-10"
 						aria-label="Предыдущий слайд"
 						data-about-gallery-prev
 					>
@@ -164,7 +164,7 @@ if ($video['url'] !== '') {
 					</button>
 					<button
 						type="button"
-						class="about-gallery-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-primary transition-colors text-white z-10"
+						class="about-gallery-next absolute right-4 min-[1280px]:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-primary hover:brightness-110 hover:scale-110 transition-all text-white z-10"
 						aria-label="Следующий слайд"
 						data-about-gallery-next
 					>
