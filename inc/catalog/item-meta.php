@@ -853,5 +853,256 @@ add_action('admin_head', static function (): void {
 			font-weight: 600;
 		}
 	</style>';
+
+	// --- Стили режима сортировки ---
+	$isSortMode = isset($_GET['show_all']) && $_GET['show_all'] === '1';
+	if ($isSortMode) {
+		echo '<style>
+			.mosaic-sort-active {
+				background: #2271b1 !important;
+				color: #fff !important;
+				border-color: #2271b1 !important;
+			}
+			#the-list tr {
+				cursor: grab;
+			}
+			#the-list tr:active {
+				cursor: grabbing;
+			}
+			#the-list tr .mosaic-grip {
+				display: inline-block;
+				width: 18px;
+				text-align: center;
+				color: #999;
+				font-size: 16px;
+				line-height: 1;
+				vertical-align: middle;
+				margin-right: 4px;
+				cursor: grab;
+			}
+			#the-list tr:active .mosaic-grip {
+				cursor: grabbing;
+			}
+			#the-list .ui-sortable-placeholder {
+				visibility: visible !important;
+				background: #f0f6fc !important;
+				border: 2px dashed #2271b1 !important;
+			}
+			#the-list tr.ui-sortable-helper {
+				background: #fff;
+				box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+			}
+			.mosaic-sort-notice {
+				display: inline-block;
+				margin-left: 10px;
+				padding: 4px 10px;
+				background: #f0f6fc;
+				border: 1px solid #2271b1;
+				border-radius: 4px;
+				color: #2271b1;
+				font-size: 12px;
+				vertical-align: middle;
+			}
+			.mosaic-sort-saving {
+				display: none;
+				margin-left: 8px;
+				color: #d63638;
+				font-size: 12px;
+				vertical-align: middle;
+			}
+			.mosaic-sort-saving.is-active {
+				display: inline-block;
+			}
+		</style>';
+	}
+});
+
+/**
+ * Кнопка «Режим сортировки» над таблицей товаров
+ */
+add_action('restrict_manage_posts', static function (string $postType): void {
+	if ($postType !== 'product') {
+		return;
+	}
+
+	// Скрываем при поиске
+	if (!empty($_GET['s'])) {
+		return;
+	}
+
+	$isSortMode = isset($_GET['show_all']) && $_GET['show_all'] === '1';
+	$baseUrl = admin_url('edit.php?post_type=product');
+
+	if ($isSortMode) {
+		$url = $baseUrl;
+		$label = 'Выйти из сортировки';
+		$class = 'button mosaic-sort-active';
+	} else {
+		$url = add_query_arg(['show_all' => '1', 'orderby' => 'menu_order', 'order' => 'asc'], $baseUrl);
+		$label = 'Режим сортировки';
+		$class = 'button';
+	}
+
+	echo '<a href="' . esc_url($url) . '" class="' . esc_attr($class) . '" style="margin-left:8px;">' . esc_html($label) . '</a>';
+
+	if ($isSortMode) {
+		echo '<span class="mosaic-sort-notice">Перетаскивайте строки для изменения порядка</span>';
+		echo '<span class="mosaic-sort-saving" id="mosaic-sort-saving">Сохранение…</span>';
+	}
+});
+
+/**
+ * Серверная логика: показать все товары в режиме сортировки, по умолчанию сортировка по menu_order
+ */
+add_action('pre_get_posts', static function (WP_Query $query): void {
+	if (!is_admin() || !$query->is_main_query()) {
+		return;
+	}
+
+	// get_current_screen() ещё недоступен в pre_get_posts, проверяем через GET
+	$postType = $_GET['post_type'] ?? '';
+	if ($postType !== 'product') {
+		return;
+	}
+
+	// Режим «Показать все»
+	if (isset($_GET['show_all']) && $_GET['show_all'] === '1') {
+		$query->set('posts_per_page', -1);
+		$query->set('orderby', 'menu_order');
+		$query->set('order', 'ASC');
+		return;
+	}
+
+	// По умолчанию сортировка по menu_order, если пользователь не задал другую
+	if (empty($_GET['orderby'])) {
+		$query->set('orderby', 'menu_order');
+		$query->set('order', 'ASC');
+	}
+});
+
+/**
+ * AJAX: сохранение нового порядка товаров
+ */
+add_action('wp_ajax_mosaic_catalog_reorder', static function (): void {
+	check_ajax_referer('mosaic_catalog_reorder', 'nonce');
+
+	if (!current_user_can('edit_posts')) {
+		wp_send_json_error(['message' => 'Нет прав'], 403);
+	}
+
+	$order = $_POST['order'] ?? [];
+	if (!is_array($order) || count($order) === 0) {
+		wp_send_json_error(['message' => 'Пустой массив']);
+	}
+
+	global $wpdb;
+	foreach ($order as $index => $postId) {
+		$postId = absint($postId);
+		if ($postId > 0) {
+			$wpdb->update(
+				$wpdb->posts,
+				['menu_order' => (int) $index],
+				['ID' => $postId],
+				['%d'],
+				['%d']
+			);
+		}
+	}
+
+	wp_send_json_success();
+});
+
+/**
+ * Подключение jquery-ui-sortable заранее (до печати скриптов)
+ */
+add_action('admin_enqueue_scripts', static function (string $hook): void {
+	if ($hook !== 'edit.php') {
+		return;
+	}
+	$postType = $_GET['post_type'] ?? '';
+	$isSortMode = $postType === 'product' && isset($_GET['show_all']) && $_GET['show_all'] === '1';
+	if (!$isSortMode) {
+		return;
+	}
+	wp_enqueue_script('jquery-ui-sortable');
+});
+
+/**
+ * JS для drag-and-drop (только в режиме сортировки)
+ */
+add_action('admin_footer', static function (): void {
+	$screen = get_current_screen();
+	if (!$screen || $screen->id !== 'edit-product') {
+		return;
+	}
+
+	$isSortMode = isset($_GET['show_all']) && $_GET['show_all'] === '1';
+	if (!$isSortMode) {
+		return;
+	}
+
+	$nonce = wp_create_nonce('mosaic_catalog_reorder');
+	$ajaxUrl = admin_url('admin-ajax.php');
+	?>
+	<script>
+	jQuery(function($){
+		var $list = $('#the-list');
+		if (!$list.length) return;
+
+		// Добавляем grip-иконку в каждую строку (перед миниатюрой)
+		$list.find('tr').each(function(){
+			$(this).find('.column-mosaic_thumb').prepend('<span class="mosaic-grip">&#9776;</span>');
+		});
+
+		// Инициализация sortable
+		$list.sortable({
+			items: 'tr',
+			axis: 'y',
+			opacity: 0.65,
+			cursor: 'grabbing',
+			placeholder: 'ui-sortable-placeholder',
+			tolerance: 'pointer',
+			helper: function(e, tr) {
+				// Сохраняем ширину колонок при перетаскивании
+				var $originals = tr.children();
+				var $helper = tr.clone();
+				$helper.children().each(function(index){
+					$(this).width($originals.eq(index).width());
+				});
+				return $helper;
+			},
+			stop: function(){
+				var order = [];
+				$list.find('tr[id^="post-"]').each(function(idx){
+					var id = this.id.replace('post-', '');
+					order.push(id);
+					// Обновляем номер в колонке «Порядок»
+					$(this).find('.column-mosaic_order').text(String(idx));
+				});
+
+				var $saving = $('#mosaic-sort-saving');
+				$saving.addClass('is-active').text('Сохранение…');
+
+				$.post(<?php echo wp_json_encode($ajaxUrl); ?>, {
+					action: 'mosaic_catalog_reorder',
+					nonce: <?php echo wp_json_encode($nonce); ?>,
+					order: order
+				}).done(function(res){
+					if (res.success) {
+						$saving.text('Сохранено!').css('color', '#00a32a');
+						setTimeout(function(){ $saving.removeClass('is-active').css('color', ''); }, 1500);
+					} else {
+						$saving.text('Ошибка сохранения').css('color', '#d63638');
+						setTimeout(function(){ $saving.removeClass('is-active').css('color', ''); }, 3000);
+					}
+				}).fail(function(){
+					$saving.text('Ошибка сети').css('color', '#d63638');
+					setTimeout(function(){ $saving.removeClass('is-active').css('color', ''); }, 3000);
+				});
+			}
+		});
+	});
+	</script>
+	<?php
 });
 
