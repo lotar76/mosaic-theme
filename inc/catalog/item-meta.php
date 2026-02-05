@@ -931,23 +931,27 @@ add_action('restrict_manage_posts', static function (string $postType): void {
 	}
 
 	$isSortMode = isset($_GET['show_all']) && $_GET['show_all'] === '1';
+	$section = $_GET['product_section'] ?? '';
+	$hasSection = $section !== '' && $section !== '0';
 	$baseUrl = admin_url('edit.php?post_type=product');
+
+	// Сохраняем текущий фильтр по разделу
+	if ($hasSection) {
+		$baseUrl = add_query_arg('product_section', $section, $baseUrl);
+	}
 
 	if ($isSortMode) {
 		$url = $baseUrl;
 		$label = 'Выйти из сортировки';
 		$class = 'button mosaic-sort-active';
-	} else {
-		$url = add_query_arg(['show_all' => '1', 'orderby' => 'menu_order', 'order' => 'asc'], $baseUrl);
-		$label = 'Режим сортировки';
-		$class = 'button';
-	}
-
-	echo '<a href="' . esc_url($url) . '" class="' . esc_attr($class) . '" style="margin-left:8px;">' . esc_html($label) . '</a>';
-
-	if ($isSortMode) {
+		echo '<a href="' . esc_url($url) . '" class="' . esc_attr($class) . '" style="margin-left:8px;">' . esc_html($label) . '</a>';
 		echo '<span class="mosaic-sort-notice">Перетаскивайте строки для изменения порядка</span>';
 		echo '<span class="mosaic-sort-saving" id="mosaic-sort-saving">Сохранение…</span>';
+	} elseif ($hasSection) {
+		$url = add_query_arg(['show_all' => '1', 'orderby' => 'menu_order', 'order' => 'asc'], $baseUrl);
+		echo '<a href="' . esc_url($url) . '" class="button" style="margin-left:8px;">Режим сортировки</a>';
+	} else {
+		echo '<span class="button disabled" style="margin-left:8px;opacity:0.5;cursor:not-allowed;" title="Сначала выберите раздел">Режим сортировки</span>';
 	}
 });
 
