@@ -66,7 +66,7 @@ $mainImageUrl = $mainImageId > 0 ? (string) wp_get_attachment_image_url($mainIma
                                         id="product-main-image"
                                         src="<?= esc_url($mainImageUrl); ?>"
                                         alt="<?= esc_attr($title); ?>"
-                                        class="block w-[302px] h-[302px] object-cover md:w-[395px] md:h-[395px] min-[1280px]:w-[562px] min-[1280px]:h-[562px]"
+                                        class="block w-[302px] h-[302px] object-contain md:w-[395px] md:h-[395px] min-[1280px]:w-[562px] min-[1280px]:h-[562px]"
                                         loading="eager"
                                         decoding="async"
                                     >
